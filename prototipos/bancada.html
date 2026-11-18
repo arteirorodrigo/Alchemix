@@ -1,0 +1,314 @@
+<title>Bancada do Alquimista</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  @font-face { font-family: 'Pixelify Sans'; src: url('PixelifySans.woff2') format('woff2'); font-weight: 400 700; font-display: swap; }
+  /* Teste rápido: esvaziar a bancada combinando vizinhos na ordem certa. Visual do protótipo (pixel art, papel creme, borda escura). */
+  :root {
+    --sky: #7fc4ea; --ink: #2f1f2b; --paper: #f6ecd2; --paper-shade: #d9c49a;
+    --grass: #6cc24a; --grass-shade: #3f8f3a; --blue: #4aa3e0; --blue-shade: #2a6db5;
+    --orange: #f2b134; --orange-shade: #c46a1c; --berry: #e2566b; --berry-shade: #9c2f3f;
+    --wood: #8a5a3b; --wood-dark: #5e3a26; --muted: #7a5a44;
+    --display: 'Pixelify Sans', ui-monospace, monospace;
+    color-scheme: light;
+  }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--sky) url('img/fundo-vila.webp') center / cover no-repeat fixed; color: var(--ink); font-family: var(--display);
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); box-sizing: border-box; overflow: hidden; -webkit-tap-highlight-color: transparent; user-select: none; }
+  .app { height: 100%; max-width: 440px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; padding-block: 12px; box-sizing: border-box; }
+  .box { background: var(--paper); border: 3px solid var(--ink); box-shadow: 0 4px 0 var(--ink); }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .btn { font-family: var(--display); font-size: 16px; font-weight: 700; color: #fff; border: 3px solid var(--ink); padding: 10px 12px; cursor: pointer; text-shadow: 0 2px 0 var(--ink); min-height: 48px; }
+  .btn:active { transform: translateY(2px); }
+  .btn:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+  .btn.paper { background: var(--paper); color: var(--ink); text-shadow: none; box-shadow: 0 4px 0 var(--paper-shade), 0 4px 0 1px var(--ink); }
+  .btn.green { background: var(--grass); box-shadow: 0 4px 0 var(--grass-shade); }
+  .btn.orange { background: var(--orange); box-shadow: 0 4px 0 var(--orange-shade); }
+  .btn.berry { background: var(--berry); box-shadow: 0 4px 0 var(--berry-shade); }
+  .title { background: var(--grass); color: #fff; text-shadow: 0 3px 0 var(--ink); font-size: 24px; padding: 6px 18px; border: 3px solid var(--ink); box-shadow: 0 4px 0 var(--grass-shade); }
+  .hud { display: flex; padding: 8px 10px; gap: 8px; align-items: center; justify-content: space-between; }
+  .hud .lbl { font-size: 11px; letter-spacing: .08em; color: var(--muted); }
+  .hud .val { font-size: 22px; }
+  .shelf { display: flex; gap: 4px; flex-wrap: wrap; min-height: 34px; align-items: center; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .chip { display: flex; align-items: center; gap: 2px; padding: 3px 6px; font-size: 14px; }
+  .chip .ico { width: 22px; height: 22px; font-size: 18px; }
+  .chip.final { background: #fff6d6; }
+  .boardwrap { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; }
+  .board { background: var(--wood); border: 3px solid var(--ink); box-shadow: 0 5px 0 var(--ink), inset 0 6px 0 var(--grass); padding: 14px 8px 8px; display: grid; gap: 6px; }
+  .cell { width: var(--cs); height: var(--cs); background: var(--wood-dark); display: flex; align-items: center; justify-content: center; position: relative; }
+  .tile { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--ink); background: var(--t, #eee); box-shadow: inset 0 -5px 0 rgba(0,0,0,.18); cursor: pointer; transition: transform .12s; }
+  .tile.sel { outline: 4px solid #fff; outline-offset: -2px; transform: scale(1.06); z-index: 2; }
+  .tile.can { animation: pulse 1s ease-in-out infinite; }
+  .tile.hint { outline: 4px dashed var(--orange); outline-offset: -2px; }
+  .tile[data-h]::after { content: attr(data-h); position: absolute; top: -8px; right: -8px; background: var(--orange); color: #fff; border: 2px solid var(--ink); font-size: 14px; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; text-shadow: 0 1px 0 var(--ink); }
+  .tile { position: relative; }
+  .tile.pop { animation: pop .35s ease-out; }
+  .tile.leave { animation: leave .45s ease-in forwards; }
+  .ico { width: 70%; height: 70%; display: flex; align-items: center; justify-content: center; font-size: calc(var(--cs) * .5); line-height: 1; image-rendering: pixelated; }
+  .ico img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+  @keyframes pulse { 50% { filter: brightness(1.12); } }
+  @keyframes pop { 0% { transform: scale(.4); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
+  @keyframes leave { to { transform: translateY(-80px) scale(.3); opacity: 0; } }
+  .foot { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .foot .btn { font-size: 15px; padding: 8px 6px; }
+  .btn.paper.on { background: var(--orange); color: #fff; text-shadow: 0 2px 0 var(--ink); }
+  .warn { display: none; padding: 6px 10px; font-size: 14px; background: #fff1d6; text-align: center; }
+  .warn.show { display: block; }
+  body.trashing .tile { outline: 3px dashed var(--berry); outline-offset: -3px; }
+  .toast { position: fixed; left: 50%; bottom: calc(110px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); padding: 10px 14px; font-size: 16px; z-index: 20; max-width: 90%; text-align: center; }
+  .modal { position: fixed; inset: 0; background: rgba(34, 20, 30, .6); display: flex; align-items: center; justify-content: center; z-index: 30; padding: 16px; }
+  .card { padding: 18px; text-align: center; display: flex; flex-direction: column; gap: 12px; width: min(340px, 100%); }
+  .card h2 { margin: 0; font-size: 26px; }
+  .card p { margin: 0; font-size: 16px; color: var(--muted); }
+  .card img { width: 90px; margin: 0 auto; image-rendering: pixelated; }
+  @media (prefers-reduced-motion: reduce) { .tile, .tile.can, .tile.pop, .tile.leave { animation: none; transition: none; } }
+</style>
+
+<div class="app">
+  <div class="top">
+    <button class="btn paper" id="restart" aria-label="Recomeçar fase">↺</button>
+    <div class="title" id="title">Fase 1</div>
+    <div style="display:flex;gap:6px"><button class="btn paper" id="help" aria-label="Como jogar">?</button><button class="btn paper" id="skip" aria-label="Pular fase">⏭</button></div>
+  </div>
+  <div class="box hud">
+    <div><div class="lbl">NA BANCADA</div><div class="val" id="left">0</div></div>
+    <div style="flex:1;min-width:0"><div class="lbl">PRATELEIRA</div><div class="shelf" id="shelf"></div></div>
+  </div>
+  <div class="box warn" id="warn">⚠️ Do jeito que está, não dá mais para limpar tudo. Desfaça ou use a lixeira — ou termine com sobras.</div>
+  <div class="legend" id="legend"></div>
+  <div class="boardwrap"><div class="board" id="board"></div></div>
+  <div class="foot">
+    <button class="btn berry" id="undo">Desfazer</button>
+    <button class="btn paper" id="trashb">🗑️ Lixeira</button>
+    <button class="btn orange" id="hintb">Dica</button>
+  </div>
+</div>
+<div class="box toast" id="toast" hidden></div>
+<div class="modal" id="modal" hidden><div class="box card" id="card"></div></div>
+
+<script>
+(() => {
+  // ---------- dados ----------
+  const EL = {
+    agua: ['Água', '💧', 'agua', '#cde8f8'], pedra: ['Pedra', '🪨', 'pedra', '#dfe1e8'], fogo: ['Fogo', '🔥', 'fogo', '#fde3b0'],
+    broto: ['Broto', '🌱', 'planta', '#d6f0c4'], barro: ['Barro', '🟤', 'barro', '#ecd9c0'], tijolo: ['Tijolo', '🧱', 'tijolo', '#f2cdbd'],
+    vapor: ['Vapor', '☁️', 'vapor', '#f1f6fb'], flor: ['Flor', '🌸', 'flor', '#f8dbe6'], casinha: ['Casinha', '🏠', 'casinha', '#fbeeb8'],
+    arcoiris: ['Arco-íris', '🌈', 'arcoiris', '#d6f2f2'], lava: ['Lava', '🌋', null, '#f7c3a6'], obsidiana: ['Obsidiana', '🖤', null, '#d6d0dc'],
+    cinza: ['Cinza', '⚫', null, '#dedad6'], sabao: ['Sabão', '🧼', null, '#e2f1fb'], nuvem: ['Nuvem', '🌥️', null, '#eef2f7'],
+    chuva: ['Chuva', '🌧️', null, '#d5e4f3'], musgo: ['Musgo', '🍀', null, '#d4ecc7'], pantano: ['Pântano', '🐸', null, '#cfe3c2'],
+    sol: ['Sol', '☀️', null, '#fdeeb0'], areia: ['Areia', '🏜️', null, '#f4e2bd'], vidro: ['Vidro', '🔷', null, '#d9ecf8'], vaso: ['Vaso', '🏺', null, '#efd6bf'],
+  };
+  const R = (a, b, r) => ({ a, b, r });
+  const RECIPES = [
+    R('agua','pedra','barro'), R('barro','fogo','tijolo'), R('agua','fogo','vapor'), R('broto','agua','flor'),
+    R('flor','vapor','arcoiris'), R('fogo','pedra','lava'), R('lava','agua','obsidiana'), R('tijolo','tijolo','casinha'),
+    R('broto','fogo','cinza'), R('cinza','agua','sabao'), R('vapor','vapor','nuvem'), R('nuvem','agua','chuva'),
+    R('broto','pedra','musgo'), R('musgo','agua','pantano'), R('fogo','fogo','sol'), R('sol','pedra','areia'),
+    R('areia','fogo','vidro'), R('barro','barro','vaso'),
+  ];
+  // receitas que cada fase traz (cumulativo); depois da 12 sorteia entre todas
+  const INTRO = [[0], [1], [2], [3], [4], [5, 6], [7], [8, 9], [10, 11], [12, 13], [14, 15, 16], [17]];
+
+  // ---------- rng ----------
+  const rngOf = (seed) => { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
+  const pick = (rng, xs) => xs[Math.floor(rng() * xs.length)];
+  const shuffle = (rng, xs) => { const a = xs.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+  // ---------- regras ----------
+  function makeRules(active) {
+    const find = (x, y) => active.find(r => (r.a === x && r.b === y) || (r.a === y && r.b === x));
+    const ingredients = new Set(active.flatMap(r => [r.a, r.b]));
+    const isFinal = (e) => !ingredients.has(e);
+    return { find, isFinal };
+  }
+  const nbrs = (i, R, C) => { const r = Math.floor(i / C), c = i % C, o = []; if (r > 0) o.push(i - C); if (r < R - 1) o.push(i + C); if (c > 0) o.push(i - 1); if (c < C - 1) o.push(i + 1); return o; };
+  // jogada: toca `a` e depois `b` → a some, resultado em b (sai se for final)
+  function moves(cells, R, C, rules) {
+    const out = [];
+    for (let a = 0; a < cells.length; a++) if (cells[a]) for (const b of nbrs(a, R, C)) if (cells[b] && rules.find(cells[a], cells[b])) out.push([a, b]);
+    return out;
+  }
+  function apply(cells, [a, b], rules) {
+    const r = rules.find(cells[a], cells[b]).r; const n = cells.slice(); n[a] = null; n[b] = rules.isFinal(r) ? null : r;
+    return { cells: n, result: r, collected: rules.isFinal(r) };
+  }
+  const empty = (cells) => cells.every(x => !x);
+  function solve(cells, R, C, rules, budget = 60000) {
+    const memo = new Map(); let nodes = 0, out = false;
+    const go = (c) => {
+      if (empty(c)) return [];
+      const k = c.join(','); if (memo.has(k)) return memo.get(k);
+      if (++nodes > budget) { out = true; return null; }
+      memo.set(k, null);
+      for (const m of moves(c, R, C, rules)) { const s = go(apply(c, m, rules).cells); if (s) { const res = [m, ...s]; memo.set(k, res); return res; } if (out) return null; }
+      return null;
+    };
+    const r = go(cells);
+    return r ?? (out ? undefined : null);
+  }
+  function flexibility(cells, R, C, rules) {
+    const ms = moves(cells, R, C, rules); if (!ms.length) return 0;
+    let ok = 0; for (const m of ms) if (solve(apply(cells, m, rules).cells, R, C, rules, 8000) !== null) ok++;
+    return ok / ms.length;
+  }
+  function randomWinRate(cells, R, C, rules, rng, runs) {
+    let wins = 0;
+    for (let k = 0; k < runs; k++) { let c = cells; for (;;) { const ms = moves(c, R, C, rules); if (!ms.length) break; c = apply(c, pick(rng, ms), rules).cells; } if (empty(c)) wins++; }
+    return wins / runs;
+  }
+
+  // ---------- gerador (de trás para frente) ----------
+  function genLevel(n) {
+    const pool = [];
+    for (let i = 0; i < Math.min(n, INTRO.length); i++) pool.push(...INTRO[i]);
+    const size = n <= 2 ? [3, 3] : n <= 8 ? [4, 4] : [5, 4];
+    const target = Math.min(4 + n, 14);
+    const maxRate = n <= 4 ? 1 : 0.5;
+    const minFlex = n <= 6 ? 0.5 : 0.34;
+    let best = null;
+    for (let seed = 0; seed < 300; seed++) {
+      const rng = rngOf(n * 7919 + seed);
+      const ids = n > INTRO.length ? shuffle(rng, RECIPES.map((_, i) => i)).slice(0, 6) : pool.slice(-6);
+      const active = ids.map(i => RECIPES[i]);
+      const rules = makeRules(active);
+      const [Rr, C] = size;
+      const cells = Array(Rr * C).fill(null);
+      const produced = new Set(active.map(r => r.r));
+      const finals = [...produced].filter(e => rules.isFinal(e));
+      if (!finals.length) continue;
+      // coloca 1–2 produtos finais e desmonta até o tamanho alvo
+      // enche a bancada: desmonta enquanto houver casa vazia; se nada puder ser desmontado, coloca outro produto final
+      let guard = 0;
+      while (guard++ < 400) {
+        const mustSplit = cells.map((v, i) => v && rules.isFinal(v) ? i : -1).filter(i => i >= 0);
+        const freeCells = cells.map((v, i) => v ? -1 : i).filter(i => i >= 0);
+        if (!mustSplit.length && !freeCells.length) break;
+        let cand = (mustSplit.length ? mustSplit : cells.map((v, i) => v && produced.has(v) ? i : -1).filter(i => i >= 0))
+          .filter(i => nbrs(i, Rr, C).some(j => !cells[j]));
+        if (!cand.length && !mustSplit.length) {
+          const spots = freeCells.filter(i => nbrs(i, Rr, C).some(j => !cells[j]));
+          if (!spots.length) break;
+          cells[pick(rng, spots)] = pick(rng, finals); continue;
+        }
+        if (!cand.length) break;
+        const i = pick(rng, cand);
+        const opts = active.filter(r => r.r === cells[i]);
+        const rec = pick(rng, opts);
+        const j = pick(rng, nbrs(i, Rr, C).filter(j => !cells[j]));
+        const [x, y] = rng() < 0.5 ? [rec.a, rec.b] : [rec.b, rec.a];
+        cells[j] = x; cells[i] = y; // forward: toca j depois i → resultado em i
+      }
+      if (cells.some(v => v && rules.isFinal(v))) continue;
+      if (!solve(cells, Rr, C, rules)) continue;
+      if (cells.filter(Boolean).length < Rr * C - 1) continue;
+      const rate = randomWinRate(cells, Rr, C, rules, rngOf(seed + 99), 120);
+      const cnt = cells.filter(Boolean).length;
+      const flex = flexibility(cells, Rr, C, rules);
+      const score = cnt + flex * 6 - rate * 4;
+      if (!best || score > best.score) best = { cells, R: Rr, C, active, rate, flex, score };
+      if (rate <= maxRate && flex >= minFlex) return best;
+    }
+    return best;
+  }
+
+  // ---------- estado / tela ----------
+  const $ = (id) => document.getElementById(id);
+  const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+  let level = Number(store.get('bancada.level')) || 1;
+  let L, cells, rules, history, shelf, sel = null, hint = null, busy = false, trash = 1, trashMode = false;
+
+  function ico(e) {
+    const d = EL[e]; const span = document.createElement('div'); span.className = 'ico';
+    if (d && d[2]) { const im = document.createElement('img'); im.src = 'img/' + d[2] + '.png'; im.alt = d[0]; span.append(im); } else span.textContent = d ? d[1] : '?';
+    return span;
+  }
+  function start(n) {
+    level = n; store.set('bancada.level', String(n));
+    L = genLevel(n); window.__L = L; rules = makeRules(L.active); cells = L.cells.slice(); history = []; shelf = []; sel = null; hint = null; trash = 1; trashMode = false;
+    $('title').textContent = 'Fase ' + n;
+    const leg = $('legend'); leg.textContent = '';
+    for (const r of L.active) {
+      const c = document.createElement('div'); c.className = 'box chip' + (rules.isFinal(r.r) ? ' final' : '');
+      c.append(ico(r.a), '+', ico(r.b), '=', ico(r.r)); c.title = `${EL[r.a][0]} + ${EL[r.b][0]} = ${EL[r.r][0]}${rules.isFinal(r.r) ? ' (vai para a prateleira)' : ''}`;
+      leg.append(c);
+    }
+    render();
+    if (n === 1 && !store.get('bancada.seen')) { store.set('bancada.seen', '1'); showHelp(); }
+  }
+  function cellSize() {
+    const w = Math.min(window.innerWidth - 32, 440) - 22, h = window.innerHeight * 0.48;
+    return Math.max(52, Math.min(92, Math.floor(Math.min((w - (L.C - 1) * 6) / L.C, (h - (L.R - 1) * 6) / L.R))));
+  }
+  function render(popAt = -1) {
+    const b = $('board'); b.textContent = ''; b.style.gridTemplateColumns = `repeat(${L.C}, auto)`; b.style.setProperty('--cs', cellSize() + 'px');
+    const can = sel !== null ? new Set(nbrs(sel, L.R, L.C).filter(j => cells[j] && rules.find(cells[sel], cells[j]))) : new Set();
+    cells.forEach((e, i) => {
+      const cell = document.createElement('div'); cell.className = 'cell';
+      if (e) {
+        const t = document.createElement('button'); t.className = 'tile'; t.style.setProperty('--t', EL[e][3]); t.setAttribute('aria-label', EL[e][0]);
+        if (i === sel) t.classList.add('sel'); if (can.has(i)) t.classList.add('can'); if (hint && hint.includes(i)) { t.classList.add('hint'); t.dataset.h = hint[0] === i ? '1' : '2'; } if (i === popAt) t.classList.add('pop');
+        t.append(ico(e)); t.onclick = () => tap(i); cell.append(t);
+      }
+      b.append(cell);
+    });
+    $('left').textContent = cells.filter(Boolean).length;
+    const sh = $('shelf'); sh.textContent = ''; for (const e of shelf) { const s = ico(e); s.style.width = s.style.height = '30px'; s.style.fontSize = '24px'; sh.append(s); }
+    $('undo').disabled = !history.length; $('undo').style.opacity = history.length ? 1 : .5;
+    $('trashb').textContent = `🗑️ Lixeira (${trash})`; $('trashb').classList.toggle('on', trashMode); $('trashb').style.opacity = trash ? 1 : .5;
+    document.body.classList.toggle('trashing', trashMode);
+    $('warn').classList.toggle('show', !empty(cells) && solve(cells, L.R, L.C, rules, 20000) === null);
+  }
+  function toast(msg, ms = 2200) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, ms); }
+  function tap(i) {
+    if (busy) return;
+    hint = null;
+    if (trashMode) { history.push({ cells, shelf, trash }); const n2 = cells.slice(); n2[i] = null; cells = n2; trash--; trashMode = false; sel = null; render(); after(); return; }
+    if (sel === null || sel === i) { sel = sel === i ? null : i; render(); return; }
+    if (!nbrs(sel, L.R, L.C).includes(i) || !rules.find(cells[sel], cells[i])) {
+      if (nbrs(sel, L.R, L.C).includes(i)) toast(`${EL[cells[sel]][0]} e ${EL[cells[i]][0]} não reagem`);
+      sel = i; render(); return;
+    }
+    const m = [sel, i]; history.push({ cells, shelf, trash }); const res = apply(cells, m, rules); sel = null;
+    if (res.collected) {
+      busy = true; const tmp = cells.slice(); tmp[m[0]] = null; tmp[m[1]] = res.result; cells = tmp; render(m[1]);
+      setTimeout(() => { const el = $('board').children[m[1]].firstChild; if (el) el.classList.add('leave'); }, 280);
+      setTimeout(() => { cells = res.cells; shelf = [...shelf, res.result]; busy = false; render(); after(); }, 720);
+    } else { cells = res.cells; render(m[1]); after(); }
+  }
+  function after() {
+    if (empty(cells)) return win(0);
+    if (moves(cells, L.R, L.C, rules).length) return;
+    const left = cells.filter(Boolean).length;
+    if (left <= 2) return win(left);
+    modal(`<h2>Travou!</h2><p>Sobraram ${left} peças sem par. Você passa se sobrarem até 2.</p><button class="btn berry" data-a="undo">Desfazer</button>${trash ? '<button class="btn paper" data-a="trash">🗑️ Usar a lixeira</button>' : ''}<button class="btn paper" data-a="restart">Recomeçar</button>`);
+  }
+  function win(left) {
+    const stars = left === 0 ? '⭐⭐⭐' : left === 1 ? '⭐⭐' : '⭐';
+    const title = left === 0 ? 'Bancada limpa!' : `Passou! Sobr${left === 1 ? 'ou 1 peça' : 'aram 2 peças'}`;
+    modal(`<img src="img/mascote-frasco.png" alt=""><h2>${title}</h2><p style="font-size:30px">${stars}</p><p>${shelf.map(e => EL[e][1]).join(' ')}</p><button class="btn green" data-a="next">Próxima fase</button>${left ? '<button class="btn paper" data-a="restart">Tentar limpar tudo</button>' : ''}`);
+  }
+  function modal(html) {
+    $('card').innerHTML = html; $('modal').hidden = false;
+    $('card').querySelectorAll('[data-a]').forEach(b => b.onclick = () => { $('modal').hidden = true; ({ undo: doUndo, restart: () => start(level), next: () => start(level + 1), close: () => {}, trash: () => { trashMode = true; render(); toast('Toque na peça que quer jogar fora'); } })[b.dataset.a](); });
+  }
+  function showHelp() {
+    modal(`<h2>Como jogar</h2><p>Toque num elemento e depois num vizinho que reage com ele (veja as receitas acima do tabuleiro).</p><p>O primeiro some e o resultado aparece no lugar do segundo. Produtos finais vão para a prateleira.</p><p><b>Esvazie a bancada</b> para 3 estrelas. Sobrou 1 ou 2 peças sem par? Você passa com menos estrelas. Errou? Desfaça ou use a lixeira.</p><button class="btn green" data-a="close">Entendi</button>`);
+  }
+  function doUndo() { if (!history.length) return; const h = history.pop(); cells = h.cells; shelf = h.shelf; trash = h.trash ?? trash; trashMode = false; sel = null; hint = null; render(); }
+  $('undo').onclick = doUndo;
+  $('restart').onclick = () => start(level);
+  $('help').onclick = showHelp;
+  $('skip').onclick = () => start(level + 1);
+  $('trashb').onclick = () => { if (!trash || busy) return; trashMode = !trashMode; sel = null; render(); if (trashMode) toast('Toque na peça que quer jogar fora'); };
+  $('hintb').onclick = () => {
+    const s = solve(cells, L.R, L.C, rules, 200000);
+    if (s === null) { toast('Daqui não dá para limpar tudo — desfaça ou use a lixeira'); return; }
+    if (!s) { toast('Hmm, essa está difícil até para mim — tente outra combinação'); return; }
+    hint = s[0]; sel = null; render();
+    toast(`Toque em ${EL[cells[s[0][0]]][0]} e depois em ${EL[cells[s[0][1]]][0]}`);
+  };
+  window.addEventListener('resize', () => render());
+  start(level);
+})();
+</script>

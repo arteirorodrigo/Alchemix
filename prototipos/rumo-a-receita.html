@@ -1,0 +1,262 @@
+<meta charset="utf-8">
+<title>Rumo à Receita</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  @font-face { font-family: 'Pixelify Sans'; src: url('PixelifySans.woff2') format('woff2'); font-weight: 400 700; font-display: swap; }
+  /* Teste: objetivo final + tabuleiro sempre cheio + descobrir receitas com toques limitados. Visual do protótipo. */
+  :root {
+    --sky: #7fc4ea; --ink: #2f1f2b; --paper: #f6ecd2; --paper-shade: #d9c49a;
+    --grass: #6cc24a; --grass-shade: #3f8f3a; --orange: #f2b134; --orange-shade: #c46a1c;
+    --berry: #e2566b; --berry-shade: #9c2f3f; --blue: #4aa3e0; --blue-shade: #2a6db5;
+    --wood: #8a5a3b; --wood-dark: #5e3a26; --muted: #7a5a44;
+    --display: 'Pixelify Sans', ui-monospace, monospace;
+    color-scheme: light;
+  }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--sky) url('img/fundo-vila.webp') center / cover no-repeat fixed; color: var(--ink); font-family: var(--display);
+    padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); box-sizing: border-box; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
+  .app { height: 100%; max-width: 440px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; padding-block: 10px; box-sizing: border-box; }
+  .box { background: var(--paper); border: 3px solid var(--ink); box-shadow: 0 4px 0 var(--ink); }
+  .btn { font-family: var(--display); font-size: 15px; font-weight: 700; color: #fff; border: 3px solid var(--ink); padding: 8px 10px; cursor: pointer; text-shadow: 0 2px 0 var(--ink); min-height: 46px; }
+  .btn:active { transform: translateY(2px); }
+  .btn:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+  .btn.paper { background: var(--paper); color: var(--ink); text-shadow: none; box-shadow: 0 4px 0 var(--paper-shade); }
+  .btn.green { background: var(--grass); box-shadow: 0 4px 0 var(--grass-shade); }
+  .btn.orange { background: var(--orange); box-shadow: 0 4px 0 var(--orange-shade); }
+  .btn.blue { background: var(--blue); box-shadow: 0 4px 0 var(--blue-shade); }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .title { background: var(--grass); color: #fff; text-shadow: 0 3px 0 var(--ink); font-size: 22px; padding: 6px 14px; border: 3px solid var(--ink); box-shadow: 0 4px 0 var(--grass-shade); }
+  .goal { display: flex; align-items: center; gap: 10px; padding: 8px 10px; }
+  .goal .lbl { font-size: 11px; letter-spacing: .08em; color: var(--muted); }
+  .goal .big { width: 54px; height: 54px; flex: none; }
+  .tree { display: flex; align-items: center; gap: 4px; font-size: 18px; flex-wrap: wrap; }
+  .slot { width: 34px; height: 34px; border: 2px dashed var(--muted); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--muted); }
+  .slot.ok { border-style: solid; border-color: var(--ink); background: #fff; }
+  .taps { margin-left: auto; text-align: center; }
+  .taps .val { font-size: 26px; }
+  .queue { display: flex; align-items: center; gap: 6px; padding: 4px 8px; font-size: 13px; color: var(--muted); }
+  .queue .q { width: 30px; height: 30px; border: 2px solid var(--ink); display: flex; align-items: center; justify-content: center; }
+  .boardwrap { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; }
+  .board { background: var(--wood); border: 3px solid var(--ink); box-shadow: 0 5px 0 var(--ink), inset 0 6px 0 var(--grass); padding: 12px 6px 6px; display: grid; gap: 5px; }
+  .tile { width: var(--cs); height: var(--cs); display: flex; align-items: center; justify-content: center; border: 2px solid var(--ink); background: var(--t, #eee); box-shadow: inset 0 -5px 0 rgba(0,0,0,.18); cursor: pointer; padding: 0; position: relative; transition: transform .12s; }
+  .tile.sel { outline: 4px solid #fff; outline-offset: -2px; transform: scale(1.07); z-index: 2; }
+  .tile.hint { outline: 4px dashed var(--orange); outline-offset: -2px; }
+  .tile.pop { animation: pop .35s ease-out; }
+  .tile.boom { animation: boom .35s ease-out; }
+  .tile.drop { animation: drop .3s ease-out; }
+  .ico { width: 72%; height: 72%; display: flex; align-items: center; justify-content: center; font-size: calc(var(--cs, 40px) * .5); line-height: 1; }
+  .ico img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+  @keyframes pop { 0% { transform: scale(.4); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
+  @keyframes boom { 0% { transform: scale(1.3) rotate(-8deg); filter: brightness(2); } 100% { transform: none; } }
+  @keyframes drop { 0% { transform: translateY(-30px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+  .foot { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); padding: 10px 14px; font-size: 16px; z-index: 20; max-width: 88%; text-align: center; }
+  .modal { position: fixed; inset: 0; background: rgba(34, 20, 30, .6); display: flex; align-items: center; justify-content: center; z-index: 30; padding: 16px; }
+  .card { padding: 16px; text-align: center; display: flex; flex-direction: column; gap: 10px; width: min(360px, 100%); max-height: 85vh; overflow: auto; }
+  .card h2 { margin: 0; font-size: 24px; }
+  .card p { margin: 0; font-size: 15px; color: var(--muted); }
+  .card .mascot { width: 84px; margin: 0 auto; image-rendering: pixelated; }
+  .book { display: grid; grid-template-columns: 1fr; gap: 6px; text-align: left; }
+  .book .row { display: flex; align-items: center; gap: 4px; font-size: 15px; padding: 4px 6px; background: #fff8e6; border: 2px solid var(--ink); }
+  .book .row .ico { width: 26px; height: 26px; font-size: 20px; }
+  @media (prefers-reduced-motion: reduce) { .tile, .tile.pop, .tile.boom, .tile.drop { animation: none; transition: none; } }
+</style>
+
+<div class="app">
+  <div class="top">
+    <button class="btn paper" id="restart" aria-label="Recomeçar">↺</button>
+    <div class="title" id="title">Fase 1</div>
+    <div style="display:flex;gap:6px"><button class="btn paper" id="help" aria-label="Como jogar">?</button><button class="btn paper" id="skip" aria-label="Pular fase">⏭</button></div>
+  </div>
+  <div class="box goal">
+    <div class="ico big" id="goalIco"></div>
+    <div style="min-width:0">
+      <div class="lbl">OBJETIVO</div>
+      <div class="tree" id="tree"></div>
+    </div>
+    <div class="taps"><div class="lbl" style="font-size:11px;color:var(--muted)">TOQUES</div><div class="val" id="taps">0</div><div id="lives" style="font-size:16px;letter-spacing:1px"></div></div>
+  </div>
+  <div class="box queue"><span>Próximas:</span><div id="queue" style="display:flex;gap:6px"></div><span style="margin-left:auto" id="found"></span></div>
+  <div class="boardwrap"><div class="board" id="board"></div></div>
+  <div class="foot">
+    <button class="btn blue" id="bookb">📖 Receitas</button>
+    <button class="btn orange" id="hintb">💡 Dica</button>
+    <button class="btn green" id="more">+5 toques</button>
+  </div>
+</div>
+<div class="box toast" id="toast" hidden></div>
+<div class="modal" id="modal" hidden><div class="box card" id="card"></div></div>
+
+<script>
+(() => {
+  const EL = {
+    agua: ['Água', '💧', 'agua', '#cde8f8'], pedra: ['Pedra', '🪨', 'pedra', '#dfe1e8'], fogo: ['Fogo', '🔥', 'fogo', '#fde3b0'],
+    broto: ['Broto', '🌱', 'planta', '#d6f0c4'], barro: ['Barro', '🟤', 'barro', '#ecd9c0'], tijolo: ['Tijolo', '🧱', 'tijolo', '#f2cdbd'],
+    vapor: ['Vapor', '☁️', 'vapor', '#f1f6fb'], flor: ['Flor', '🌸', 'flor', '#f8dbe6'], casinha: ['Casinha', '🏠', 'casinha', '#fbeeb8'],
+    arcoiris: ['Arco-íris', '🌈', 'arcoiris', '#d6f2f2'], lava: ['Lava', '🌋', null, '#f7c3a6'], obsidiana: ['Obsidiana', '🖤', null, '#d6d0dc'],
+    cinza: ['Cinza', '⚫', null, '#dedad6'], sabao: ['Sabão', '🧼', null, '#e2f1fb'], nuvem: ['Nuvem', '🌥️', null, '#eef2f7'],
+    chuva: ['Chuva', '🌧️', null, '#d5e4f3'], musgo: ['Musgo', '🍀', null, '#d4ecc7'], pantano: ['Pântano', '🐸', null, '#cfe3c2'],
+    sol: ['Sol', '☀️', null, '#fdeeb0'], areia: ['Areia', '🏜️', null, '#f4e2bd'], vidro: ['Vidro', '🔷', null, '#d9ecf8'], vaso: ['Vaso', '🏺', null, '#efd6bf'],
+    lago: ['Lago', '🏞️', null, '#cfe6f2'], montanha: ['Montanha', '⛰️', null, '#e2e0dc'], arbusto: ['Arbusto', '🌿', null, '#cfeac0'],
+    arvore: ['Árvore', '🌳', null, '#cde8bf'], minerio: ['Minério', '🪙', null, '#efe2b8'], metal: ['Metal', '⚙️', null, '#dde2e8'],
+  };
+  const BASE = ['agua', 'pedra', 'fogo', 'broto'];
+  const R = (a, b, r) => ({ a, b, r, k: [a, b].sort().join('+') });
+  const RECIPES = [
+    R('agua','pedra','barro'), R('agua','fogo','vapor'), R('broto','agua','flor'), R('fogo','pedra','lava'), R('broto','pedra','musgo'),
+    R('broto','fogo','cinza'), R('agua','agua','lago'), R('pedra','pedra','montanha'), R('fogo','fogo','sol'), R('broto','broto','arbusto'),
+    R('barro','fogo','tijolo'), R('flor','vapor','arcoiris'), R('vapor','vapor','nuvem'), R('lava','agua','obsidiana'), R('lava','pedra','minerio'),
+    R('sol','pedra','areia'), R('cinza','agua','sabao'), R('musgo','agua','pantano'), R('tijolo','tijolo','casinha'), R('nuvem','agua','chuva'),
+    R('arbusto','chuva','arvore'), R('areia','fogo','vidro'), R('minerio','fogo','metal'), R('barro','barro','vaso'),
+  ];
+  const find = (x, y) => RECIPES.find(r => (r.a === x && r.b === y) || (r.a === y && r.b === x));
+  const producer = (e) => RECIPES.find(r => r.r === e);
+  // objetivos em ordem de dificuldade
+  const GOALS = ['barro', 'vapor', 'flor', 'lava', 'tijolo', 'sabao', 'arcoiris', 'obsidiana', 'nuvem', 'areia', 'minerio', 'casinha', 'vaso', 'chuva', 'vidro', 'metal', 'arvore'];
+
+  const rngOf = (seed) => { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
+  const pick = (rng, xs) => xs[Math.floor(rng() * xs.length)];
+
+  // folhas (elementos base) e passos necessários para fazer `e`
+  function leaves(e, out = []) { const p = producer(e); if (!p || BASE.includes(e)) out.push(e); else { leaves(p.a, out); leaves(p.b, out); } return out; }
+  const steps = (e) => leaves(e).length - 1;
+
+  const $ = (id) => document.getElementById(id);
+  const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+  let level = Number(store.get('receita.level')) || 1;
+  let known = new Set(JSON.parse(store.get('receita.book') || '[]'));
+  let G, cells, queue, rng, taps, lives = 3, sel = null, busy = false, hint = null, seenEls;
+  const ROWS = 6, COLS = 5;
+
+  function ico(e) {
+    const d = EL[e]; const s = document.createElement('div'); s.className = 'ico';
+    if (d && d[2]) { const im = document.createElement('img'); im.src = 'img/' + d[2] + '.png'; im.alt = d[0]; s.append(im); } else s.textContent = d ? d[1] : '?';
+    return s;
+  }
+  // peça "útil": folha do objetivo que está em falta no tabuleiro
+  function helpful() {
+    const need = leaves(G.goal); const have = {}; for (const c of cells) if (c) have[c] = (have[c] || 0) + 1;
+    const cnt = {}; for (const l of need) cnt[l] = (cnt[l] || 0) + 1;
+    const short = Object.keys(cnt).filter(l => (have[l] || 0) < cnt[l] + 1);
+    return short.length ? pick(rng, short) : pick(rng, need);
+  }
+  function nextPiece() { queue.push(rng() < 0.55 ? pick(rng, leaves(G.goal)) : pick(rng, BASE)); return queue.shift(); }
+
+  function start(n) {
+    level = n; store.set('receita.level', String(n));
+    const goal = GOALS[(n - 1) % GOALS.length];
+    rng = rngOf(n * 104729 + 7);
+    G = { goal, need: steps(goal) };
+    cells = Array.from({ length: ROWS * COLS }, () => rng() < 0.5 ? pick(rng, leaves(goal)) : pick(rng, BASE));
+    queue = [0, 0, 0].map(() => rng() < 0.55 ? pick(rng, leaves(goal)) : pick(rng, BASE));
+    taps = G.need + 4 + Math.ceil(G.need * 0.8);
+    sel = null; hint = null; busy = false; lives = 3; seenEls = new Set(cells);
+    $('title').textContent = 'Fase ' + n;
+    render();
+    if (n === 1 && !store.get('receita.seen')) { store.set('receita.seen', '1'); help(); }
+  }
+  function slotFor(e, revealed) {
+    const s = document.createElement('div'); s.className = 'slot' + (revealed ? ' ok' : '');
+    if (revealed) s.append(ico(e)); else s.textContent = '?'; s.title = revealed ? EL[e][0] : 'ainda não descoberto';
+    return s;
+  }
+  function renderTree() {
+    // os ingredientes de uma receita só aparecem depois que você descobre essa receita
+    const t = $('tree'); t.textContent = '';
+    const p = producer(G.goal); const kp = known.has(p.k);
+    t.append(slotFor(p.a, kp), '+', slotFor(p.b, kp));
+    for (const part of [p.a, p.b]) {
+      const q = producer(part); if (!q || BASE.includes(part)) continue;
+      const kq = known.has(q.k);
+      const w = document.createElement('span'); w.style.width = '100%'; w.style.height = '0'; t.append(w);
+      t.append(slotFor(part, kp || kq), '=', slotFor(q.a, kq), '+', slotFor(q.b, kq));
+    }
+  }
+  function cs() { const w = Math.min(window.innerWidth - 24, 440) - 18, h = window.innerHeight * 0.5; return Math.max(44, Math.min(76, Math.floor(Math.min((w - (COLS - 1) * 5) / COLS, (h - (ROWS - 1) * 5) / ROWS)))); }
+  function render(fx = {}) {
+    $('goalIco').textContent = ''; $('goalIco').append(ico(G.goal)); $('goalIco').title = EL[G.goal][0];
+    renderTree();
+    $('taps').textContent = taps; $('lives').textContent = '❤️'.repeat(lives) + '🤍'.repeat(3 - lives);
+    $('found').textContent = `📖 ${known.size}/${RECIPES.length}`;
+    const q = $('queue'); q.textContent = ''; for (const e of queue) { const d = document.createElement('div'); d.className = 'q'; d.style.background = EL[e][3]; d.append(ico(e)); q.append(d); }
+    const b = $('board'); b.textContent = ''; b.style.gridTemplateColumns = `repeat(${COLS}, auto)`; b.style.setProperty('--cs', cs() + 'px');
+    cells.forEach((e, i) => {
+      const t = document.createElement('button'); t.className = 'tile'; t.style.setProperty('--t', EL[e][3]); t.setAttribute('aria-label', EL[e][0]);
+      if (i === sel) t.classList.add('sel'); if (hint && hint.includes(i)) t.classList.add('hint');
+      if (fx.pop === i) t.classList.add('pop'); if (fx.boom && fx.boom.includes(i)) t.classList.add('boom'); if (fx.drop === i) t.classList.add('drop');
+      t.append(ico(e)); t.onclick = () => tap(i); b.append(t);
+    });
+  }
+  const adj = (a, b) => { const ra = Math.floor(a / COLS), ca = a % COLS, rb = Math.floor(b / COLS), cb = b % COLS; return Math.abs(ra - rb) + Math.abs(ca - cb) === 1; };
+  function toast(msg, ms = 2000) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, ms); }
+
+  function tap(i) {
+    if (busy) return;
+    hint = null;
+    if (sel === null || sel === i || !adj(sel, i)) { sel = sel === i ? null : i; render(); return; }
+    const a = sel, b = i; sel = null;
+    const r = find(cells[a], cells[b]);
+    if (r) {
+      taps--;
+      const isNew = !known.has(r.k);
+      known.add(r.k); store.set('receita.book', JSON.stringify([...known]));
+      cells[b] = r.r; cells[a] = nextPiece(); seenEls.add(r.r);
+      render({ pop: b, drop: a });
+      if (isNew) toast(`✨ Nova receita! ${EL[r.a][1]} + ${EL[r.b][1]} = ${EL[r.r][1]} ${EL[r.r][0]}`, 2600);
+      if (r.r === G.goal) return setTimeout(win, 450);
+    } else {
+      lives--;
+      cells[a] = helpful(); cells[b] = helpful();
+      render({ boom: [a, b] });
+      if (lives <= 0) return setTimeout(() => lose('vidas'), 500);
+      toast(`💥 Não reagiu! −1 ❤️ — vieram peças úteis no lugar.`, 1800);
+    }
+    if (taps <= 0) setTimeout(() => lose('toques'), 400);
+  }
+  function win() {
+    const extra = taps; const stars = extra >= 4 ? '⭐⭐⭐' : extra >= 2 ? '⭐⭐' : '⭐';
+    modal(`<img class="mascot" src="img/mascote-frasco.png" alt=""><h2>Você fez ${EL[G.goal][0]}!</h2><div class="ico" style="width:70px;height:70px;margin:0 auto;font-size:52px" id="wico"></div><p style="font-size:28px">${stars}</p><p>Sobraram ${extra} toques</p><button class="btn green" data-a="next">Próxima fase</button>`);
+    $('wico').append(ico(G.goal));
+  }
+  function lose(why) {
+    if (cells.includes(G.goal)) return;
+    const msg = why === 'vidas' ? 'Acabaram as vidas' : 'Acabaram os toques';
+    const extra = why === 'vidas' ? '<button class="btn green" data-a="life">+1 ❤️ (anúncio)</button>' : '<button class="btn green" data-a="more">+5 toques (anúncio)</button>';
+    modal(`<h2>${msg}</h2><p>Faltou pouco para ${EL[G.goal][0]}. As receitas que você descobriu ficam no livro.</p>${extra}<button class="btn paper" data-a="restart">Recomeçar</button>`);
+  }
+  function modal(html) {
+    $('card').innerHTML = html; $('modal').hidden = false;
+    $('card').querySelectorAll('[data-a]').forEach(btn => btn.onclick = () => { $('modal').hidden = true; ({ restart: () => start(level), next: () => start(level + 1), close: () => {}, more: addMore, life: () => { lives = 1; render(); toast('+1 ❤️'); } })[btn.dataset.a](); });
+  }
+  function addMore() { taps += 5; render(); toast('+5 toques'); }
+  function help() {
+    modal(`<h2>Como jogar</h2><p>Chegue ao <b>objetivo</b> lá em cima juntando peças.</p><p>Toque numa peça e depois numa <b>vizinha</b>. Se for uma receita, nasce um elemento novo — e você descobre a receita!</p><p>Não reagiu? 💥 Explode, <b>tira uma vida ❤️</b> e as duas viram peças úteis. São 3 vidas por fase.</p><p>Os <b>?</b> do objetivo se revelam conforme você descobre. Use poucos toques para ganhar mais estrelas.</p><button class="btn green" data-a="close">Bora!</button>`);
+  }
+  function book() {
+    const rows = RECIPES.map(r => known.has(r.k)
+      ? `<div class="row"><span class="ico" data-e="${r.a}"></span>+<span class="ico" data-e="${r.b}"></span>=<span class="ico" data-e="${r.r}"></span> ${EL[r.r][0]}</div>`
+      : `<div class="row" style="opacity:.55">? + ? = ?</div>`).join('');
+    modal(`<h2>Receitas (${known.size}/${RECIPES.length})</h2><div class="book">${rows}</div><button class="btn green" data-a="close">Fechar</button>`);
+    $('card').querySelectorAll('[data-e]').forEach(s => { s.replaceWith(ico(s.dataset.e)); });
+  }
+  // dica: procura um par vizinho que faça uma peça do caminho do objetivo
+  function findHint() {
+    const path = new Set(); (function walk(e) { path.add(e); const p = producer(e); if (p && !BASE.includes(e)) { walk(p.a); walk(p.b); } })(G.goal);
+    let best = null, bestTier = -1;
+    for (let a = 0; a < cells.length; a++) for (let b = 0; b < cells.length; b++) {
+      if (!adj(a, b)) continue; const r = find(cells[a], cells[b]); if (!r || !path.has(r.r)) continue;
+      const tier = steps(r.r); if (tier > bestTier) { bestTier = tier; best = [a, b]; }
+    }
+    return best;
+  }
+  $('restart').onclick = () => start(level);
+  $('skip').onclick = () => start(level + 1);
+  $('help').onclick = help;
+  $('bookb').onclick = book;
+  $('more').onclick = addMore;
+  $('hintb').onclick = () => { const h = findHint(); if (!h) { toast('Nenhum par útil agora — tente explodir peças que não servem'); return; } hint = h; sel = null; render(); toast('Junte as peças marcadas'); };
+  window.addEventListener('resize', () => render());
+  start(level);
+})();
+</script>
