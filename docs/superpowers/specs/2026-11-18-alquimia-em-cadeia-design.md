@@ -1,6 +1,6 @@
 # Alquimia em Cadeia — Design
 
-Data: 2026-11-18 · Status: rascunho para aprovação
+Data: 2026-11-18 · Status: decisões do dono incorporadas — aguardando aprovação final
 
 ## 1. Intenção e o porquê
 
@@ -57,6 +57,8 @@ se resolve pensando.
 - **Pausa instantânea:** fechar/minimizar a qualquer momento não perde nada;
   ao voltar, a fase está exatamente onde parou.
 - **Aparelhos simples:** rodar liso em Android de entrada (alvo: Android 8+).
+- **Público:** a partir de 13 anos (decisão do dono). Não é app infantil /
+  "para famílias" no Google Play; visual bonito, sem aparência infantil.
 - **Idioma:** português do Brasil, com textos separados do código para
   traduzir depois.
 - **Original:** nome, arte e textos próprios.
@@ -90,7 +92,8 @@ escolha técnica; foi decisão do Claude, apresentada e confirmada.
   duas casas viram uma peça C e uma casa vazia.
 - Depois das reações, as peças **caem** para ocupar casas vazias (gravidade),
   mas **nada novo cai do céu** — não há reposição aleatória. A queda pode
-  juntar novos pares → **reação em cadeia**.
+  juntar novos pares → **reação em cadeia**. (Decisão do dono: sem
+  reposição sorteada, ao contrário do protótipo do Lovable.)
 - Repete reação → queda até o tabuleiro estabilizar.
 - Tudo é determinístico: o mesmo estado + o mesmo movimento sempre dão o mesmo
   resultado.
@@ -180,9 +183,13 @@ receitas preparado para isso (receitas como dados, não código fixo).
 ## 7. Anúncios (AdMob)
 
 **Com recompensa** (o jogador escolhe assistir):
-- Ao perder: "+3 movimentos e continue".
-- Durante a fase: desfazer o último movimento (1 grátis por fase, depois anúncio).
-- Dica de um passo (decisão do Claude: 1 grátis por dia, depois anúncio).
+- Ao perder: "+3 movimentos e continue" — **no máximo 1 vez por fase**; vitória
+  que usou isso vale no máximo 1 estrela (decisão do dono).
+- Durante a fase: desfazer o último movimento (1 grátis por fase, depois anúncio,
+  sem limite).
+- Dica de um passo (decisão do Claude: 1 grátis por dia, depois anúncio, sem
+  limite). A sequência de 3 dicas iniciais e o "Presente do dia" (+3 dicas)
+  vêm do protótipo.
 - Laboratório: +5 experimentos.
 
 **Entre fases (intersticial):**
