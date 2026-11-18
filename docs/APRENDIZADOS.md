@@ -52,3 +52,13 @@ Mantenha curto: refine, junte e apague o que deixar de valer.
   acontecem); testar vidas por fase (❤️❤️❤️); calibrar dificuldade.
 - O jogo completo do Plano 1 (troca de peças) está no `main`; arte, telas,
   receitas e salvamento serão reaproveitados.
+- Links jogáveis (privados do dono): Rumo à Receita
+  https://claude.ai/artifact/59vrE33HZuFwvJSfR1e2Ww (sem as vidas; a versão
+  com vidas está só no arquivo do protótipo), Bancada
+  https://claude.ai/artifact/1xyHgg77uzk47FvpgWsNVP, jogo do Plano 1
+  https://claude.ai/artifact/LcLS268JM7wJi3rNdTRG9K.
+- Próximo passo combinado: **unir este documento com o `CLAUDE.md` do
+  computador do dono** (projetos Elevador, Gem TD etc.). A parte geral (sobre
+  o dono e como trabalhamos) vai para `~/.claude/CLAUDE.md` no computador; a
+  parte de cada projeto fica no `CLAUDE.md` de cada pasta. Fazer isso numa
+  sessão aberta no computador dele.
