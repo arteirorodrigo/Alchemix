@@ -144,11 +144,15 @@ Uma árvore de receitas escrita à mão, intuitiva, com ~40–60 elementos em
 níveis. Começo sugerido (o resto fica para o construtor, seguindo o mesmo
 espírito "faz sentido no mundo real/mágico"):
 
+Elementos base e primeiras receitas seguem o protótipo do Lovable (arte já
+existe em `docs/design/prototipo-lovable/imagens/`): base 💧 água, 🪨 pedra,
+🔥 fogo, 🌱 broto.
+
 | Nível | Receitas |
 |---|---|
-| 1 | 💧+🪨 = Barro · 🔥+💧 = Vapor · 🔥+🪨 = Lava · 💨+🪨 = Poeira · 🔥+💨 = Fumaça · 💧+💨 = Nuvem |
-| 2 | Barro+🔥 = Tijolo · Lava+💧 = Pedra · Nuvem+💧 = Chuva · Vapor+💨 = Névoa · Poeira+💧 = Lama… |
-| 3+ | Pedra+🔥 = Metal · Chuva+🪨 = Planta · … até poções: ex. Planta+Névoa = Poção do Sono |
+| 1 | 💧+🪨 = Barro · 💧+🔥 = Vapor · 🌱+💧 = Flor |
+| 2 | Barro+🔥 = Tijolo · Flor+Vapor = Arco-íris · Tijolo+Tijolo = Casinha |
+| 3+ | A expandir no mesmo espírito (ex.: 🔥+🪨 = Lava, Lava+💧 = Obsidiana, 🌱+🪨 = Musgo…) até poções |
 
 ### 6.2 Fases infinitas
 - Fases geradas por algoritmo a partir de uma semente (número da fase).
@@ -210,6 +214,15 @@ exigido antes de exibir anúncios.
  └──┴──┴──┴──┘
    [↶ desfazer]     [💡 dica]
 ```
+
+### 8.1 Direção visual
+A referência de layout e estilo é o protótipo do dono no Lovable, salvo em
+`docs/design/prototipo-lovable/` (telas, arte em pixel art, cores em
+`tema.css`, descrição no README). Seguir: pixel art, fonte Pixelify Sans,
+caixas creme com borda escura e sombra dura, fundo da vila mágica, tabuleiro
+em moldura de madeira, botões grandes no rodapé. Telas extras do protótipo
+que entram na v1: **Presente do dia** (anúncio com recompensa: +3 dicas) e
+**Ajustes** (sons, vibração, modo canhoto).
 
 ## 9. Deixado para o construtor
 
