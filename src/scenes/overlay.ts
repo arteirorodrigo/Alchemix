@@ -44,7 +44,8 @@ export abstract class OverlayScene extends Phaser.Scene {
     const rw = Math.ceil(label.width) + 44
     drawBox(g, { x: W / 2 - rw / 2, y: panel.y - 26, w: rw, h: 44 }, { fill: C.primary, shade: C.primaryShade })
 
-    const x: Rect = { x: panel.x + panel.w - 54, y: panel.y + 4, w: 50, h: 50 }
+    // 54×54: ≥ 48 px CSS já na largura 360 (54 × 360/390 ≈ 49,8)
+    const x: Rect = { x: panel.x + panel.w - 58, y: panel.y + 3, w: 54, h: 54 }
     const xg = this.add.graphics()
     icons.close(xg, x.x + x.w / 2, x.y + x.h / 2, 14, C.ink)
     this.add.zone(x.x, x.y, x.w, x.h).setOrigin(0).setInteractive().on('pointerup', () => this.close())

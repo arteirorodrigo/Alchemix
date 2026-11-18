@@ -139,9 +139,8 @@ export class HomeScene extends Phaser.Scene {
       const x = lx - this.stripPad
       const i = Math.floor(x / (CHIP_W + CHIP_GAP))
       if (i >= 0 && i < levels.length && x - i * (CHIP_W + CHIP_GAP) <= CHIP_W) {
-        const n = levels[i]
-        const p = this.sv.progress
-        this.startLevel(n === cur && p.inProgress ? p.inProgress.levelNumber : n)
+        // GameScene só retoma `inProgress` quando é da mesma fase
+        this.startLevel(levels[i])
       }
     })
     levels.forEach((n, i) => {

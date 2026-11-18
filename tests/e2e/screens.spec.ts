@@ -132,7 +132,7 @@ test('modo canhoto inverte o rodapé', async ({ page }) => {
 })
 
 for (const vp of [{ width: 320, height: 568 }, { width: 412, height: 915 }]) {
-  test(`em ${vp.width}×${vp.height} o tabuleiro 7×8 cabe sem rolagem horizontal e o rodapé fica visível`, async ({ page }) => {
+  test(`em ${vp.width}×${vp.height} o tabuleiro 8×7 cabe sem rolagem horizontal e o rodapé fica visível`, async ({ page }) => {
     await page.setViewportSize(vp)
     await seed(page, { currentLevel: 61 })
     await page.goto('/')
@@ -162,3 +162,39 @@ for (const vp of [{ width: 320, height: 568 }, { width: 412, height: 915 }]) {
     await shot(page, `fase61-${vp.width}x${vp.height}`)
   })
 }
+
+test('em 360×640 o X das janelas tem ≥ 48 px CSS', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 640 })
+  await page.goto('/')
+  await home(page)
+  const k = await cssScale(page)
+  await tapHome(page, 'settings')
+  await page.waitForFunction(() => (window as any).__settings?.ready === true)
+  const s = await page.evaluate(() => (window as any).__settings.rects.close)
+  expect(Math.min(s.w, s.h) * k).toBeGreaterThanOrEqual(48)
+  await tapWorld(page, s)
+  await page.waitForFunction(() => !(window as any).__settings)
+  await tapHome(page, 'book')
+  await page.waitForFunction(() => (window as any).__book?.ready === true)
+  const b = await page.evaluate(() => (window as any).__book.rects.close)
+  expect(Math.min(b.w, b.h) * k).toBeGreaterThanOrEqual(48)
+})
+
+test('chip da fase atual abre a fase atual mesmo com outra fase em andamento', async ({ page }) => {
+  await seed(page, { currentLevel: 5, stars: { 1: 3, 2: 3, 3: 3, 4: 3 } })
+  await page.goto('/')
+  await home(page)
+  // rejoga a fase 2 pela faixa e deixa no meio
+  await tapWorld(page, (await homeInfo(page)).rects.strip1)
+  await page.waitForFunction(() => (window as any).__game?.level?.number === 2)
+  await idle(page)
+  await tapMove(page, nonWinningMove(generateLevel(2, book), book))
+  expect((await saved(page)).inProgress.levelNumber).toBe(2)
+  await backHome(page)
+  const h = await homeInfo(page)
+  expect(h.strip[4].level).toBe(5)
+  await tapWorld(page, h.rects.strip4)
+  await page.waitForFunction(() => (window as any).__game?.level?.number !== undefined)
+  await idle(page)
+  expect(await page.evaluate(() => (window as any).__game.level.number)).toBe(5)
+})
