@@ -134,13 +134,24 @@ export class GameScene extends Phaser.Scene {
     const known = new Set([...this.sv.progress.discovered, ...this.state.seen])
     const { state, result } = play(this.state, m, this.level, book)
     this.state = state
-    let pts = this.points[this.points.length - 1]
-    this.points = [...this.points, pts]
-    this.saveInProgress()
+    // Tudo que persiste é decidido aqui, antes da animação: fechar no meio não perde nada.
+    const before = this.points[this.points.length - 1]
+    const gained = result.steps.reduce((sum, st, i) => sum + 10 * st.reactions.length * (i + 1), 0)
+    this.points = [...this.points, before + gained]
     const fresh = result.newlySeen.filter((k) => !known.has(k))
     if (fresh.length) this.sv.update((p) => recordSeen(p, fresh))
+    let won = 0
+    if (state.status === 'won') {
+      won = stars(state, this.level)
+      this.sv.update((p) => recordWin(p, this.levelNumber, won, state.seen))
+      this.sv.savePoints(this.levelNumber + 1, [0])
+    } else {
+      this.saveInProgress()
+      this.sv.savePoints(this.levelNumber, this.points)
+    }
     this.hud.setMoves(state.movesLeft)
 
+    let pts = before
     const collected: Record<string, number> = { ...this.prevCollected() }
     await this.board.animate(m, result.steps, state.board, (i) => {
       const step = result.steps[i]
@@ -153,13 +164,11 @@ export class GameScene extends Phaser.Scene {
       }
       this.hud.setCollected(collected)
     })
-    this.points[this.points.length - 1] = pts
-    this.sv.savePoints(this.levelNumber, this.points)
     for (const k of fresh) discoveryCard(this, book, book.byKey(k))
     if (fresh.length) this.refreshLegend()
     this.animating = false
     this.refreshHud()
-    if (state.status === 'won') this.finishWin()
+    if (state.status === 'won') this.showWin(won)
     else if (state.status === 'lost') this.showLose()
   }
 
@@ -172,12 +181,13 @@ export class GameScene extends Phaser.Scene {
 
   private async useHint(): Promise<void> {
     if (this.locked() || this.overlay || this.state.status !== 'playing') return
+    // Sem saída não custa nada; só cobra (estoque ou anúncio) quando há um movimento a mostrar.
+    const h = getHint(this.state, this.level, this.sv.book)
+    if (h.kind === 'undo') return toast(this, t.semSaida)
     if (this.sv.progress.hints > 0) {
       this.sv.update((p) => ({ ...p, hints: p.hints - 1 }))
     } else if (!(await this.watchAd('hint'))) return
     this.refreshButtons()
-    const h = getHint(this.state, this.level, this.sv.book)
-    if (h.kind === 'undo') return toast(this, t.semSaida)
     this.select(null)
     this.highlight = [h.move.from, h.move.to]
     this.board.setHighlight(this.highlight)
@@ -220,14 +230,12 @@ export class GameScene extends Phaser.Scene {
 
   // ---------- fim de fase ----------
 
-  private finishWin(): void {
-    const n = stars(this.state, this.level)
-    this.sv.update((p) => recordWin(p, this.levelNumber, n, this.state.seen))
-    this.sv.savePoints(this.levelNumber + 1, [0])
+  /** Só a celebração: a vitória já foi gravada em `doMove`, antes da animação. */
+  private showWin(nStars: number): void {
     this.overlay = 'win'
     const pts = this.points[this.points.length - 1]
     this.time.delayedCall(350, () => {
-      this.dialogBox = winDialog(this, n, pts, () => this.scene.restart({ levelNumber: this.levelNumber + 1 }))
+      this.dialogBox = winDialog(this, nStars, pts, () => this.scene.restart({ levelNumber: this.levelNumber + 1 }))
     })
   }
 

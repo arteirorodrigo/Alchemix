@@ -126,3 +126,21 @@ test('dica destaca duas casas vizinhas', async ({ page }) => {
   await page.evaluate(() => (window as any).__game.tap(0, 0))
   expect(await page.evaluate(() => (window as any).__game.highlight)).toBeNull()
 })
+
+test('fechar durante a animação do movimento vencedor não perde a vitória', async ({ page }) => {
+  await open(page)
+  const m = level1.solution[0]
+  await page.evaluate((m) => {
+    const g = (window as any).__game
+    g.tap(m.from.r, m.from.c)
+    g.tap(m.to.r, m.to.c)
+  }, m)
+  expect(await page.evaluate(() => (window as any).__game.animating)).toBe(true)
+  const p = await saved(page)
+  await page.reload()
+  await page.waitForFunction(() => (window as any).__game?.level)
+  expect(p.currentLevel).toBe(2)
+  expect(p.stars['1']).toBeGreaterThanOrEqual(1)
+  expect(p.inProgress).toBeUndefined()
+  expect(await page.evaluate(() => (window as any).__game.level.number)).toBe(2)
+})
