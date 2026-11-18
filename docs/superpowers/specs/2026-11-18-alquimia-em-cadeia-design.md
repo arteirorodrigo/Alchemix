@@ -1,6 +1,6 @@
 # Alquimia em Cadeia — Design
 
-Data: 2026-11-18 · Status: decisões do dono incorporadas — aguardando aprovação final
+Data: 2026-11-18 · Status: aprovado pelo dono (2026-11-18)
 
 ## 1. Intenção e o porquê
 
