@@ -1,0 +1,60 @@
+nivel,ingrediente_a,ingrediente_b,resultado,emoji,tipo,logica,arte_pronta,status
+0,-,-,Água,💧,base,elemento inicial,sim,confirmado
+0,-,-,Pedra,🪨,base,elemento inicial,sim,confirmado
+0,-,-,Fogo,🔥,base,elemento inicial,sim,confirmado
+0,-,-,Broto,🌱,base,elemento inicial,sim,confirmado
+1,Água,Pedra,Barro,🟤,elemento,terra molhada vira barro,sim,confirmado
+1,Água,Fogo,Vapor,☁️,elemento,água aquecida evapora,sim,confirmado
+1,Broto,Água,Flor,🌸,elemento,broto regado floresce,sim,confirmado
+1,Fogo,Pedra,Lava,🌋,elemento,pedra derretida,não,proposta
+1,Broto,Pedra,Musgo,🍀,elemento,planta que cresce na pedra,não,proposta
+1,Broto,Fogo,Cinza,⚫,elemento,planta queimada,não,proposta
+1,Água,Água,Lago,🏞️,elemento,muita água junta,não,proposta
+1,Pedra,Pedra,Montanha,⛰️,elemento,pedra sobre pedra,não,proposta
+1,Fogo,Fogo,Sol,☀️,elemento,fogo enorme,não,proposta
+1,Broto,Broto,Arbusto,🌿,elemento,brotos juntos crescem,não,proposta
+2,Barro,Fogo,Tijolo,🧱,elemento,barro cozido,sim,confirmado
+2,Flor,Vapor,Arco-íris,🌈,elemento,cor + umidade no ar,sim,confirmado
+2,Vapor,Vapor,Nuvem,🌥️,elemento,vapor acumulado,não,proposta
+2,Lava,Água,Obsidiana,🖤,elemento,lava resfriada vira vidro negro,não,proposta
+2,Lava,Pedra,Minério,🪙,elemento,pedra com veios derretidos,não,proposta
+2,Sol,Pedra,Areia,🏜️,elemento,pedra desgastada pelo sol,não,proposta
+2,Cinza,Água,Sabão,🧼,elemento,cinza + água faz sabão (antigo),não,proposta
+2,Musgo,Água,Pântano,🐸,elemento,musgo encharcado,não,proposta
+2,Montanha,Fogo,Vulcão,🌋,elemento,montanha com fogo dentro,não,proposta
+2,Lago,Broto,Alga,🌊,elemento,planta que nasce na água,não,proposta
+3,Tijolo,Tijolo,Casinha,🏠,construção,tijolos empilhados,sim,confirmado
+3,Nuvem,Água,Chuva,🌧️,elemento,nuvem carregada,não,proposta
+3,Arbusto,Chuva,Árvore,🌳,elemento,arbusto regado cresce,não,proposta
+3,Areia,Fogo,Vidro,🔷,elemento,areia derretida,não,proposta
+3,Minério,Fogo,Metal,⚙️,elemento,minério fundido,não,proposta
+3,Sol,Chuva,Orvalho Mágico,💎,elemento,gota tocada pelo sol,não,proposta
+3,Árvore,Pedra,Madeira,🪵,elemento,árvore cortada,não,proposta
+3,Árvore,Fogo,Carvão,🔥,elemento,madeira queimada devagar,não,proposta
+4,Vidro,Vidro,Frasco,🧪,ferramenta,vidro moldado (o mascote!),sim,proposta
+4,Casinha,Casinha,Vila,🏘️,construção,casas juntas,sim,proposta
+4,Árvore,Árvore,Floresta,🌲,elemento,árvores juntas,não,proposta
+4,Casinha,Montanha,Castelo,🏰,construção,casa no alto da montanha,não,proposta
+4,Metal,Madeira,Caldeirão,🍲,ferramenta,metal + cabo de madeira,não,proposta
+5,Frasco,Flor,Poção do Perfume,🌸,poção,essência de flor,não,proposta
+5,Frasco,Nuvem,Poção da Leveza,🎈,poção,faz flutuar,não,proposta
+5,Frasco,Lava,Poção do Fogo,🔥,poção,fogo engarrafado,não,proposta
+5,Frasco,Musgo,Poção da Cura,💚,poção,erva medicinal,não,proposta
+5,Frasco,Sol,Poção da Luz,✨,poção,luz engarrafada,não,proposta
+5,Frasco,Arco-íris,Poção das Cores,🌈,poção,muda a cor das coisas,não,proposta
+5,Frasco,Cinza,Poção da Invisibilidade,👻,poção,some como fumaça,não,proposta
+5,Frasco,Obsidiana,Poção da Força,💪,poção,dureza da pedra negra,não,proposta
+5,Frasco,Orvalho Mágico,Poção do Sono,💤,poção,orvalho da madrugada,não,proposta
+5,Frasco,Pântano,Poção do Sapo,🐸,poção,"cuidado, vira sapo",não,proposta
+2,Flor,Flor,Jardim,🌷,elemento,flores juntas,não,proposta
+2,Vapor,Lago,Névoa,🌫️,elemento,lago coberto de vapor,não,proposta
+3,Barro,Barro,Vaso,🏺,ferramenta,barro moldado,não,proposta
+3,Areia,Lago,Praia,🏖️,elemento,areia na beira d'água,não,proposta
+3,Musgo,Montanha,Caverna,🕳️,elemento,montanha úmida por dentro,não,proposta
+4,Madeira,Madeira,Ponte,🌉,construção,tábuas unidas,não,proposta
+4,Madeira,Água,Barco,⛵,construção,madeira que flutua,não,proposta
+4,Vidro,Sol,Lupa,🔍,ferramenta,vidro que concentra luz,não,proposta
+4,Metal,Vidro,Lanterna,🏮,ferramenta,luz protegida,não,proposta
+5,Frasco,Sabão,Poção das Bolhas,🫧,poção,bolhas sem fim,não,proposta
+5,Frasco,Alga,Poção do Mergulho,🤿,poção,respirar debaixo d'água,não,proposta
+5,Frasco,Névoa,Poção do Mistério,🔮,poção,ninguém sabe o que faz,não,proposta
