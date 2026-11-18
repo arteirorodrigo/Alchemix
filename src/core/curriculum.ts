@@ -48,9 +48,9 @@ export function paramsFor(n: number, book: RecipeBook): LevelParams {
   const unlocked: string[] = []
   for (let i = 1; i <= n; i++) { const k = p.intro[i]; if (k) unlocked.push(k) }
 
-  const [rows, cols] = n <= 5 ? [5, 5] : n <= 20 ? [6, 6] : n <= 60 ? [7, 6] : [8, 7]
-  const playoutMoves = n <= 5 ? 2 : n <= 20 ? 3 : n <= 60 ? 4 : 5
-  const baseSlack = n <= 5 ? 3 : n <= 20 ? 2 : n <= 40 ? 1 : 0
+  const [rows, cols] = n <= 10 ? [4, 4] : n <= 30 ? [5, 5] : n <= 60 ? [6, 5] : [6, 6]
+  const playoutMoves = n <= 2 ? 2 : n <= 10 ? 3 : 4
+  const baseSlack = 0
   return {
     number: n,
     rows,
@@ -59,7 +59,7 @@ export function paramsFor(n: number, book: RecipeBook): LevelParams {
     newRecipe: p.intro[n],
     activeCount: Math.min(2 + Math.floor(n / 8), 6, unlocked.length),
     playoutMoves,
-    slack: baseSlack + (n % 5 === 0 ? 2 : 0),
-    walls: n <= 20 ? 0 : Math.min(Math.floor((n - 20) / 20) + 1, 6),
+    slack: baseSlack,
+    walls: n <= 30 ? 0 : Math.min(Math.floor((n - 20) / 20) + 1, 6),
   }
 }

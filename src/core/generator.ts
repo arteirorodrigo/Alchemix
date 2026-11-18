@@ -6,7 +6,7 @@ import { boardKey } from './board'
 import { hashString, mulberry32 } from './rng'
 import { newGame, play } from './game'
 
-const MAX_ATTEMPTS = 200
+const MAX_ATTEMPTS = 400
 const MAX_ACTIVE = 6
 const MAX_GOAL_COUNT = 4
 const CLOSED_UNTIL = 20 // antes desta fase as ativas são fechadas (sem peças intermediárias)
@@ -117,8 +117,8 @@ function buildBoard(
     placed++
   }
   if (placed < p.walls) return undefined
-  const emptyTop = rng() < 0.5
-  const lastRow = emptyTop ? 1 : 0
+  const counts = new Map<ElementId, number>()
+  const lastRow = 0
   // de baixo para cima; vizinhos já colocados: abaixo e à esquerda
   for (let r = rows - 1; r >= lastRow; r--) {
     for (let c = 0; c < cols; c++) {
@@ -130,11 +130,13 @@ function buildBoard(
         !(typeof below === 'string' && below !== '#' && book.find(el, below, activeSet)) &&
         !(typeof left === 'string' && left !== '#' && book.find(el, left, activeSet)))
       if (ok.length === 0) return undefined
-      const total = ok.reduce((s, e) => s + e.w, 0)
+      const wt = (e: { el: ElementId; w: number }) => e.w / Math.pow(1 + (counts.get(e.el) ?? 0), 2)
+      const total = ok.reduce((s, e) => s + wt(e), 0)
       let x = rng() * total
       let chosen = ok[ok.length - 1].el
-      for (const e of ok) { x -= e.w; if (x < 0) { chosen = e.el; break } }
+      for (const e of ok) { x -= wt(e); if (x < 0) { chosen = e.el; break } }
       cells[i] = chosen
+      counts.set(chosen, (counts.get(chosen) ?? 0) + 1)
     }
   }
   return { rows, cols, cells }
@@ -283,9 +285,69 @@ function attempt(n: number, seed: number, p: LevelParams, book: RecipeBook): Lev
 export function generateLevel(n: number, book: RecipeBook, seen?: Set<string>): Level {
   const p = paramsFor(n, book)
   const seed0 = hashString('alquimia:' + n)
+  const target = n <= 2 ? 2 : n <= 10 ? 3 : 4
+  for (const need of [target, target - 1]) {
+    for (let k = 0; k < MAX_ATTEMPTS / 2; k++) {
+      const lv = attempt(n, (seed0 + k) >>> 0, p, book)
+      if (lv && !(seen && seen.has(lv.fingerprint)) && isGoodPuzzle(lv, book, n, need)) return lv
+    }
+  }
   for (let k = 0; k < MAX_ATTEMPTS; k++) {
     const lv = attempt(n, (seed0 + k) >>> 0, p, book)
     if (lv && !(seen && seen.has(lv.fingerprint))) return lv
   }
   throw new Error(`Não foi possível gerar a fase ${n} após ${MAX_ATTEMPTS} tentativas`)
+}
+
+// ---------- SPIKE: filtro de qualidade de quebra-cabeça ----------
+
+function allSwaps(b: Board): Move[] {
+  const out: Move[] = []
+  const { rows, cols, cells } = b
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const v = cells[r * cols + c]
+    if (!isEl(v)) continue
+    if (c + 1 < cols) { const w = cells[r * cols + c + 1]; if (isEl(w) && w !== v) out.push({ from: { r, c }, to: { r, c: c + 1 } }) }
+    if (r + 1 < rows) { const w = cells[(r + 1) * cols + c]; if (isEl(w) && w !== v) out.push({ from: { r, c }, to: { r: r + 1, c } }) }
+  }
+  return out
+}
+
+// Existe vitória em <= depth movimentos?
+function winnableWithin(level: Level, book: RecipeBook, depth: number): boolean {
+  const seen = new Set<string>()
+  const go = (s: ReturnType<typeof newGame>, d: number): boolean => {
+    if (s.status === 'won') return true
+    if (d === 0 || s.status !== 'playing') return false
+    const key = boardKey(s.board) + JSON.stringify(s.collected) + '|' + d
+    if (seen.has(key)) return false
+    seen.add(key)
+    for (const m of allSwaps(s.board)) {
+      if (go(play(s, m, level, book).state, d - 1)) return true
+    }
+    return false
+  }
+  return go(newGame(level), depth)
+}
+
+function randomWinRate(level: Level, book: RecipeBook, runs: number, seed: number): number {
+  const rng = mulberry32(seed)
+  let wins = 0
+  for (let k = 0; k < runs; k++) {
+    let s = newGame(level)
+    while (s.status === 'playing') {
+      const ms = allSwaps(s.board)
+      if (!ms.length) break
+      s = play(s, pick(rng, ms), level, book).state
+    }
+    if (s.status === 'won') wins++
+  }
+  return wins / runs
+}
+
+function isGoodPuzzle(lv: Level, book: RecipeBook, n: number, need: number): boolean {
+  if (lv.solution.length < need) return false
+  if (winnableWithin(lv, book, lv.solution.length - 1)) return false
+  const maxRate = n <= 3 ? 0.1 : 0.03
+  return randomWinRate(lv, book, 150, lv.seed ^ 0x9e3779b9) <= maxRate
 }

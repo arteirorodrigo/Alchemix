@@ -318,7 +318,7 @@ export class GameScene extends Phaser.Scene {
     const known = new Set([...this.sv.progress.discovered, ...this.state.seen])
     return this.level.active.map((k) => {
       const r = this.sv.book.byKey(k)
-      return { a: r.a, b: r.b, result: r.result, secret: k === this.level.newRecipe && !known.has(k) }
+      return { a: r.a, b: r.b, result: r.result, secret: false }
     })
   }
 
