@@ -60,7 +60,7 @@ export function plus(g: G, x: number, y: number, s: number, color: number): void
   g.lineBetween(x, y - s / 2, x, y + s / 2)
 }
 
-export function star(g: G, x: number, y: number, r: number, fill: number, stroke: number): void {
+export function star(g: G, x: number, y: number, r: number, fill: number, stroke: number, lw = 3): void {
   const pts: Phaser.Types.Math.Vector2Like[] = []
   for (let i = 0; i < 10; i++) {
     const a = -Math.PI / 2 + (i * Math.PI) / 5
@@ -68,5 +68,15 @@ export function star(g: G, x: number, y: number, r: number, fill: number, stroke
     pts.push({ x: x + Math.cos(a) * rr, y: y + Math.sin(a) * rr })
   }
   g.fillStyle(fill, 1).fillPoints(pts, true)
-  g.lineStyle(3, stroke, 1).strokePoints(pts, true)
+  g.lineStyle(lw, stroke, 1).strokePoints(pts, true)
+}
+
+export function playTriangle(g: G, x: number, y: number, s: number, color: number): void {
+  g.fillStyle(color, 1).fillTriangle(x - s * 0.4, y - s / 2, x - s * 0.4, y + s / 2, x + s * 0.5, y)
+}
+
+export function close(g: G, x: number, y: number, s: number, color: number): void {
+  g.lineStyle(3, color, 1)
+  g.lineBetween(x - s / 2, y - s / 2, x + s / 2, y + s / 2)
+  g.lineBetween(x - s / 2, y + s / 2, x + s / 2, y - s / 2)
 }

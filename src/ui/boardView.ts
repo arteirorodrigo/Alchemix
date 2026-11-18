@@ -1,22 +1,33 @@
 import Phaser from 'phaser'
 import type { RecipeBook } from '../core/recipes'
 import type { Board, Move, Pos, StepEvents } from '../core/types'
-import { BOARD_AREA } from './layout'
+import { BOARD_AREA, W, type Rect } from './layout'
 import { drawWall, makePiece } from './pieces'
 import { C } from './theme'
 import { tween } from './widgets'
 
-const GAP = 5
-const PAD = 8      // madeira entre a moldura e as casas
-const RIM = 4      // borda escura externa
 const GRASS = 12
 const MAX_TILE = 58
+
+/**
+ * Espaçamentos da moldura. Tabuleiros de 7+ colunas usam a largura toda da tela, sem vão entre as
+ * casas (cada peça já tem borda escura): é o que deixa as peças ≥ 44 px CSS numa tela de 320.
+ */
+interface Geometry { gap: number; pad: number; rim: number; area: Rect }
+function geometry(cols: number): Geometry {
+  return cols >= 7
+    ? { gap: 0, pad: 3, rim: 3, area: { ...BOARD_AREA, x: 0, w: W } }
+    : { gap: 5, pad: 8, rim: 4, area: BOARD_AREA }
+}
 
 export const TIMING = { swap: 120, react: 180, fallPerCell: 140 }
 
 /** Tabuleiro na moldura de madeira com borda de grama; desenha, recebe toques e anima `StepEvents`. */
 export class BoardView {
   readonly tile: number
+  /** Moldura inteira (madeira + grama), em coordenadas do mundo. */
+  readonly frame: Rect
+  private gap: number
   private ox: number
   private oy: number
   private pieces = new Map<number, Phaser.GameObjects.Container>()
@@ -34,17 +45,20 @@ export class BoardView {
   ) {
     this.rows = board.rows
     this.cols = board.cols
+    const { gap: GAP, pad: PAD, rim: RIM, area } = geometry(this.cols)
+    this.gap = GAP
     const frame = RIM + PAD
-    const fitW = (BOARD_AREA.w - 2 * frame - (this.cols - 1) * GAP) / this.cols
-    const fitH = (BOARD_AREA.h - 2 * frame - GRASS - (this.rows - 1) * GAP) / this.rows
+    const fitW = (area.w - 2 * frame - (this.cols - 1) * GAP) / this.cols
+    const fitH = (area.h - 2 * frame - GRASS - (this.rows - 1) * GAP) / this.rows
     this.tile = Math.floor(Math.min(MAX_TILE, fitW, fitH))
     const gridW = this.cols * this.tile + (this.cols - 1) * GAP
     const gridH = this.rows * this.tile + (this.rows - 1) * GAP
     const fw = gridW + 2 * frame
     const fh = gridH + 2 * frame + GRASS
-    const fx = Math.round(BOARD_AREA.x + (BOARD_AREA.w - fw) / 2)
-    const fy = Math.round(BOARD_AREA.y + Math.min(16, (BOARD_AREA.h - fh) / 2))   // ancorado no alto, como no protótipo
+    const fx = Math.round(area.x + (area.w - fw) / 2)
+    const fy = Math.round(area.y + Math.min(16, (area.h - fh) / 2))   // ancorado no alto, como no protótipo
     this.ox = fx + frame
+    this.frame = { x: fx, y: fy, w: fw, h: fh }
     this.oy = fy + frame + GRASS
 
     const g = scene.add.graphics()
@@ -52,7 +66,7 @@ export class BoardView {
     g.fillStyle(C.ink, 1).fillRect(fx, fy, fw, fh)
     g.fillStyle(C.earth, 1).fillRect(fx + RIM, fy + RIM, fw - 2 * RIM, fh - 2 * RIM)
     for (let y = fy + RIM + GRASS + 10; y < fy + fh - RIM; y += 18) {   // veios da madeira
-      g.fillStyle(C.earthDark, 0.35).fillRect(fx + RIM, y, PAD - 2, 3).fillRect(fx + fw - RIM - PAD + 2, y + 9, PAD - 2, 3)
+      if (PAD > 4) g.fillStyle(C.earthDark, 0.35).fillRect(fx + RIM, y, PAD - 2, 3).fillRect(fx + fw - RIM - PAD + 2, y + 9, PAD - 2, 3)
     }
     g.fillStyle(C.primary, 1).fillRect(fx + RIM, fy + RIM, fw - 2 * RIM, GRASS)
     g.fillStyle(C.primaryShade, 1).fillRect(fx + RIM, fy + RIM + GRASS - 4, fw - 2 * RIM, 4)
@@ -63,7 +77,8 @@ export class BoardView {
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {
         const { x, y } = this.xy({ r, c })
-        g.fillStyle(0x5a2f20, 1).fillRect(x - this.tile / 2, y - this.tile / 2, this.tile, this.tile)
+        const inset = GAP === 0 ? 1 : 0   // sem vão: um filete separa as casas vazias
+        g.fillStyle(0x5a2f20, 1).fillRect(x - this.tile / 2 + inset, y - this.tile / 2 + inset, this.tile - 2 * inset, this.tile - 2 * inset)
       }
     }
     this.walls = scene.add.graphics()
@@ -81,14 +96,14 @@ export class BoardView {
 
   xy(p: Pos): { x: number; y: number } {
     return {
-      x: this.ox + p.c * (this.tile + GAP) + this.tile / 2,
-      y: this.oy + p.r * (this.tile + GAP) + this.tile / 2,
+      x: this.ox + p.c * (this.tile + this.gap) + this.tile / 2,
+      y: this.oy + p.r * (this.tile + this.gap) + this.tile / 2,
     }
   }
 
   cellAt(x: number, y: number): Pos | null {
-    const c = Math.floor((x - this.ox) / (this.tile + GAP))
-    const r = Math.floor((y - this.oy) / (this.tile + GAP))
+    const c = Math.floor((x - this.ox) / (this.tile + this.gap))
+    const r = Math.floor((y - this.oy) / (this.tile + this.gap))
     if (r < 0 || c < 0 || r >= this.rows || c >= this.cols) return null
     return { r, c }
   }

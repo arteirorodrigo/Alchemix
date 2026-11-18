@@ -4,11 +4,10 @@ import { artKey } from '../ui/pieces'
 import { H, W } from '../ui/layout'
 import { C } from '../ui/theme'
 import { setupCamera, txt } from '../ui/widgets'
-import { SERVICES, type Services } from './services'
 
 const ART = ['agua', 'pedra', 'fogo', 'planta', 'barro', 'tijolo', 'vapor', 'flor', 'casinha', 'arcoiris']
 
-/** Carrega imagens e a fonte, depois abre a fase atual (até a HomeScene existir). */
+/** Carrega imagens e a fonte, depois abre a tela inicial. */
 export class BootScene extends Phaser.Scene {
   constructor() { super('boot') }
 
@@ -27,7 +26,6 @@ export class BootScene extends Phaser.Scene {
       await document.fonts.load('bold 20px "Pixelify Sans"')
     } catch { /* segue com a fonte reserva */ }
     loading.destroy()
-    const sv = this.registry.get(SERVICES) as Services
-    this.scene.start('game', { levelNumber: sv.progress.currentLevel })
+    this.scene.start('home')
   }
 }

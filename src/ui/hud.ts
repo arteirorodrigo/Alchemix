@@ -3,7 +3,7 @@ import type { RecipeBook } from '../core/recipes'
 import type { Goal } from '../core/types'
 import { t } from '../i18n/pt-BR'
 import * as icons from './icons'
-import { FOOTER, LEGEND_Y, PANEL, TOP, W, type Rect } from './layout'
+import { FOOTER, LEGEND_MAX, LEGEND_Y, PANEL, TOP, W, footerRects, type FooterKey, type Rect } from './layout'
 import { elementIcon } from './pieces'
 import { C } from './theme'
 import { Button, drawBox, txt } from './widgets'
@@ -23,14 +23,17 @@ export class Hud {
   readonly extra: Button
   readonly hint: Button
   readonly undo: Button
+  readonly bookButton: Button
+  readonly back: Button
+  readonly settings: Button
 
   constructor(
     private scene: Phaser.Scene, private book: RecipeBook, levelNumber: number,
-    private goals: Goal[], a: HudActions,
+    private goals: Goal[], a: HudActions, leftHanded = false,
   ) {
-    const back = new Button(scene, TOP.back, { fill: C.card, shade: C.paperShade }, a.back)
+    const back = this.back = new Button(scene, TOP.back, { fill: C.card, shade: C.paperShade }, a.back)
     icons.arrowLeft(back.icon, TOP.back.w / 2, TOP.back.h / 2 - 2, 22, C.ink)
-    const settings = new Button(scene, TOP.settings, { fill: C.card, shade: C.paperShade }, a.settings)
+    const settings = this.settings = new Button(scene, TOP.settings, { fill: C.card, shade: C.paperShade }, a.settings)
     icons.gear(settings.icon, TOP.settings.w / 2, TOP.settings.h / 2 - 2, 26, C.ink)
     const tg = scene.add.graphics()
     drawBox(tg, TOP.title, { fill: C.primary, shade: C.primaryShade })
@@ -39,7 +42,7 @@ export class Hud {
 
     this.buildPanel()
 
-    const bk = new Button(scene, FOOTER.book, { fill: C.card, shade: C.paperShade }, a.book)
+    const bk = this.bookButton = new Button(scene, FOOTER.book, { fill: C.card, shade: C.paperShade }, a.book)
     icons.book(bk.icon, FOOTER.book.w / 2, FOOTER.book.h / 2 - 2, 26, C.ink)
     this.extra = new Button(scene, FOOTER.extra,
       { fill: C.secondary, shade: C.secondaryShade, label: t.maisMovimentos, sub: t.verAnuncio, size: 15 }, a.extra)
@@ -51,6 +54,24 @@ export class Hud {
     this.hint.shiftText(9)
     this.undo = new Button(scene, FOOTER.undo,
       { fill: C.berry, shade: C.berryShade, label: t.desfazer, sub: '', size: 14 }, a.undo)
+    this.setLeftHanded(leftHanded)
+  }
+
+  private get footerButtons(): Record<FooterKey, Button> {
+    return { book: this.bookButton, extra: this.extra, hint: this.hint, undo: this.undo }
+  }
+
+  /** Modo canhoto: espelha o rodapé (só muda o x; o y de cada botão segue o original). */
+  setLeftHanded(on: boolean): void {
+    const rects = footerRects(on)
+    for (const [k, b] of Object.entries(this.footerButtons)) b.setX(rects[k as FooterKey].x)
+  }
+
+  /** Retângulos atuais dos botões do rodapé. */
+  footer(): Record<FooterKey, Rect> {
+    const out = {} as Record<FooterKey, Rect>
+    for (const [k, b] of Object.entries(this.footerButtons)) out[k as FooterKey] = { ...b.rect, x: b.x }
+    return out
   }
 
   private buildPanel(): void {
@@ -62,14 +83,16 @@ export class Hud {
       const x = PANEL.x + col * i
       for (let y = PANEL.y + 12; y < PANEL.y + PANEL.h - 10; y += 6) g.fillStyle(C.paperShade, 1).fillRect(x - 1, y, 2, 3)
     }
-    const labelY = PANEL.y + 22
-    const valueY = PANEL.y + 52
+    const k = PANEL.h / 84
+    const labelY = PANEL.y + Math.round(22 * k)
+    const valueY = PANEL.y + Math.round(52 * k)
     const cx = (i: number) => PANEL.x + col * i + col / 2
     txt(s, cx(0), labelY, t.movimentos, 11, { color: C.mutedFg, bold: false })
     txt(s, cx(1), labelY - 4, t.objetivo, 11, { color: C.mutedFg, bold: false })
     txt(s, cx(2), labelY, t.pontos, 11, { color: C.mutedFg, bold: false })
-    this.moves = txt(s, cx(0), valueY, '0', 28)
-    this.points = txt(s, cx(2), valueY, '0', 28)
+    const big = k < 1 ? 24 : 28
+    this.moves = txt(s, cx(0), valueY, '0', big)
+    this.points = txt(s, cx(2), valueY, '0', big)
 
     // objetivo: ícone + contador por meta, barra do progresso total
     const n = this.goals.length
@@ -77,8 +100,9 @@ export class Hud {
     this.goals.forEach((goal, i) => {
       const x0 = PANEL.x + col + slot * i
       const icon = 24
-      elementIcon(s, this.book, goal.element, x0 + slot / 2 - 18, PANEL.y + 42, icon)
-      this.goalTexts.push(txt(s, x0 + slot / 2 + 14, PANEL.y + 42, '', n > 1 ? 13 : 17).setOrigin(0.5))
+      const gy = PANEL.y + Math.round(42 * k)
+      elementIcon(s, this.book, goal.element, x0 + slot / 2 - 18, gy, k < 1 ? 20 : icon)
+      this.goalTexts.push(txt(s, x0 + slot / 2 + 14, gy, '', n > 1 ? 13 : 17).setOrigin(0.5))
     })
     this.bar = s.add.graphics()
   }
@@ -96,7 +120,8 @@ export class Hud {
       this.goalTexts[i].setText(`${c}/${g.count}`)
     })
     const col = PANEL.w / 3
-    const bar: Rect = { x: PANEL.x + col + 14, y: PANEL.y + 60, w: col - 28, h: 12 }
+    const k = PANEL.h / 84
+    const bar: Rect = { x: PANEL.x + col + 14, y: PANEL.y + Math.round(60 * k), w: col - 28, h: k < 1 ? 10 : 12 }
     this.bar.clear()
     this.bar.fillStyle(C.ink, 1).fillRect(bar.x, bar.y, bar.w, bar.h)
     this.bar.fillStyle(C.muted, 1).fillRect(bar.x + 2, bar.y + 2, bar.w - 4, bar.h - 4)
@@ -112,7 +137,13 @@ export class Hud {
     const icon = 26
     const chipW = 116
     const chipH = 34
-    const perRow = 3
+    // Quantas por linha: a divisão que deixa a legenda maior dentro de LEGEND_MAX × (largura útil).
+    const fit = (per: number) => {
+      const r = Math.ceil(entries.length / per)
+      return Math.min(1, LEGEND_MAX / (r * chipH + (r - 1) * 6), (W - 28) / (per * (chipW + 8) - 8))
+    }
+    let perRow = 1
+    for (let k = 2; k <= Math.max(1, entries.length); k++) if (fit(k) > fit(perRow) + 1e-6) perRow = k
     const rows = Math.ceil(entries.length / perRow)
     entries.forEach((e, i) => {
       const inRow = Math.min(perRow, entries.length - Math.floor(i / perRow) * perRow)
@@ -133,8 +164,7 @@ export class Hud {
       box.add(txt(s, xs[1], y, '+', 16))
       box.add(txt(s, xs[3], y, '=', 16))
     })
-    const height = rows * chipH + (rows - 1) * 6
-    const scale = Math.min(1, 48 / height)
+    const scale = fit(perRow)
     box.setScale(scale).setPosition(W / 2, LEGEND_Y - ((rows - 1) * (chipH + 6) * scale) / 2)
     this.legend = box
   }

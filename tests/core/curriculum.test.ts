@@ -39,8 +39,8 @@ describe('curriculum', () => {
     const sz = (n: number) => { const p = paramsFor(n, book); return [p.rows, p.cols] }
     expect(sz(1)).toEqual([5, 5]); expect(sz(5)).toEqual([5, 5])
     expect(sz(6)).toEqual([6, 6]); expect(sz(20)).toEqual([6, 6])
-    expect(sz(21)).toEqual([6, 7]); expect(sz(60)).toEqual([6, 7])
-    expect(sz(61)).toEqual([7, 8])
+    expect(sz(21)).toEqual([7, 6]); expect(sz(60)).toEqual([7, 6])
+    expect(sz(61)).toEqual([8, 7])
   })
 
   it('fase 25 é respiro com slack maior', () => {

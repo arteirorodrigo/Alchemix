@@ -3,7 +3,10 @@ import { grantDailyHint } from './core/progress'
 import { FakeAdService } from './platform/ads'
 import { LocalStorage } from './platform/storage'
 import { BootScene } from './scenes/BootScene'
+import { BookScene } from './scenes/BookScene'
 import { GameScene } from './scenes/GameScene'
+import { HomeScene } from './scenes/HomeScene'
+import { SettingsOverlay } from './scenes/SettingsOverlay'
 import { SERVICES, Services } from './scenes/services'
 import { H, W } from './ui/layout'
 import { C, css } from './ui/theme'
@@ -22,6 +25,9 @@ const game = new Phaser.Game({
   backgroundColor: css(C.background),
   pixelArt: true,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-  scene: [BootScene, GameScene],
+  scene: [BootScene, HomeScene, GameScene, BookScene, SettingsOverlay],
 })
 game.registry.set(SERVICES, services)
+
+declare global { interface Window { __world?: { w: number; h: number } } }
+if (import.meta.env.DEV) window.__world = { w: W, h: H }

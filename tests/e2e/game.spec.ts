@@ -2,44 +2,18 @@ import { expect, test, type Page } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 import { RecipeBook } from '../../src/core/recipes'
 import { generateLevel } from '../../src/core/generator'
-import { newGame, play } from '../../src/core/game'
 import type { Move } from '../../src/core/types'
 import { FOOTER, center } from '../../src/ui/layout'
+import { idle, nonWinningMove as nwm, play, tapMove } from './helpers'
 
 const book = new RecipeBook(readFileSync(new URL('../../src/data/receitas.csv', import.meta.url), 'utf8'))
 const level1 = generateLevel(1, book)
 
-/** Primeira troca válida da fase 1 que não vence a fase. */
-function nonWinningMove(): Move {
-  const { rows, cols, cells } = level1.board
-  const el = (r: number, c: number) => { const v = cells[r * cols + c]; return v !== null && v !== '#' }
-  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
-    for (const to of [{ r, c: c + 1 }, { r: r + 1, c }]) {
-      if (to.r >= rows || to.c >= cols || !el(r, c) || !el(to.r, to.c)) continue
-      const m = { from: { r, c }, to }
-      if (play(newGame(level1), m, level1, book).state.status === 'playing') return m
-    }
-  }
-  throw new Error('fase 1 sem movimento não vencedor')
-}
+const nonWinningMove = (): Move => nwm(level1, book)
 
 async function open(page: Page) {
   await page.goto('/')
-  await page.waitForFunction(() => (window as any).__game?.level?.number === 1)
-  await idle(page)
-}
-
-async function idle(page: Page) {
-  await page.waitForFunction(() => (window as any).__game && !(window as any).__game.animating)
-}
-
-async function tapMove(page: Page, m: Move) {
-  await page.evaluate((m) => {
-    const g = (window as any).__game
-    g.tap(m.from.r, m.from.c)
-    g.tap(m.to.r, m.to.c)
-  }, m)
-  await idle(page)
+  await play(page, 1)
 }
 
 const state = (page: Page) => page.evaluate(() => JSON.parse(JSON.stringify((window as any).__game.state)))
@@ -84,8 +58,10 @@ test('toques rápidos durante animação aplicam um movimento só', async ({ pag
   await page.evaluate(async (m) => {
     const g = (window as any).__game
     const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
-    for (let i = 0; i < 3; i++) {
+    // Os toques extras só valem enquanto a primeira animação roda (sob carga os timers atrasam).
+    for (let i = 0; i < 3 && (i === 0 || g.animating); i++) {
       g.tap(m.from.r, m.from.c); await wait(15)
+      if (i > 0 && !g.animating) break
       g.tap(m.to.r, m.to.c); await wait(15)
     }
   }, m)
@@ -138,7 +114,7 @@ test('fechar durante a animação do movimento vencedor não perde a vitória', 
   expect(await page.evaluate(() => (window as any).__game.animating)).toBe(true)
   const p = await saved(page)
   await page.reload()
-  await page.waitForFunction(() => (window as any).__game?.level)
+  await play(page, 2)
   expect(p.currentLevel).toBe(2)
   expect(p.stars['1']).toBeGreaterThanOrEqual(1)
   expect(p.inProgress).toBeUndefined()

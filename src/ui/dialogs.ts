@@ -3,7 +3,7 @@ import type { RecipeBook } from '../core/recipes'
 import type { Recipe } from '../core/types'
 import { t } from '../i18n/pt-BR'
 import * as icons from './icons'
-import { FOOTER, H, W } from './layout'
+import { FOOTER, H, W, type Rect } from './layout'
 import { elementIcon } from './pieces'
 import { C } from './theme'
 import { Button, drawBox, txt } from './widgets'
@@ -67,12 +67,15 @@ function dialog(
   root.add([rib, label])
   body(root, top)
   const bh = 62
+  const rects: Rect[] = []
   buttons.forEach((b, i) => {
     const by = top + height - 18 - (buttons.length - i) * (bh + 12) + 12
-    const btn = new Button(scene, { x: x + 24, y: by, w: w - 48, h: bh },
+    rects.push({ x: x + 24, y: by, w: w - 48, h: bh })
+    const btn = new Button(scene, rects[i],
       { fill: b.fill, shade: b.shade, label: b.label, sub: b.sub, size: 18, textColor: b.textColor }, b.onTap)
     root.add(btn)
   })
+  root.setData('buttons', rects)   // retângulos dos botões (para os testes)
   root.setAlpha(0)
   scene.tweens.add({ targets: root, alpha: 1, duration: 200 })
   return root

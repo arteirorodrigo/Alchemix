@@ -9,8 +9,9 @@ import { t } from '../i18n/pt-BR'
 import { BoardView } from '../ui/boardView'
 import { discoveryCard, loseDialog, toast, winDialog } from '../ui/dialogs'
 import { Hud } from '../ui/hud'
-import { H, W } from '../ui/layout'
+import { H, TOP, W, type Rect } from '../ui/layout'
 import { setupCamera } from '../ui/widgets'
+import { OVERLAY_CLOSED, openOverlay } from './overlay'
 import { SERVICES, type Services } from './services'
 
 type Overlay = 'win' | 'lose' | null
@@ -22,6 +23,12 @@ export interface GameDebug {
   readonly highlight: [Pos, Pos] | null
   readonly overlay: Overlay
   readonly legend: string[]
+  /** Lado da peça, em unidades do mundo. */
+  readonly tile: number
+  /** Botões do rodapé da esquerda para a direita. */
+  readonly footerOrder: string[]
+  /** `next`: primeiro botão do diálogo aberto ("Próxima fase" na vitória). */
+  readonly rects: { back: Rect; settings: Rect; board: Rect; footer: Record<string, Rect>; next?: Rect }
   tap(r: number, c: number): void
 }
 
@@ -68,12 +75,16 @@ export class GameScene extends Phaser.Scene {
     bg.setScale(Math.max(W / bg.width, H / bg.height))
 
     this.hud = new Hud(this, book, this.levelNumber, this.level.goals, {
-      back: () => { if (!this.locked()) this.scene.start('boot') },
-      settings: () => toast(this, t.emBreve),
-      book: () => toast(this, t.emBreve),
+      back: () => { if (!this.locked()) this.scene.start('home') },
+      settings: () => openOverlay(this, 'settings'),
+      book: () => openOverlay(this, 'book'),
       extra: () => void this.useExtraMoves(),
       hint: () => void this.useHint(),
       undo: () => void this.useUndo(),
+    }, this.sv.progress.settings.leftHanded)
+    this.events.on(OVERLAY_CLOSED, () => {
+      this.hud.setLeftHanded(this.sv.progress.settings.leftHanded)
+      this.refreshButtons()
     })
     this.board = new BoardView(this, book, this.state.board, (r, c) => this.onCellTap(r, c))
     this.refreshHud()
@@ -84,6 +95,7 @@ export class GameScene extends Phaser.Scene {
     document.addEventListener('visibilitychange', onVisibility)
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       document.removeEventListener('visibilitychange', onVisibility)
+      this.events.off(OVERLAY_CLOSED)
       if (import.meta.env.DEV && window.__game === debug) delete window.__game
     })
 
@@ -95,6 +107,14 @@ export class GameScene extends Phaser.Scene {
       get highlight() { return scene.highlight },
       get overlay() { return scene.overlay },
       get legend() { return scene.legendStrings() },
+      get tile() { return scene.board.tile },
+      get footerOrder() {
+        return Object.entries(scene.hud.footer()).sort((a, b) => a[1].x - b[1].x).map(([k]) => k)
+      },
+      get rects() {
+        const next = (scene.dialogBox?.getData('buttons') as Rect[] | undefined)?.[0]
+        return { back: TOP.back, settings: TOP.settings, board: scene.board.frame, footer: scene.hud.footer(), next }
+      },
       tap: (r, c) => this.onCellTap(r, c),
     }
     if (import.meta.env.DEV) window.__game = debug

@@ -99,6 +99,9 @@ export class Button extends Phaser.GameObjects.Container {
   }
 
   get styleDef(): ButtonStyle { return this.style }
+
+  /** Largura do rótulo principal (0 se não houver). */
+  get labelWidth(): number { return this.main?.width ?? 0 }
 }
 
 /** Promessa que resolve quando o tween termina. */

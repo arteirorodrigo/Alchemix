@@ -14,7 +14,6 @@ export const t = {
   desfazer: 'Desfazer',
   gratis: 'grátis',
   semSaida: 'Sem saída daqui — desfaça um movimento',
-  emBreve: 'Em breve!',
   descoberta: 'descoberta!',
   vitoria: 'Fase completa!',
   pontosFinal: (n: number) => `${n} pontos`,
@@ -23,6 +22,29 @@ export const t = {
   derrotaTexto: 'Faltou pouco! Ganhe mais 3 movimentos ou recomece.',
   maisMovimentosAnuncio: '+3 movimentos (anúncio)',
   tentarDeNovo: 'Tentar de novo',
+  // início
+  logo: 'ALQUIMIA',
+  logoSub: 'em Cadeia',
+  oQueMais: 'e o que mais?',
+  jogar: (n: number) => `JOGAR · Fase ${n}`,
+  receitasBotao: (x: number, y: number) => `Receitas ${x}/${y}`,
+  dicas: (n: number) => `${n} dica${n === 1 ? '' : 's'}`,
+  fases: 'Suas fases',
+  umaMao: 'Feito para jogar com uma mão',
+  // livro
+  receitas: 'Receitas',
+  descobertas: (x: number, y: number) => `${x} de ${y} descobertas`,
+  aindaSecreta: 'ainda secreta',
+  nivel: (n: number) => `Nível ${n}`,
+  // ajustes
+  ajustes: 'Ajustes',
+  ajustesSub: 'Deixe do seu jeitinho',
+  sons: 'Sons',
+  sonsDesc: 'Plim-plim das reações',
+  vibracao: 'Vibração',
+  vibracaoDesc: 'Tremidinha a cada combo',
+  canhoto: 'Modo canhoto',
+  canhotoDesc: 'Botões do lado esquerdo',
   anuncio: {
     titulo: 'Anúncio',
     motivo: {
