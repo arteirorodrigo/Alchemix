@@ -13,6 +13,7 @@ export const t = {
   dicaAnuncio: 'ver anúncio',
   desfazer: 'Desfazer',
   gratis: 'grátis',
+  talvezSaida: 'Hmm… pense mais um pouco — tente outra combinação',
   semSaida: 'Sem saída daqui — desfaça um movimento',
   descoberta: 'descoberta!',
   vitoria: 'Fase completa!',

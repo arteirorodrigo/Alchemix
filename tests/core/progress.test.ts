@@ -72,4 +72,28 @@ describe('progress', () => {
     ls.set('k', 'v')
     expect(ls.get('k')).toBe('v')
   })
+
+  test('recordWin só limpa inProgress da própria fase', () => {
+    const level = generateLevel(10, book)
+    const g = newGame(level)
+    const p0 = { ...loadProgress(new MemoryStorage()), currentLevel: 10, inProgress: g }
+    expect(recordWin(p0, 1, 3, []).inProgress).toEqual(g)
+    expect(recordWin(p0, 10, 3, []).inProgress).toBeUndefined()
+  })
+
+  test('save com formato inválido cai nos padrões', () => {
+    const st = new MemoryStorage()
+    const put = (o: object) => st.set('alquimia.save.v1', JSON.stringify({ version: 1, ...o }))
+    put({ inProgress: { levelNumber: 3 } })
+    expect(loadProgress(st).inProgress).toBeUndefined()
+    put({ discovered: 'x', hints: -2, currentLevel: 0, stars: 5, settings: { sound: 'sim' } })
+    const p = loadProgress(st)
+    expect(p.discovered).toEqual([])
+    expect(p.hints).toBe(3)
+    expect(p.currentLevel).toBe(1)
+    expect(p.stars).toEqual({})
+    expect(p.settings.sound).toBe(true)
+    put({ inProgress: { levelNumber: 1, board: { rows: 2, cols: 2, cells: ['a'] }, movesLeft: 1, collected: {}, history: [], status: 'playing' } })
+    expect(loadProgress(st).inProgress).toBeUndefined()
+  })
 })

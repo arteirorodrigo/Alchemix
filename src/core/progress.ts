@@ -21,6 +21,33 @@ function defaults(): Progress {
   }
 }
 
+const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v)
+
+function validInProgress(g: unknown): g is GameState {
+  if (!isObj(g) || typeof g.levelNumber !== 'number' || typeof g.movesLeft !== 'number') return false
+  const b = g.board
+  if (!isObj(b) || !Array.isArray(b.cells) || typeof b.rows !== 'number' || typeof b.cols !== 'number') return false
+  if (b.rows * b.cols !== b.cells.length) return false
+  return isObj(g.collected) && Array.isArray(g.history) && typeof g.status === 'string'
+}
+
+function sanitize(o: Record<string, unknown>, d: Progress): Progress {
+  const out: Progress = { ...d }
+  if (Number.isInteger(o.currentLevel) && (o.currentLevel as number) > 0) out.currentLevel = o.currentLevel as number
+  if (typeof o.hints === 'number' && Number.isFinite(o.hints) && o.hints >= 0) out.hints = o.hints
+  if (isObj(o.stars)) out.stars = o.stars as Record<number, number>
+  if (Array.isArray(o.discovered) && o.discovered.every((x) => typeof x === 'string')) out.discovered = o.discovered as string[]
+  if (typeof o.lastFreeHintDay === 'string') out.lastFreeHintDay = o.lastFreeHintDay
+  if (isObj(o.settings)) {
+    for (const k of Object.keys(d.settings) as (keyof Progress['settings'])[]) {
+      const v = o.settings[k]
+      if (typeof v === 'boolean') out.settings[k] = v
+    }
+  }
+  if (validInProgress(o.inProgress)) out.inProgress = o.inProgress
+  return out
+}
+
 export function loadProgress(st: Storage): Progress {
   try {
     const raw = st.get(KEY)
@@ -28,7 +55,7 @@ export function loadProgress(st: Storage): Progress {
     const o = JSON.parse(raw)
     if (typeof o !== 'object' || o === null || o.version !== 1) return defaults()
     const d = defaults()
-    return { ...d, ...o, settings: { ...d.settings, ...(o.settings ?? {}) } }
+    return sanitize(o, d)
   } catch {
     return defaults()
   }
@@ -48,9 +75,10 @@ function union(a: string[], b: string[]): string[] {
 }
 
 export function recordWin(p: Progress, level: number, stars: number, seen: string[]): Progress {
-  const { inProgress: _drop, ...rest } = p
+  const { inProgress, ...rest } = p
   return {
     ...rest,
+    ...(inProgress && inProgress.levelNumber !== level ? { inProgress } : {}),
     stars: { ...p.stars, [level]: Math.max(p.stars[level] ?? 0, stars) },
     currentLevel: Math.max(p.currentLevel, level + 1),
     discovered: union(p.discovered, seen),

@@ -68,7 +68,8 @@ export class GameScene extends Phaser.Scene {
     const { book } = this.sv
     this.level = generateLevel(this.levelNumber, book)
     const saved = this.sv.progress.inProgress
-    this.state = saved && saved.levelNumber === this.levelNumber && saved.status !== 'won' ? saved : newGame(this.level)
+    const ok = saved && saved.levelNumber === this.levelNumber && saved.fingerprint === this.level.fingerprint && saved.status !== 'won'
+    this.state = ok ? saved : newGame(this.level)
     this.points = this.sv.loadPoints(this.levelNumber, this.state.history.length)
 
     const bg = this.add.image(W / 2, H / 2, 'fundo')
@@ -204,6 +205,7 @@ export class GameScene extends Phaser.Scene {
     // Sem saída não custa nada; só cobra (estoque ou anúncio) quando há um movimento a mostrar.
     const h = getHint(this.state, this.level, this.sv.book)
     if (h.kind === 'undo') return toast(this, t.semSaida)
+    if (h.kind === 'unknown') return toast(this, t.talvezSaida)
     if (this.sv.progress.hints > 0) {
       this.sv.update((p) => ({ ...p, hints: p.hints - 1 }))
     } else if (!(await this.watchAd('hint'))) return
@@ -289,6 +291,8 @@ export class GameScene extends Phaser.Scene {
 
   private saveInProgress(): void {
     if (this.state.status === 'won') return
+    // replay de fase anterior não toca no slot único da partida em andamento
+    if (this.levelNumber < this.sv.progress.currentLevel) return
     this.sv.update((p) => ({ ...p, inProgress: this.state }))
   }
 

@@ -3,10 +3,11 @@ import type { RecipeBook } from './recipes'
 import { boardKey, get } from './board'
 import { newGame, play, type GameState } from './game'
 
-export type Hint = { kind: 'move'; move: Move } | { kind: 'undo' }
+export type Hint = { kind: 'move'; move: Move } | { kind: 'undo' } | { kind: 'unknown' }
 
 const MAX_DEPTH = 4
 const UNDO: Hint = { kind: 'undo' }
+const UNKNOWN: Hint = { kind: 'unknown' }
 
 function isElement(c: unknown): boolean {
   return typeof c === 'string' && c !== '#'
@@ -66,11 +67,13 @@ export function getHint(s: GameState, level: Level, book: RecipeBook, budgetMs =
 
   const depth = Math.min(s.movesLeft, MAX_DEPTH)
   for (const m of validMoves(s)) {
-    if (performance.now() > deadline) break
+    if (performance.now() > deadline) { timedOut = true; break }
     const next = play(s, m, level, book).state
     if (next.status === 'won') return { kind: 'move', move: m }
     if (next.status === 'playing' && depth > 1 && dfs(next, depth - 1)) return { kind: 'move', move: m }
     if (timedOut) break
   }
-  return UNDO
+  // 'undo' só com prova exaustiva (busca completa dentro dos movimentos restantes) e algo a desfazer.
+  const exhaustive = !timedOut && s.movesLeft <= MAX_DEPTH
+  return exhaustive && s.history.length > 0 ? UNDO : UNKNOWN
 }

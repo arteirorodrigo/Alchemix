@@ -14,12 +14,15 @@ export interface GameState {
   extraMovesUsed: boolean
   seen: string[]
   status: 'playing' | 'won' | 'lost'
+  /** Impressão digital da fase gerada; liga o save à fase. */
+  fingerprint?: string
 }
 
 export function newGame(level: Level): GameState {
   return {
     levelNumber: level.number, board: level.board, movesLeft: level.moves, collected: {},
     history: [], freeUndoUsed: false, extraMovesUsed: false, seen: [], status: 'playing',
+    fingerprint: level.fingerprint,
   }
 }
 
@@ -66,6 +69,7 @@ export function addExtraMoves(s: GameState): GameState {
   if (s.extraMovesUsed) throw new Error('movimentos extras já usados')
   return {
     ...s, movesLeft: s.movesLeft + 3, extraMovesUsed: true,
+    history: s.history.map((h) => ({ ...h, movesLeft: h.movesLeft + 3 })),
     status: s.status === 'lost' ? 'playing' : s.status,
   }
 }

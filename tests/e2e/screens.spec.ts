@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 import { RecipeBook } from '../../src/core/recipes'
 import { generateLevel } from '../../src/core/generator'
+import { newGame, play as playMove } from '../../src/core/game'
 import { cssScale, home, idle, nonWinningMove, play, saved, seed, tapMove, tapWorld } from './helpers'
 
 const book = new RecipeBook(readFileSync(new URL('../../src/data/receitas.csv', import.meta.url), 'utf8'))
@@ -189,7 +190,7 @@ test('chip da fase atual abre a fase atual mesmo com outra fase em andamento', a
   await page.waitForFunction(() => (window as any).__game?.level?.number === 2)
   await idle(page)
   await tapMove(page, nonWinningMove(generateLevel(2, book), book))
-  expect((await saved(page)).inProgress.levelNumber).toBe(2)
+  expect((await saved(page)).inProgress).toBeUndefined()   // replay não usa o slot de partida em andamento
   await backHome(page)
   const h = await homeInfo(page)
   expect(h.strip[4].level).toBe(5)
@@ -197,4 +198,25 @@ test('chip da fase atual abre a fase atual mesmo com outra fase em andamento', a
   await page.waitForFunction(() => (window as any).__game?.level?.number !== undefined)
   await idle(page)
   expect(await page.evaluate(() => (window as any).__game.level.number)).toBe(5)
+})
+
+test('rejogar e vencer fase antiga preserva a partida em andamento da fase atual (fase 6)', async ({ page }) => {
+  const lv6 = generateLevel(6, book)
+  const inProgress = playMove(newGame(lv6), nonWinningMove(lv6, book), lv6, book).state
+  await seed(page, {
+    currentLevel: 6, stars: Object.fromEntries([...Array(5)].map((_, i) => [i + 1, 1])), inProgress,
+  })
+  await page.goto('/')
+  await home(page)
+  const h = await homeInfo(page)
+  expect(h.strip[1].level).toBe(2)
+  await tapWorld(page, h.rects.strip1)
+  await page.waitForFunction(() => (window as any).__game?.level?.number === 2)
+  await idle(page)
+  for (const m of generateLevel(2, book).solution) await tapMove(page, m)
+  await page.waitForFunction(() => (window as any).__game.overlay === 'win')
+  expect((await saved(page)).inProgress.levelNumber).toBe(6)
+  await backHome(page)
+  await play(page, 6)
+  expect(await page.evaluate(() => (window as any).__game.state.history.length)).toBe(1)
 })

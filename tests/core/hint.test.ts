@@ -38,7 +38,7 @@ describe('getHint', () => {
     let steps = 0
     while (s.status === 'playing' && steps < 10) {
       const h = getHint(s, lv, book)
-      if (h.kind === 'undo') break
+      if (h.kind !== 'move') break
       s = play(s, h.move, lv, book).state
       steps++
     }
@@ -63,9 +63,25 @@ describe('getHint', () => {
       goals: [{ element: 'tijolo', count: 1 }], moves: 4, active: ['agua+pedra'], solution: [], fingerprint: '',
     }
     const t0 = performance.now()
-    const h = getHint(newGame(lv), lv, book)
+    const start = newGame(lv)
+    const h = getHint({ ...start, history: [{ board: start.board, movesLeft: 5, collected: {} }] }, lv, book)
     expect(performance.now() - t0).toBeLessThan(300)
     expect(h).toEqual({ kind: 'undo' })
+  })
+
+  test('sem tempo na busca fora da solução devolve unknown', () => {
+    const lv = generateLevel(30, book)
+    const wrong = { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } }
+    const s = play(newGame(lv), wrong, lv, book).state
+    expect(getHint(s, lv, book, 0)).toEqual({ kind: 'unknown' })
+  })
+
+  test('sem solução e sem histórico devolve unknown', () => {
+    const lv: Level = {
+      number: 1, seed: 0, board: parseBoard(['APBF', 'FBPA', 'PABF'], L),
+      goals: [{ element: 'tijolo', count: 1 }], moves: 4, active: ['agua+pedra'], solution: [], fingerprint: '',
+    }
+    expect(getHint(newGame(lv), lv, book)).toEqual({ kind: 'unknown' })
   })
 
   test('partida terminada devolve undo', () => {

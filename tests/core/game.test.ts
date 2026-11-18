@@ -90,4 +90,30 @@ describe('game', () => {
     expect(g.movesLeft).toBeGreaterThanOrEqual(2)
     expect(stars(g, lv)).toBe(1)
   })
+
+  test('perdeu → +3 → desfazer mantém os +3', () => {
+    const lv = mk(['APB'], [{ element: 'tijolo', count: 1 }], 2)
+    const a = play(newGame(lv), NOOP, lv, book).state
+    const lost = play(a, mv([0, 1], [0, 2]), lv, book).state
+    expect(lost.status).toBe('lost')
+    const extra = addExtraMoves(lost)
+    const u = undo(extra)
+    expect(u.movesLeft).toBe(lost.history[lost.history.length - 1].movesLeft + 3)
+    expect(u.status).toBe('playing')
+  })
+
+  test('play() não altera o estado de entrada', () => {
+    const lv = winLevel()
+    const s = newGame(lv)
+    const before = structuredClone(s)
+    play(s, mv([0, 1], [0, 0]), lv, book)
+    expect(s).toEqual(before)
+  })
+
+  test('estrelas em fase perdida = 0', () => {
+    const lv = mk(['APB'], [{ element: 'tijolo', count: 1 }], 1)
+    const lost = play(newGame(lv), NOOP, lv, book).state
+    expect(lost.status).toBe('lost')
+    expect(stars(lost, lv)).toBe(0)
+  })
 })

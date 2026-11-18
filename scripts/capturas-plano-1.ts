@@ -58,7 +58,6 @@ for (let n = 1; n <= 3; n++) {
   if (n === 1) await page.screenshot({ path: `${out}/vitoria.png` })
   await click({ x: 195, y: 548 })           // Próxima fase
   await wait(1500)
-  await page.screenshot({ path: `/tmp/claude-0/-home-user-Jogo/3acacfa0-61b2-5ee8-9dcc-d4b56ae72896/scratchpad/after${n}.png` })
   // volta ao início para o próximo JOGAR
   await click({ x: 40, y: 44 }); await wait(1200)
 }
