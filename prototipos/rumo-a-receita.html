@@ -142,6 +142,8 @@
   // folhas (elementos base) e passos necessários para fazer `e`
   function leaves(e, out = []) { const p = producer(e); if (!p || BASE.includes(e)) out.push(e); else { leaves(p.a, out); leaves(p.b, out); } return out; }
   const steps = (e) => leaves(e).length - 1;
+  // só entram no livro as receitas feitas com bases já liberadas
+  const visibleRecipes = () => RECIPES.filter(r => known.has(r.k) || leaves(r.r).every(l => G.bases.includes(l)));
 
   const $ = (id) => document.getElementById(id);
   const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
@@ -205,7 +207,8 @@
     $('goalIco').textContent = ''; $('goalIco').append(ico(G.goal)); $('goalIco').title = EL[G.goal][0];
     renderTree();
     $('taps').textContent = taps; $('lives').textContent = '❤️'.repeat(lives) + '🤍'.repeat(3 - lives);
-    $('found').textContent = `📖 ${known.size}/${RECIPES.length}`;
+    const vis = visibleRecipes();
+    $('found').textContent = `📖 ${vis.filter(r => known.has(r.k)).length}/${vis.length}`;
     const q = $('queue'); q.textContent = ''; for (const e of queue) { const d = document.createElement('div'); d.className = 'q'; d.style.background = EL[e][3]; d.append(ico(e)); q.append(d); }
     const b = $('board'); b.textContent = ''; b.style.gridTemplateColumns = `repeat(${COLS}, auto)`; b.style.setProperty('--cs', cs() + 'px');
     cells.forEach((e, i) => {
@@ -266,10 +269,12 @@
     modal(`<h2>Como jogar</h2><p>Chegue ao <b>objetivo</b> lá em cima juntando peças.</p><p>Toque numa peça e depois numa <b>vizinha</b>. Se for uma receita, nasce um elemento novo — e você descobre a receita!</p><p>Não reagiu? 💥 Explode, <b>tira uma vida ❤️ e 1 toque</b>, e as duas viram peças úteis. São 3 vidas por fase.</p><p>Os <b>?</b> do objetivo se revelam conforme você descobre. Use poucos toques para ganhar mais estrelas.</p><button class="btn green" data-a="close">Bora!</button>`);
   }
   function book() {
-    const rows = RECIPES.map(r => known.has(r.k)
+    const vis = visibleRecipes(); const got = vis.filter(r => known.has(r.k)).length;
+    const locked = RECIPES.length - vis.length;
+    const rows = vis.map(r => known.has(r.k)
       ? `<div class="row"><span class="ico" data-e="${r.a}"></span>+<span class="ico" data-e="${r.b}"></span>=<span class="ico" data-e="${r.r}"></span> ${EL[r.r][0]}</div>`
       : `<div class="row" style="opacity:.55">? + ? = ?</div>`).join('');
-    modal(`<h2>Receitas (${known.size}/${RECIPES.length})</h2><div class="book">${rows}</div><button class="btn green" data-a="close">Fechar</button>`);
+    modal(`<h2>Receitas (${got}/${vis.length})</h2><div class="book">${rows}</div>${locked ? '<p>🔒 Mais receitas chegam com a próxima base.</p>' : ''}<button class="btn green" data-a="close">Fechar</button>`);
     $('card').querySelectorAll('[data-e]').forEach(s => { s.replaceWith(ico(s.dataset.e)); });
   }
   // dica: procura um par vizinho que faça uma peça do caminho do objetivo
