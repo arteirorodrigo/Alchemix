@@ -152,7 +152,7 @@
     G = { goal, need: steps(goal) };
     cells = Array.from({ length: ROWS * COLS }, () => rng() < 0.5 ? pick(rng, leaves(goal)) : pick(rng, BASE));
     queue = [0, 0, 0].map(() => rng() < 0.55 ? pick(rng, leaves(goal)) : pick(rng, BASE));
-    taps = G.need + 4 + Math.ceil(G.need * 0.8);
+    taps = G.need + 2 + Math.ceil(G.need * 0.5);
     sel = null; hint = null; busy = false; lives = 3; seenEls = new Set(cells);
     $('title').textContent = 'Fase ' + n;
     render();
@@ -208,20 +208,21 @@
       if (isNew) toast(`✨ Nova receita! ${EL[r.a][1]} + ${EL[r.b][1]} = ${EL[r.r][1]} ${EL[r.r][0]}`, 2600);
       if (r.r === G.goal) return setTimeout(win, 450);
     } else {
-      lives--; busy = true;
+      lives--; taps--; busy = true;
       render({ shake: [a, b] });
       return setTimeout(() => {
         busy = false;
         cells[a] = helpful(); cells[b] = helpful();
         render({ boom: [a, b] });
         if (lives <= 0) return setTimeout(() => lose('vidas'), 500);
+        if (taps <= 0) return setTimeout(() => lose('toques'), 400);
         toast(`💥 Não reagiu! −1 ❤️ — vieram peças úteis no lugar.`, 1800);
       }, 520);
     }
     if (taps <= 0) setTimeout(() => lose('toques'), 400);
   }
   function win() {
-    const extra = taps; const stars = extra >= 4 ? '⭐⭐⭐' : extra >= 2 ? '⭐⭐' : '⭐';
+    const extra = taps; const stars = extra >= 2 ? '⭐⭐⭐' : extra >= 1 ? '⭐⭐' : '⭐';
     modal(`<img class="mascot" src="img/mascote-frasco.png" alt=""><h2>Você fez ${EL[G.goal][0]}!</h2><div class="ico" style="width:70px;height:70px;margin:0 auto;font-size:52px" id="wico"></div><p style="font-size:28px">${stars}</p><p>Sobraram ${extra} toques</p><button class="btn green" data-a="next">Próxima fase</button>`);
     $('wico').append(ico(G.goal));
   }
@@ -237,7 +238,7 @@
   }
   function addMore() { taps += 5; render(); toast('+5 toques'); }
   function help() {
-    modal(`<h2>Como jogar</h2><p>Chegue ao <b>objetivo</b> lá em cima juntando peças.</p><p>Toque numa peça e depois numa <b>vizinha</b>. Se for uma receita, nasce um elemento novo — e você descobre a receita!</p><p>Não reagiu? 💥 Explode, <b>tira uma vida ❤️</b> e as duas viram peças úteis. São 3 vidas por fase.</p><p>Os <b>?</b> do objetivo se revelam conforme você descobre. Use poucos toques para ganhar mais estrelas.</p><button class="btn green" data-a="close">Bora!</button>`);
+    modal(`<h2>Como jogar</h2><p>Chegue ao <b>objetivo</b> lá em cima juntando peças.</p><p>Toque numa peça e depois numa <b>vizinha</b>. Se for uma receita, nasce um elemento novo — e você descobre a receita!</p><p>Não reagiu? 💥 Explode, <b>tira uma vida ❤️ e 1 toque</b>, e as duas viram peças úteis. São 3 vidas por fase.</p><p>Os <b>?</b> do objetivo se revelam conforme você descobre. Use poucos toques para ganhar mais estrelas.</p><button class="btn green" data-a="close">Bora!</button>`);
   }
   function book() {
     const rows = RECIPES.map(r => known.has(r.k)
