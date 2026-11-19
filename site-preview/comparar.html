@@ -31,13 +31,21 @@ kbd{font:700 .78rem ui-monospace,monospace;border:1px solid var(--line);border-b
 
 main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;padding-block:22px 48px;align-items:start}
 @media (max-width:900px){main{grid-template-columns:1fr}}
-.palco{display:flex;justify-content:center;min-width:0}
+.palco{display:flex;justify-content:center;min-width:0;width:100%}
 .janela{width:100%;max-width:1000px;background:var(--frame);border-radius:14px;overflow:hidden;box-shadow:0 20px 50px rgb(20 30 30 / .18)}
 .barra{display:flex;align-items:center;gap:10px;padding:10px 14px;color:#cfd6d4;font-size:.82rem}
 .barra i{width:11px;height:11px;border-radius:50%;background:#555c60;display:inline-block}
 .url{flex:1;min-width:0;background:#363c40;border-radius:8px;padding:5px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tela{height:min(72vh,760px);overflow-y:auto;background:#fff;position:relative;overscroll-behavior:contain}
 .tela img{display:block;width:100%;height:auto}
+.tela.vivo{overflow:hidden;position:relative}
+.tela iframe{border:0;display:block;position:absolute;top:0;left:0;transform-origin:0 0;background:#fff}
+.aovivo{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:14px}
+.aovivo p{margin:0;font-size:.9rem;color:var(--muted);flex:1;min-width:220px}
+.aovivo a{font:800 .95rem var(--body);color:#fff;background:var(--mar);border-radius:999px;padding:10px 18px;text-decoration:none;white-space:nowrap}
+.aovivo a.cinza{background:var(--antes)}
+.coluna{display:flex;flex-direction:column;min-width:0;width:100%;align-items:center}
+.coluna>.aovivo{width:100%;max-width:1000px}
 .selo{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);box-shadow:0 4px 14px rgb(0 0 0 / .25);z-index:2;font:800 .78rem var(--body);letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--antes);padding:6px 12px;border-radius:999px;pointer-events:none}
 .selo.novo{background:var(--mar)}
 .palco.cel .janela{max-width:400px;border-radius:44px;padding:14px;}
@@ -76,14 +84,21 @@ aside{display:flex;flex-direction:column;gap:14px;min-width:0}
 </div>
 
 <main class="wrap">
+  <div class="coluna">
+  <div class="aovivo" id="aovivo">
+    <p id="aovivo-txt"></p>
+    <a id="aovivo-link" href="https://www.riohosting.com.br/pt/" target="_blank" rel="noopener">Abrir o site atual ao vivo</a>
+  </div>
   <div class="palco" id="palco">
     <div class="janela">
       <div class="barra"><i></i><i></i><i></i><span class="url" id="url">riohosting.com.br · nova versão</span></div>
       <div class="tela-wrap">
         <span class="selo novo" id="selo">Depois</span>
         <div class="tela" id="tela" tabindex="0" aria-label="Captura do site, role para ver tudo"><img id="img" alt="Página inicial da Rio Hosting"></div>
+        <div class="tela vivo" id="tela-vivo" hidden><iframe id="vivo" title="Nova versão do site, navegável"></iframe></div>
       </div>
     </div>
+  </div>
   </div>
 
   <aside>
@@ -107,18 +122,41 @@ aside{display:flex;flex-direction:column;gap:14px;min-width:0}
         <li>Rodapé completo e WhatsApp sempre visível.</li>
       </ul>
     </div>
-    <p class="fonte">Capturas feitas em 19/11/2026. O site atual foi fotografado de riohosting.com.br. Na nova versão, depoimentos e cupom ainda são exemplos.</p>
+    <p class="fonte">O site atual bloqueia ser aberto dentro de outra página, por isso o "antes" é uma captura feita em 19/11/2026; o botão acima abre o site de verdade. A nova versão é navegável aqui mesmo. Depoimentos e cupom ainda são exemplos.</p>
   </aside>
 </main>
 
+<script type="text/plain" id="novo-src">@@NOVO@@</script>
 <script>
-const IMGS={antes:{desk:"comparar/antes-desk.jpg",cel:"comparar/antes-cel.jpg"},depois:{desk:"comparar/depois-desk.jpg",cel:"comparar/depois-cel.jpg"}};
+const IMGS={desk:"comparar/antes-desk.jpg",cel:"comparar/antes-cel.jpg"};
+const W={desk:1280,cel:390};
+/* a nova versão entra viva no iframe: no arquivo único vem embutida; no link, é buscada ao lado */
+const NOVO=document.getElementById("novo-src");
+let novoPronto=false;
+async function carregarNovo(){
+  if(novoPronto)return;novoPronto=true;
+  let html=NOVO?NOVO.textContent:"@@NOVO@@";
+  if(html.trim()==="@@NOVO@@"){try{html=await (await fetch("riohosting-site.html")).text()}catch(e){html="<p style='font:16px sans-serif;padding:20px'>Não consegui carregar a nova versão.</p>"}}
+  else html=html.replace(/<\\\/script/g,"</"+"script");
+  html=html.replace("<head>","<head><style>.nota,.toggle-notas{display:none!important}</style>");
+  document.getElementById("vivo").srcdoc=html;
+}
+function ajustar(){
+  const tv=document.getElementById("tela-vivo"),f=document.getElementById("vivo");
+  const larg=tv.clientWidth||W[d],alt=tv.clientHeight||700,esc=Math.min(1,larg/W[d]);
+  f.style.width=W[d]+"px";f.style.height=(alt/esc)+"px";f.style.transform="scale("+esc+")";
+}
+addEventListener("resize",()=>{if(v==="depois")ajustar()});
 let v="depois",d="desk";
 const $=id=>document.getElementById(id);
 function show(){
-  $("img").src=IMGS[v][d];
-  $("img").alt=(v==="antes"?"Site atual":"Nova versão")+" da Rio Hosting, "+(d==="cel"?"no celular":"no computador");
+  $("img").src=IMGS[d];
+  $("img").alt="Site atual da Rio Hosting, "+(d==="cel"?"no celular":"no computador");
   $("tela").scrollTop=0;
+  $("tela").hidden=v!=="antes";$("tela-vivo").hidden=v!=="depois";
+  $("aovivo-txt").textContent=v==="antes"?"Captura do site atual. Para navegar nele de verdade, abra o link.":"Nova versão funcionando: role, clique nos filtros, nas abas da busca e nas dúvidas.";
+  $("aovivo-link").hidden=v!=="antes";
+  if(v==="depois"){carregarNovo();requestAnimationFrame(ajustar)}
   $("palco").classList.toggle("cel",d==="cel");
   $("selo").textContent=v==="antes"?"Antes":"Depois";
   $("selo").classList.toggle("novo",v==="depois");
@@ -131,6 +169,6 @@ document.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{v=b.dataset.v;sh
 document.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{d=b.dataset.d;show()});
 addEventListener("keydown",e=>{if(e.key==="ArrowLeft"){v="antes";show()}if(e.key==="ArrowRight"){v="depois";show()}});
 if(matchMedia("(max-width:700px)").matches)d="cel";
-Object.values(IMGS).forEach(o=>Object.values(o).forEach(s=>{const i=new Image();i.src=s}));
+Object.values(IMGS).forEach(s=>{const i=new Image();i.src=s});
 show();
 </script>

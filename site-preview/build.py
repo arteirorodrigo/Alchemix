@@ -14,6 +14,9 @@ def inline(m):
 def build(nome, saida):
     src = (d / nome).read_text()
     src = re.sub(r"((?:img|comparar)/[A-Za-z0-9_.-]+\.(?:jpg|png))", inline, src)
+    if "@@NOVO@@" in src:
+        novo = (d / "riohosting-site.html").read_text().replace("</script", "<\\/script")
+        src = src.replace(">@@NOVO@@</script>", ">" + novo + "</script>", 1)
     head, body = src.split("</style>", 1)
     html = ('<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
