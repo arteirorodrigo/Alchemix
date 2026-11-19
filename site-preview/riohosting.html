@@ -1,36 +1,30 @@
 <title>Rio Hosting — prévia</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;600;700;800;900&display=swap">
 <style>
 /* Layout: faixas largas de ponta a ponta, conteúdo em coluna de 1120px; o calçadão de Copacabana (ondas) amarra as seções */
 :root{
-  --bg:#fbfaf6; --surface:#ffffff; --ink:#0f2329; --muted:#56686d; --line:#e3e1da;
-  --mar:#0a6c74; --mar-ink:#ffffff; --mar-soft:#e2f0ef; --sol:#f0ad32; --deep:#0d2f36; --deep-ink:#eaf3f2;
-  --nota:#7a4cc2; --nota-bg:#f1eafb;
-  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-  --body:"DM Sans", system-ui, -apple-system, sans-serif;
-  --r:14px;
+  /* Identidade Rio Hosting: verde-mar do logo, cinza grafite do texto, fundo branco; um só tema claro, como o site atual */
+  --bg:#ffffff; --surface:#ffffff; --ink:#3a3838; --muted:#6e6a6a; --line:#ebe9e7;
+  --mar:#009a8a; --mar-ink:#ffffff; --mar-soft:#e2f4f1; --sol:#f2b33d; --deep:#0b6f64; --deep-ink:#effaf8;
+  --nota:#7a4cc2; --nota-bg:#f1eafb; --claro:#f8f8f8;
+  --display:"Nunito", "Segoe UI", system-ui, sans-serif;
+  --body:"Nunito", system-ui, -apple-system, sans-serif;
+  --hand:"Caveat", "Segoe Print", "Bradley Hand", cursive;
+  --r:16px; color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0c1719; --surface:#132226; --ink:#e7efee; --muted:#9cb0b2; --line:#24383c;
-  --mar:#3cb6bd; --mar-ink:#06201f; --mar-soft:#133a3d; --sol:#f3b94b; --deep:#08262b; --deep-ink:#e3f1f0;
-  --nota:#c4a3f5; --nota-bg:#2a1f3d; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0c1719; --surface:#132226; --ink:#e7efee; --muted:#9cb0b2; --line:#24383c;
-  --mar:#3cb6bd; --mar-ink:#06201f; --mar-soft:#133a3d; --sol:#f3b94b; --deep:#08262b; --deep-ink:#e3f1f0;
-  --nota:#c4a3f5; --nota-bg:#2a1f3d; color-scheme:dark}
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
 h1,h2,h3{font-family:var(--display);line-height:1.08;text-wrap:balance;margin:0}
-h2{font-size:clamp(1.7rem,3.6vw,2.5rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(1.7rem,3.6vw,2.5rem);font-weight:900;letter-spacing:-.015em}
 h3{font-size:1.1rem;font-weight:700}
 p{margin:0}
 a{color:inherit}
 .wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 section{padding-block:clamp(48px,8vw,88px)}
-.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mar)}
+.eyebrow{font:700 1.6rem/1 var(--hand);color:var(--mar)}
 .head{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;max-width:640px}
 .head p{color:var(--muted)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:700 .95rem var(--body);border-radius:999px;padding:12px 22px;border:0;cursor:pointer;text-decoration:none;background:var(--mar);color:var(--mar-ink)}
@@ -52,8 +46,8 @@ body.sem-notas .nota{display:none}
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:21;background:var(--bg)}
 .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:12px}
-.logo{font:800 1.35rem var(--display);letter-spacing:-.03em;text-decoration:none;display:flex;align-items:center;gap:8px}
-.logo i{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 50% 38%,var(--sol) 0 38%,transparent 39%),linear-gradient(var(--mar),var(--mar));display:inline-block}
+.logo{display:flex;align-items:center;text-decoration:none}
+.logo img{height:42px;width:auto;display:block}
 .menu{display:flex;gap:22px;font-weight:500;font-size:.95rem}
 .menu a{text-decoration:none;color:var(--muted)}
 .menu a:hover{color:var(--ink)}
@@ -62,18 +56,19 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 /* hero */
 .hero{position:relative;overflow:hidden;background:
-  radial-gradient(circle at 82% 22%,color-mix(in srgb,var(--sol) 85%,transparent) 0 70px,transparent 71px),
-  linear-gradient(180deg,#9fd3d6 0%,#5db1b6 46%,#0a6c74 46.2%,#0b5a62 100%);color:#fff;padding-block:clamp(56px,9vw,110px) 0}
-.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(#e9d8b4,#dcc596);
+  linear-gradient(100deg,rgb(20 18 14 / .62) 0%,rgb(20 18 14 / .25) 60%,transparent),
+  url("img/por-do-sol.jpg") center 60%/cover,#7a5a2a;color:#fff;padding-block:clamp(56px,9vw,110px) 0}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:90px;background:var(--bg);
   -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='120' preserveAspectRatio='none'%3E%3Cpath d='M0 40 C300 0 500 80 800 40 S1100 10 1200 30 V120 H0Z'/%3E%3C/svg%3E") 0 0/100% 100%;
           mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='120' preserveAspectRatio='none'%3E%3Cpath d='M0 40 C300 0 500 80 800 40 S1100 10 1200 30 V120 H0Z'/%3E%3C/svg%3E") 0 0/100% 100%}
 .hero-grid{position:relative;z-index:1;display:grid;gap:22px;padding-bottom:150px}
-.hero h1{font-size:clamp(2.4rem,7vw,4.6rem);font-weight:800;letter-spacing:-.035em;max-width:13ch;text-shadow:0 2px 24px rgb(0 40 45 / .25)}
+.hero .bmg{font:700 clamp(1.6rem,3vw,2.1rem)/1 var(--hand);color:var(--sol)}
+.hero h1{font-size:clamp(2.4rem,7vw,4.4rem);font-weight:900;letter-spacing:-.025em;max-width:13ch;text-shadow:0 2px 24px rgb(0 40 45 / .25)}
 .hero .sub{font-size:1.1rem;max-width:44ch;opacity:.95}
 .badges{display:flex;flex-wrap:wrap;gap:8px}
 .badge{background:rgb(255 255 255 / .16);border:1px solid rgb(255 255 255 / .35);border-radius:999px;padding:6px 12px;font-size:.85rem;font-weight:500;backdrop-filter:blur(4px)}
-.oferta{display:inline-flex;gap:10px;align-items:center;background:var(--sol);color:#2a1a00;border-radius:12px;padding:10px 14px;font-weight:700;font-size:.92rem;width:fit-content}
-.oferta code{background:rgb(0 0 0 / .12);padding:2px 8px;border-radius:6px;font-family:ui-monospace,monospace}
+.oferta{display:inline-flex;gap:10px;align-items:center;background:var(--mar);color:#fff;border-radius:12px;padding:10px 14px;font-weight:700;font-size:.92rem;width:fit-content}
+.oferta code{background:rgb(255 255 255 / .2);padding:2px 8px;border-radius:6px;font-family:ui-monospace,monospace}
 
 /* busca */
 .busca{position:relative;z-index:2;margin-top:-118px}
@@ -98,17 +93,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .foto{position:relative;aspect-ratio:4/3;max-width:100%;display:flex;align-items:flex-end;padding:12px;color:#fff}
 .foto .cod{position:absolute;top:10px;left:10px;font:700 .72rem ui-monospace,monospace;background:rgb(0 0 0 / .4);padding:3px 7px;border-radius:6px}
 .foto .fav{position:absolute;top:8px;right:8px;width:34px;height:34px;border-radius:50%;border:0;background:rgb(255 255 255 / .9);color:#c2384b;font-size:1rem;cursor:pointer}
-.foto .ph{font-size:.72rem;opacity:.85;font-weight:500}
-.f-copa{background:linear-gradient(160deg,#ffd38a 0%,#f39c6b 30%,#3d97a0 31%,#0e5b66 70%,#e6d2a3 71%)}
-.f-ipa{background:linear-gradient(170deg,#ffe7b3 0%,#f6b26b 34%,#2f8f9d 35%,#0b4f5c 66%,#3b5d43 67%,#2b4532 100%)}
-.f-leb{background:linear-gradient(165deg,#c9e6f0 0%,#8ec5d6 38%,#1f7584 39%,#0d4652 72%,#efe0bb 73%)}
-.f-zs{background:linear-gradient(160deg,#f4c6d2 0%,#e48aa0 30%,#4f8fa0 31%,#1d4f5c 70%,#dfcfa6 71%)}
+.foto{background:var(--mar-soft) center/cover no-repeat}
 .card-body{display:flex;flex-direction:column;gap:8px;padding:14px 16px 16px;flex:1}
 .loc{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mar)}
 .card h3{font-family:var(--body);font-size:1rem;font-weight:700;line-height:1.3}
 .specs{display:flex;gap:12px;color:var(--muted);font-size:.85rem}
 .preco{margin-top:auto;padding-top:8px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;font-size:.85rem;color:var(--muted)}
-.preco strong{font:800 1.2rem var(--display);color:var(--ink);font-variant-numeric:tabular-nums}
+.preco strong{font:900 1.2rem var(--display);color:var(--ink);font-variant-numeric:tabular-nums}
 .vertodos{margin-top:26px;display:flex;justify-content:center}
 
 /* coleções */
@@ -117,13 +108,17 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .col{position:relative;aspect-ratio:3/4;max-width:100%;border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:14px;color:#fff;text-decoration:none;border:0;cursor:pointer;text-align:left;font:inherit}
 .col::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,rgb(0 0 0 / .55))}
 .col>*{position:relative;z-index:1}
-.col strong{font:800 1.2rem var(--display)}
+.col strong{font:700 1.9rem/1 var(--hand)}
 .col span{font-size:.82rem;opacity:.9}
-.c1{background:linear-gradient(170deg,#ffd38a,#f39c6b 40%,#0e5b66 41%)}
-.c2{background:linear-gradient(170deg,#ffe7b3,#f6b26b 40%,#2b4532 41%)}
-.c3{background:linear-gradient(170deg,#c9e6f0,#1f7584 45%,#0d4652)}
-.c4{background:linear-gradient(170deg,#a5e3e8,#3cb6bd 50%,#126c74)}
-.c5{background:linear-gradient(170deg,#f6e2a4,#e2a93b 55%,#8c5c12)}
+.c1{background:url("img/ap-OE17J.jpg") center/cover}
+.c2{background:url("img/por-do-sol.jpg") center/cover}
+.c3{background:url("img/vista.jpg") center/cover}
+.c4{background:url("img/ap-OA03J.jpg") center/cover}
+.c5{background:url("img/ap-OA02J.jpg") center/cover}
+.c6{background:url("img/cristo.jpg") center/cover}
+.c7{background:url("img/sala.jpg") center/cover}
+.c8{background:url("img/varanda.jpg") center/cover}
+.c9{background:url("img/cozinha.jpg") center/cover}
 @media (max-width:860px){.colecoes .col:last-child{grid-column:1/-1;aspect-ratio:16/7}}
 
 /* por que reservar */
@@ -141,7 +136,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .numeros{background:var(--deep);color:var(--deep-ink)}
 .num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 @media (max-width:760px){.num-grid{grid-template-columns:1fr 1fr}}
-.num strong{display:block;font:800 clamp(2.2rem,5vw,3.4rem)/1 var(--display);color:var(--sol);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.num strong{display:block;font:900 clamp(2.2rem,5vw,3.4rem)/1 var(--display);color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
 .num span{font-size:.92rem;opacity:.85}
 .numeros .nota{margin-top:24px}
 
@@ -180,7 +175,7 @@ details p{margin-top:10px;color:var(--muted)}
 .dono .eyebrow{color:inherit;opacity:.8}
 .dono ul{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:10px}
 .dono li{display:flex;gap:10px}
-.dono li::before{content:"✓";font-weight:800;color:var(--sol)}
+.dono li::before{content:"✓";font-weight:900;color:#fff}
 .form{background:var(--surface);color:var(--ink);border-radius:18px;padding:22px;display:grid;gap:12px}
 .form .linha{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media (max-width:520px){.form .linha{grid-template-columns:1fr}}
@@ -192,13 +187,13 @@ details p{margin-top:10px;color:var(--muted)}
 .insta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:22px}
 @media (max-width:600px){.insta-grid{grid-template-columns:repeat(2,1fr)}}
 .insta-grid div{aspect-ratio:1;max-width:100%;border-radius:10px}
-footer{background:var(--deep);color:var(--deep-ink);padding-block:44px 90px;font-size:.92rem}
+footer{background:var(--claro);color:var(--ink);padding-block:44px 90px;font-size:.92rem}
 .foot{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:28px}
 @media (max-width:760px){.foot{grid-template-columns:1fr 1fr}}
 .foot h4{margin:0 0 10px;font:700 .8rem var(--body);letter-spacing:.1em;text-transform:uppercase;opacity:.7}
 .foot ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
-.foot a{text-decoration:none;opacity:.9}
-.copy{margin-top:30px;padding-top:18px;border-top:1px solid rgb(255 255 255 / .12);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;opacity:.65;font-size:.82rem}
+.foot a{text-decoration:none;color:var(--mar)}
+.copy{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;opacity:.65;font-size:.82rem}
 .zap{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;width:58px;height:58px;border-radius:50%;background:#25d366;display:grid;place-items:center;box-shadow:0 8px 24px rgb(0 0 0 / .25)}
 .zap svg{width:30px;height:30px;fill:#fff}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -206,7 +201,7 @@ footer{background:var(--deep);color:var(--deep-ink);padding-block:44px 90px;font
 
 <header>
   <div class="wrap nav">
-    <a class="logo" href="#topo"><i aria-hidden="true"></i>Rio Hosting</a>
+    <a class="logo" href="#topo"><img src="img/logo.png" alt="Rio Hosting" width="183" height="42"></a>
     <nav class="menu" aria-label="Principal">
       <a href="#apartamentos">Apartamentos</a>
       <a href="#porque">Por que a Rio Hosting</a>
@@ -221,8 +216,9 @@ footer{background:var(--deep);color:var(--deep-ink);padding-block:44px 90px;font
 <main id="topo">
   <section class="hero">
     <div class="wrap hero-grid">
-      <span class="nota"><b>Prévia</b> As notas roxas explicam cada bloco e o que falta. Use o botão "Esconder notas" para ver o site limpo.</span>
+      <span class="nota"><b>Prévia</b> Logo, cores e fotos são os do seu site atual. As notas roxas explicam cada bloco e o que falta. Use o botão "Esconder notas" para ver o site limpo.</span>
       <div class="badges"><span class="badge">Copacabana · Arpoador · Ipanema · Leblon</span><span class="badge">10 anos no Rio</span></div>
+      <span class="bmg">be my guest</span>
       <h1>Sinta-se em casa longe de casa.</h1>
       <p class="sub">Apartamentos mobiliados a passos da praia na Zona Sul do Rio. Reserve direto com a gente, com atendimento do primeiro contato até depois do check-out.</p>
       <div class="oferta">Primeira reserva direta: 5% off com o cupom <code>VEMPRORIO</code></div>
@@ -252,10 +248,10 @@ footer{background:var(--deep);color:var(--deep-ink);padding-block:44px 90px;font
   <section id="apartamentos">
     <div class="wrap">
       <div class="head">
-        <span class="eyebrow">Vem pro Rio</span>
+        <span class="eyebrow">vem pro Rio =)</span>
         <h2>Nossos apartamentos</h2>
         <p>14 apartamentos selecionados em Copacabana, Ipanema e Leblon. Preço por noite, a partir de.</p>
-        <span class="nota"><b>Ideia do concorrente:</b> fotos em carrossel, nota de avaliação e uma frase de localização em cada card. Aqui as fotos são desenhos provisórios. No site real entram as fotos e notas do Airbnb/Booking.</span>
+        <span class="nota"><b>Ideia do concorrente:</b> fotos em carrossel, nota de avaliação e uma frase de localização em cada card. Aqui vai a foto de capa de cada apartamento; falta só colocar as notas de avaliação.</span>
       </div>
       <div class="chips" id="chips" role="group" aria-label="Filtrar por bairro">
         <button class="chip" aria-pressed="true" data-f="todos">Todos</button>
@@ -345,7 +341,7 @@ footer{background:var(--deep);color:var(--deep-ink);padding-block:44px 90px;font
       <div class="dicas">
         <a class="dica" href="https://www.riohosting.com.br/pt/category/660578e30854fe57078b78e7" target="_blank" rel="noopener"><div class="topo c1"></div><div class="t"><small>Copacabana</small><h3>Um dia inteiro sem sair do bairro</h3></div></a>
         <a class="dica" href="https://www.riohosting.com.br/pt/category/660578e30854fe57078b78e7" target="_blank" rel="noopener"><div class="topo c2"></div><div class="t"><small>Ipanema & Arpoador</small><h3>Onde ver o pôr do sol</h3></div></a>
-        <a class="dica" href="https://www.riohosting.com.br/pt/category/660578e30854fe57078b78e7" target="_blank" rel="noopener"><div class="topo c3"></div><div class="t"><small>Leblon</small><h3>Restaurantes perto dos nossos apartamentos</h3></div></a>
+        <a class="dica" href="https://www.riohosting.com.br/pt/category/660578e30854fe57078b78e7" target="_blank" rel="noopener"><div class="topo c6"></div><div class="t"><small>Passeios</small><h3>Cristo e Pão de Açúcar sem fila</h3></div></a>
       </div>
     </div>
   </section>
@@ -380,7 +376,7 @@ footer{background:var(--deep);color:var(--deep-ink);padding-block:44px 90px;font
           <li>Vistoria e cuidado do imóvel a cada estadia</li>
           <li>Você acompanha as reservas e bloqueia datas para uso próprio</li>
         </ul>
-        <span class="nota" style="margin-top:18px;background:#fff"><b>Ideia do concorrente:</b> página própria para captar proprietários, com formulário, perguntas sobre comissão e proteção contra danos. Confirme quais destes serviços vocês oferecem.</span>
+        <span class="nota" style="margin-top:18px"><b>Ideia do concorrente:</b> página própria para captar proprietários, com formulário, perguntas sobre comissão e proteção contra danos. Confirme quais destes serviços vocês oferecem.</span>
       </div>
       <form class="form" id="f-dono">
         <h3>Quero ser parceiro</h3>
@@ -405,7 +401,7 @@ footer{background:var(--deep);color:var(--deep-ink);padding-block:44px 90px;font
         <div class="head" style="margin:0"><span class="eyebrow">@riohosting</span><h2>O Rio pelo nosso Instagram</h2></div>
         <a class="btn" href="https://www.instagram.com/riohosting" target="_blank" rel="noopener">Seguir no Instagram</a>
       </div>
-      <div class="insta-grid"><div class="c1"></div><div class="c3"></div><div class="c4"></div><div class="c2"></div></div>
+      <div class="insta-grid"><div class="c7"></div><div class="c3"></div><div class="c9"></div><div class="c8"></div></div>
     </div>
   </section>
 </main>
@@ -413,7 +409,7 @@ footer{background:var(--deep);color:var(--deep-ink);padding-block:44px 90px;font
 <footer>
   <div class="wrap">
     <div class="foot">
-      <div><a class="logo" href="#topo" style="color:inherit"><i aria-hidden="true"></i>Rio Hosting</a><p style="margin-top:10px;opacity:.8;max-width:32ch">Aluguel por temporada na Zona Sul do Rio de Janeiro há 10 anos.</p></div>
+      <div><a class="logo" href="#topo"><img src="img/logo.png" alt="Rio Hosting" width="183" height="42"></a><p style="margin-top:10px;opacity:.8;max-width:32ch">Aluguel por temporada na Zona Sul do Rio de Janeiro há 10 anos.</p></div>
       <div><h4>Hospede-se</h4><ul><li><a href="#apartamentos">Apartamentos</a></li><li><a href="#busca">Minha reserva</a></li><li><a href="#faq">Dúvidas</a></li></ul></div>
       <div><h4>Empresa</h4><ul><li><a href="#porque">Quem somos</a></li><li><a href="#proprietario">Seja parceiro</a></li><li><a href="#dicas">Dicas do Rio</a></li><li><a href="https://www.riohosting.com.br/pt/page/60345845008db5a7fb540671" target="_blank" rel="noopener">Privacidade</a></li></ul></div>
       <div><h4>Contato</h4><ul><li style="user-select:all">+55 21 97965-1176</li><li><a href="https://www.instagram.com/riohosting" target="_blank" rel="noopener">Instagram</a></li><li><span class="nota" style="background:transparent">Falta: e-mail e endereço/CNPJ</span></li></ul></div>
@@ -442,14 +438,14 @@ const aps=[
  ["OE17J","Na praia, com piscina e varanda","Copacabana",1,1,414.68,"lazer"],
  ["OE18J","Ótimo apartamento no Leblon","Leblon",1,1,461.70,""]
 ];
-const cls={Copacabana:"f-copa",Ipanema:"f-ipa",Leblon:"f-leb","Zona Sul":"f-zs"};
+const fotos={OA01J:"img/ap-OA01J.jpg",OA02J:"img/ap-OA02J.jpg",OA03J:"img/ap-OA03J.jpg",OE01J:"img/ap-OE01J.jpg",OE03J:"img/ap-OE03J.jpg",OE04J:"img/ap-OE04J.jpg",OE06J:"img/ap-OE06J.jpg",OE08J:"img/ap-OE08J.jpg",OE10J:"img/ap-OE10J.jpg",OE11J:"img/ap-OE11J.jpg",OE13J:"img/ap-OE13J.jpg",OE15J:"img/ap-OE15J.jpg",OE17J:"img/ap-OE17J.jpg",OE18J:"img/ap-OE18J.jpg"};
 const brl=n=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL",minimumFractionDigits:0,maximumFractionDigits:0});
 const grid=document.getElementById("grid");
 function render(f){
   const lista=aps.filter(a=>f==="todos"||a[2]===f||(f==="lazer"&&a[6]==="lazer")||(f==="economico"&&a[5]<=350));
   grid.innerHTML=lista.map(([c,t,b,q,ba,p])=>`
    <a class="card" href="https://www.riohosting.com.br/pt/search" target="_blank" rel="noopener">
-     <div class="foto ${cls[b]}"><span class="cod">${c}</span><button class="fav" type="button" aria-label="Favoritar">♡</button><span class="ph">foto do apartamento</span></div>
+     <div class="foto" style="background-image:url('${fotos[c]}')"><span class="cod">${c}</span><button class="fav" type="button" aria-label="Favoritar">♡</button></div>
      <div class="card-body"><span class="loc">${b}</span><h3>${t}</h3>
        <div class="specs"><span>${q} quarto</span><span>${ba} banh.</span><span>2 hóspedes</span></div>
        <div class="preco"><span>a partir de</span><span><strong>${brl(p)}</strong> /noite</span></div></div>
