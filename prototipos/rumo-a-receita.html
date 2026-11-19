@@ -93,8 +93,8 @@
 <script>
 (() => {
   const EL = {
-    agua: ['Água', '💧', 'agua', '#cde8f8'], pedra: ['Pedra', '🪨', 'pedra', '#dfe1e8'], fogo: ['Fogo', '🔥', 'fogo', '#fde3b0'],
-    broto: ['Broto', '🌱', 'planta', '#d6f0c4'], barro: ['Barro', '🟤', 'barro', '#ecd9c0'], tijolo: ['Tijolo', '🧱', 'tijolo', '#f2cdbd'],
+    agua: ['Água', '💧', 'agua', '#cde8f8'], terra: ['Terra', '🟫', 'terra', '#dfe1e8'], fogo: ['Fogo', '🔥', 'fogo', '#fde3b0'],
+    vida: ['Vida', '🌱', 'planta', '#d6f0c4'], barro: ['Barro', '🟤', 'barro', '#ecd9c0'], tijolo: ['Tijolo', '🧱', 'tijolo', '#f2cdbd'],
     vapor: ['Vapor', '☁️', 'vapor', '#f1f6fb'], flor: ['Flor', '🌸', 'flor', '#f8dbe6'], casinha: ['Casinha', '🏠', 'casinha', '#fbeeb8'],
     arcoiris: ['Arco-íris', '🌈', 'arcoiris', '#d6f2f2'], lava: ['Lava', '🌋', null, '#f7c3a6'], obsidiana: ['Obsidiana', '🖤', null, '#d6d0dc'],
     cinza: ['Cinza', '⚫', null, '#dedad6'], sabao: ['Sabão', '🧼', null, '#e2f1fb'], nuvem: ['Nuvem', '🌥️', null, '#eef2f7'],
@@ -102,18 +102,18 @@
     sol: ['Sol', '☀️', null, '#fdeeb0'], areia: ['Areia', '🏜️', null, '#f4e2bd'], vidro: ['Vidro', '🔷', null, '#d9ecf8'], vaso: ['Vaso', '🏺', null, '#efd6bf'],
     lago: ['Lago', '🏞️', null, '#cfe6f2'], montanha: ['Montanha', '⛰️', null, '#e2e0dc'], arbusto: ['Arbusto', '🌿', null, '#cfeac0'],
     arvore: ['Árvore', '🌳', null, '#cde8bf'], minerio: ['Minério', '🪙', null, '#efe2b8'], metal: ['Metal', '⚙️', null, '#dde2e8'],
-    ar: ['Ar', '💨', null, '#e6f3f8'], raio: ['Raio', '⚡', null, '#fff1a8'], onda: ['Onda', '🌊', null, '#cfe4f6'], poeira: ['Poeira', '🌫️', null, '#e8e3da'],
+    vento: ['Vento', '🌬️', null, '#e6f3f8'], passaro: ['Pássaro', '🐦', null, '#e3eefa'], raio: ['Raio', '⚡', null, '#fff1a8'], onda: ['Onda', '🌊', null, '#cfe4f6'], poeira: ['Poeira', '🌫️', null, '#e8e3da'],
     tornado: ['Tornado', '🌪️', null, '#dfe4ea'], tempestade: ['Tempestade', '⛈️', null, '#cfd7e3'], praia: ['Praia', '🏖️', null, '#f6e6c0'],
   };
-  const BASE = ['agua', 'fogo', 'pedra', 'broto', 'ar'];
+  const BASE = ['agua', 'fogo', 'terra', 'vento', 'vida'];
   const R = (a, b, r) => ({ a, b, r, k: [a, b].sort().join('+') });
   const RECIPES = [
-    R('agua','pedra','barro'), R('agua','fogo','vapor'), R('broto','agua','flor'), R('fogo','pedra','lava'), R('broto','pedra','musgo'),
-    R('broto','fogo','cinza'), R('agua','agua','lago'), R('pedra','pedra','montanha'), R('fogo','fogo','sol'), R('broto','broto','arbusto'),
-    R('barro','fogo','tijolo'), R('flor','vapor','arcoiris'), R('vapor','vapor','nuvem'), R('lava','agua','obsidiana'), R('lava','pedra','minerio'),
-    R('sol','pedra','areia'), R('cinza','agua','sabao'), R('musgo','agua','pantano'), R('tijolo','tijolo','casinha'), R('nuvem','agua','chuva'),
+    R('agua','terra','barro'), R('agua','fogo','vapor'), R('vida','agua','flor'), R('fogo','terra','lava'), R('vida','terra','musgo'),
+    R('vida','fogo','cinza'), R('agua','agua','lago'), R('terra','terra','montanha'), R('fogo','fogo','sol'), R('vida','vida','arbusto'),
+    R('barro','fogo','tijolo'), R('flor','vapor','arcoiris'), R('vapor','vapor','nuvem'), R('lava','agua','obsidiana'), R('lava','terra','minerio'),
+    R('sol','terra','areia'), R('cinza','agua','sabao'), R('musgo','agua','pantano'), R('tijolo','tijolo','casinha'), R('nuvem','agua','chuva'),
     R('arbusto','chuva','arvore'), R('areia','fogo','vidro'), R('minerio','fogo','metal'), R('barro','barro','vaso'),
-    R('ar','fogo','raio'), R('ar','agua','onda'), R('ar','pedra','poeira'), R('ar','ar','tornado'), R('nuvem','raio','tempestade'), R('areia','onda','praia'),
+    R('vento','fogo','raio'), R('vento','agua','onda'), R('vento','terra','poeira'), R('vento','vento','tornado'), R('nuvem','raio','tempestade'), R('areia','onda','praia'), R('vida','vento','passaro'),
   ];
   const find = (x, y) => RECIPES.find(r => (r.a === x && r.b === y) || (r.a === y && r.b === x));
   const producer = (e) => RECIPES.find(r => r.r === e);
@@ -121,9 +121,9 @@
   // capítulos: cada um destrava uma base nova
   const CHAPTERS = [
     { bases: ['agua', 'fogo'], goals: ['vapor', 'lago', 'sol', 'nuvem', 'chuva'] },
-    { bases: ['agua', 'fogo', 'pedra'], goals: ['barro', 'lava', 'montanha', 'tijolo', 'obsidiana', 'areia', 'minerio', 'vaso', 'vidro', 'metal', 'casinha'] },
-    { bases: ['agua', 'fogo', 'pedra', 'broto'], goals: ['flor', 'musgo', 'cinza', 'arbusto', 'arcoiris', 'sabao', 'pantano', 'arvore'] },
-    { bases: ['agua', 'fogo', 'pedra', 'broto', 'ar'], goals: ['raio', 'onda', 'poeira', 'tornado', 'tempestade', 'praia'] },
+    { bases: ['agua', 'fogo', 'terra'], goals: ['barro', 'lava', 'montanha', 'tijolo', 'obsidiana', 'areia', 'minerio', 'vaso', 'vidro', 'metal', 'casinha'] },
+    { bases: ['agua', 'fogo', 'terra', 'vento'], goals: ['raio', 'onda', 'poeira', 'tornado', 'tempestade', 'praia'] },
+    { bases: ['agua', 'fogo', 'terra', 'vento', 'vida'], goals: ['flor', 'musgo', 'cinza', 'arbusto', 'passaro', 'arcoiris', 'sabao', 'pantano', 'arvore'] },
   ];
   const ALLGOALS = CHAPTERS.flatMap(c => c.goals);
   function levelInfo(n) {
