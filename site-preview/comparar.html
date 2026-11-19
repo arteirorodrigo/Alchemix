@@ -1,0 +1,136 @@
+<title>Rio Hosting: antes e depois</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Nunito:wght@400;600;700;800;900&display=swap">
+<style>
+/* Layout: barra de controle no topo; abaixo, a tela do site numa moldura de navegador ou de celular, com rolagem própria */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --ink:#3a3838; --muted:#6e6a6a; --line:#e2e6e4;
+  --mar:#009a8a; --mar-soft:#e2f4f1; --antes:#8a8580; --frame:#23272a;
+  --body:"Nunito", system-ui, -apple-system, sans-serif; --hand:"Caveat", "Segoe Print", cursive;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{padding-block:24px 8px}
+.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between}
+.hand{font:700 1.5rem/1 var(--hand);color:var(--mar)}
+h1{margin:4px 0 0;font-size:clamp(1.6rem,4vw,2.3rem);font-weight:900;letter-spacing:-.015em;text-wrap:balance}
+.controles{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px;border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:6;background:var(--bg)}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px}
+.seg button{font:800 1rem var(--body);border:0;background:transparent;color:var(--muted);border-radius:999px;padding:10px 22px;cursor:pointer}
+.seg.grande button{font-size:1.05rem;padding:12px 30px}
+.seg button[aria-pressed="true"]{color:#fff;background:var(--mar)}
+.seg button[data-v="antes"][aria-pressed="true"]{background:var(--antes)}
+.seg.peq button{font-size:.88rem;padding:8px 14px}
+.seg button:focus-visible{outline:3px solid #f2b33d;outline-offset:2px}
+.dica{font-size:.85rem;color:var(--muted)}
+kbd{font:700 .78rem ui-monospace,monospace;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;background:var(--surface)}
+
+main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;padding-block:22px 48px;align-items:start}
+@media (max-width:900px){main{grid-template-columns:1fr}}
+.palco{display:flex;justify-content:center;min-width:0}
+.janela{width:100%;max-width:1000px;background:var(--frame);border-radius:14px;overflow:hidden;box-shadow:0 20px 50px rgb(20 30 30 / .18)}
+.barra{display:flex;align-items:center;gap:10px;padding:10px 14px;color:#cfd6d4;font-size:.82rem}
+.barra i{width:11px;height:11px;border-radius:50%;background:#555c60;display:inline-block}
+.url{flex:1;min-width:0;background:#363c40;border-radius:8px;padding:5px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tela{height:min(72vh,760px);overflow-y:auto;background:#fff;position:relative;overscroll-behavior:contain}
+.tela img{display:block;width:100%;height:auto}
+.selo{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);box-shadow:0 4px 14px rgb(0 0 0 / .25);z-index:2;font:800 .78rem var(--body);letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--antes);padding:6px 12px;border-radius:999px;pointer-events:none}
+.selo.novo{background:var(--mar)}
+.palco.cel .janela{max-width:400px;border-radius:44px;padding:14px;}
+.palco.cel .barra{display:none}
+.palco.cel .tela{border-radius:30px;height:min(74vh,780px)}
+.tela-wrap{position:relative}
+
+aside{display:flex;flex-direction:column;gap:14px;min-width:0}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px}
+.box h2{margin:0 0 10px;font-size:1.05rem;font-weight:900}
+.box ul{margin:0;padding:0;list-style:none;display:grid;gap:9px;font-size:.93rem}
+.box li{display:flex;gap:9px}
+.box li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;margin-top:.5em;background:var(--mar)}
+.box.antes li::before{background:var(--antes)}
+.fonte{font-size:.8rem;color:var(--muted)}
+</style>
+
+<header class="wrap">
+  <div class="top">
+    <div><span class="hand">be my guest</span><h1>Rio Hosting: antes e depois</h1></div>
+    <p class="dica">Toque em <b>Antes</b> e <b>Depois</b> para trocar. No teclado: <kbd>←</kbd> <kbd>→</kbd></p>
+  </div>
+</header>
+
+<div class="controles">
+  <div class="wrap ctl">
+    <div class="seg grande" role="group" aria-label="Versão do site">
+      <button id="b-antes" data-v="antes" aria-pressed="false">Antes</button>
+      <button id="b-depois" data-v="depois" aria-pressed="true">Depois</button>
+    </div>
+    <div class="seg peq" role="group" aria-label="Tela">
+      <button id="b-desk" data-d="desk" aria-pressed="true">Computador</button>
+      <button id="b-cel" data-d="cel" aria-pressed="false">Celular</button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="palco" id="palco">
+    <div class="janela">
+      <div class="barra"><i></i><i></i><i></i><span class="url" id="url">riohosting.com.br · nova versão</span></div>
+      <div class="tela-wrap">
+        <span class="selo novo" id="selo">Depois</span>
+        <div class="tela" id="tela" tabindex="0" aria-label="Captura do site, role para ver tudo"><img id="img" alt="Página inicial da Rio Hosting"></div>
+      </div>
+    </div>
+  </div>
+
+  <aside>
+    <div class="box antes" id="box-antes" hidden>
+      <h2>Site atual</h2>
+      <ul>
+        <li>Topo com busca, depois um carrossel de apartamentos que mostra 3 por vez.</li>
+        <li>Quatro blocos de foto com títulos (Dicas, Cadastre seu imóvel, Quem Somos, Acomodações), sem texto.</li>
+        <li>Sem vantagens de reservar direto, números, depoimentos ou dúvidas na página inicial.</li>
+        <li>Rodapé só com Privacidade, Quem Somos e Instagram. Sem e-mail ou endereço.</li>
+      </ul>
+    </div>
+    <div class="box" id="box-depois">
+      <h2>Nova versão</h2>
+      <ul>
+        <li>Mesma marca: logo, verde, fotos e o "be my guest".</li>
+        <li>Os 14 apartamentos à vista, com filtro por bairro, lazer e preço.</li>
+        <li>Coleções: Copacabana, Ipanema, Leblon, Piscina & rooftop, Econômicos.</li>
+        <li>Por que reservar direto, números da empresa, depoimentos e plataformas.</li>
+        <li>Dúvidas frequentes, Dicas do Rio e área para proprietários com formulário.</li>
+        <li>Rodapé completo e WhatsApp sempre visível.</li>
+      </ul>
+    </div>
+    <p class="fonte">Capturas feitas em 19/11/2026. O site atual foi fotografado de riohosting.com.br. Na nova versão, depoimentos e cupom ainda são exemplos.</p>
+  </aside>
+</main>
+
+<script>
+const IMGS={antes:{desk:"comparar/antes-desk.jpg",cel:"comparar/antes-cel.jpg"},depois:{desk:"comparar/depois-desk.jpg",cel:"comparar/depois-cel.jpg"}};
+let v="depois",d="desk";
+const $=id=>document.getElementById(id);
+function show(){
+  $("img").src=IMGS[v][d];
+  $("img").alt=(v==="antes"?"Site atual":"Nova versão")+" da Rio Hosting, "+(d==="cel"?"no celular":"no computador");
+  $("tela").scrollTop=0;
+  $("palco").classList.toggle("cel",d==="cel");
+  $("selo").textContent=v==="antes"?"Antes":"Depois";
+  $("selo").classList.toggle("novo",v==="depois");
+  $("url").textContent=v==="antes"?"riohosting.com.br · site atual":"riohosting.com.br · nova versão";
+  $("b-antes").setAttribute("aria-pressed",v==="antes");$("b-depois").setAttribute("aria-pressed",v==="depois");
+  $("b-desk").setAttribute("aria-pressed",d==="desk");$("b-cel").setAttribute("aria-pressed",d==="cel");
+  $("box-antes").hidden=v!=="antes";$("box-depois").hidden=v!=="depois";
+}
+document.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{v=b.dataset.v;show()});
+document.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{d=b.dataset.d;show()});
+addEventListener("keydown",e=>{if(e.key==="ArrowLeft"){v="antes";show()}if(e.key==="ArrowRight"){v="depois";show()}});
+if(matchMedia("(max-width:700px)").matches)d="cel";
+Object.values(IMGS).forEach(o=>Object.values(o).forEach(s=>{const i=new Image();i.src=s}));
+show();
+</script>
