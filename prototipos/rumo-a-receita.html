@@ -232,7 +232,12 @@
     const p = producer(G.goal); const kp = known.has(p.k);
     t.append(slotFor(p.a, kp), '+', slotFor(p.b, kp));
   }
-  function cs() { const w = Math.min(window.innerWidth - 24, 440) - 18, h = window.innerHeight * 0.5; return Math.max(44, Math.min(76, Math.floor(Math.min((w - (COLS - 1) * 5) / COLS, (h - (ROWS - 1) * 5) / ROWS)))); }
+  // tamanho da peça pelo espaço que sobra de verdade para o tabuleiro (moldura: 2×(8 de margem + 3 de borda))
+  function cs() {
+    const wrap = document.querySelector('.boardwrap');
+    const w = Math.min(wrap.clientWidth, 440) - 24, h = wrap.clientHeight - 24;
+    return Math.max(28, Math.min(76, Math.floor(Math.min((w - (COLS - 1) * 5) / COLS, (h - (ROWS - 1) * 5) / ROWS))));
+  }
   function render(fx = {}) {
     $('goalIco').textContent = ''; $('goalIco').append(ico(G.goal)); $('goalIco').title = EL[G.goal][0];
     $('goalCnt').textContent = G.count > 1 ? `${G.made}/${G.count}` : '';

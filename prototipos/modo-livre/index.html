@@ -124,7 +124,12 @@
     if (d[2]) { const im = document.createElement('img'); im.src = 'img/' + d[2] + '.png'; im.alt = d[0]; s.append(im); } else s.textContent = d[1];
     return s;
   }
-  function cs() { const w = Math.min(window.innerWidth - 24, 440) - 16, h = window.innerHeight - 250; return Math.max(44, Math.min(78, Math.floor(Math.min((w - (COLS - 1) * 5) / COLS, (h - (ROWS - 1) * 5) / ROWS)))); }
+  // tamanho da peça pelo espaço que sobra de verdade para o tabuleiro (moldura: 2×(8 de margem + 3 de borda))
+  function cs() {
+    const wrap = document.querySelector('.boardwrap');
+    const w = Math.min(wrap.clientWidth, 440) - 24, h = wrap.clientHeight - 24;
+    return Math.max(28, Math.min(78, Math.floor(Math.min((w - (COLS - 1) * 5) / COLS, (h - (ROWS - 1) * 5) / ROWS))));
+  }
   const bestKey = () => 'livre.best.' + mode;
 
   function render(fx = {}) {
