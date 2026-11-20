@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alchemix - comparar visual</title>
+<style>
+@font-face { font-family: 'Pixelify Sans'; src: url('PixelifySans.woff2') format('woff2'); }
+* { box-sizing: border-box; margin: 0; }
+body { background: #1d1a22; color: #eee; font-family: 'Pixelify Sans', monospace; padding: 24px 16px; }
+h1 { text-align: center; font-size: 26px; margin-bottom: 6px; }
+.nota { text-align: center; opacity: .7; margin-bottom: 24px; font-size: 14px; }
+.linha { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; }
+.col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.col h2 { font-size: 20px; }
+.col p { font-size: 13px; opacity: .75; max-width: 330px; text-align: center; }
+.cel { width: 330px; height: 714px; border-radius: 28px; overflow: hidden; position: relative; border: 6px solid #000; box-shadow: 0 10px 30px #0008; }
+.cel > img.print { width: 100%; height: 100%; object-fit: cover; }
+
+/* tela montada (A e C) */
+.tela { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding: 18px 16px; }
+.fundo { position: absolute; inset: 0; background: url('fundo-lab.jpg') 4% center / auto 100% no-repeat; }
+.topo { width: 100%; display: flex; justify-content: space-between; position: relative; }
+.chip { padding: 8px 12px; font-size: 14px; border: 3px solid; }
+.logo { position: relative; font-size: 58px; letter-spacing: 2px; margin-top: 150px; line-height: 1; }
+.sub { position: relative; font-size: 17px; padding: 6px 16px; margin-top: 10px; border: 3px solid; }
+.elementos { position: relative; display: flex; gap: 8px; margin-top: 22px; }
+.el { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-size: 24px; }
+.botoes { position: relative; margin-top: auto; width: 100%; display: flex; flex-direction: column; gap: 12px; }
+.btn { text-align: center; padding: 16px; font-size: 24px; border: 4px solid; }
+.btn.peq { font-size: 18px; padding: 12px; }
+
+/* A — medieval escuro */
+.a .fundo { filter: brightness(.8); }
+.a .fundo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(#0000 30%, #1a0b2ecc 85%); }
+.a .chip { background: #3b2416; color: #f5d68a; border-color: #c9962e; }
+.a .logo { color: #f6c544; text-shadow: 0 4px 0 #7a3b0b, 0 0 18px #b46cff, 3px 3px 0 #2a1033, -3px -3px 0 #2a1033, 3px -3px 0 #2a1033, -3px 3px 0 #2a1033; }
+.a .sub { background: #2a1033cc; color: #e9c8ff; border-color: #c9962e; }
+.a .el { background: radial-gradient(#ffffff30, #1a0b2e); box-shadow: 0 0 14px var(--c), inset 0 0 0 2px var(--c); }
+.a .btn { background: #4a2c18; color: #f5d68a; border-color: #c9962e; box-shadow: 0 5px 0 #24130a; }
+
+/* C — mistura */
+.c .fundo { filter: brightness(1.45) saturate(1.05) sepia(.3) hue-rotate(-10deg) contrast(.9); }
+.c .fundo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(#ffe7b833, #ffd99a55 60%, #ffe9c299); }
+.c .mascote { position: absolute; top: 70px; width: 120px; left: 50%; transform: translateX(-50%); image-rendering: pixelated; }
+.c .logo { margin-top: 190px; color: #ffd24a; text-shadow: 0 4px 0 #b4621a, 3px 3px 0 #3a2234, -3px -3px 0 #3a2234, 3px -3px 0 #3a2234, -3px 3px 0 #3a2234; }
+.c .chip { background: #fff4dc; color: #3a2234; border-color: #3a2234; }
+.c .sub { background: #8f5fd6; color: #fff; border-color: #3a2234; }
+.c .el { background: #fff4dc; border: 3px solid #3a2234; box-shadow: 0 0 10px var(--c); }
+.c .btn { background: #5dbb4a; color: #fff; border-color: #3a2234; box-shadow: 0 5px 0 #2e6b24; text-shadow: 2px 2px 0 #2e6b24; }
+.c .btn.peq { background: #fff4dc; color: #3a2234; box-shadow: 0 5px 0 #c9a46a; text-shadow: none; }
+
+/* D — mistura B + A: o mundo de ilhas do jogo atual ao entardecer, com a magia roxa e dourada do PDF */
+.d .fundo { background: url('fundo-vila.webp') center / cover no-repeat; filter: brightness(.82) saturate(1.15) hue-rotate(-18deg); }
+.d .fundo::after { content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 78% 12%, #fff6c8 0 18px, #ffe59a55 26px, #0000 70px),
+    radial-gradient(1.5px 1.5px at 20% 8%, #fff 99%, #0000), radial-gradient(1.5px 1.5px at 45% 15%, #fff 99%, #0000),
+    radial-gradient(1.5px 1.5px at 62% 5%, #fff 99%, #0000), radial-gradient(1.5px 1.5px at 10% 22%, #fff 99%, #0000),
+    radial-gradient(1.5px 1.5px at 33% 28%, #fff 99%, #0000), radial-gradient(1.5px 1.5px at 90% 30%, #fff 99%, #0000),
+    linear-gradient(#3b1f6ee6 0%, #7a3fa0aa 30%, #ff9f6a44 55%, #1a0b2e55 100%); }
+.d .mascote { position: absolute; top: 70px; width: 120px; left: 50%; transform: translateX(-50%); image-rendering: pixelated; filter: drop-shadow(0 0 14px #c77dff); }
+.d .logo { margin-top: 190px; color: #f6c544; text-shadow: 0 4px 0 #7a3b0b, 0 0 18px #b46cff, 3px 3px 0 #2a1033, -3px -3px 0 #2a1033, 3px -3px 0 #2a1033, -3px 3px 0 #2a1033; }
+.d .chip { background: #fff4dc; color: #3a2234; border-color: #3a2234; }
+.d .sub { background: #2a1033dd; color: #f5d68a; border-color: #c9962e; }
+.d .el { background: radial-gradient(#ffffff40, #2a1033); box-shadow: 0 0 14px var(--c), inset 0 0 0 2px var(--c); }
+.d .btn { background: #5dbb4a; color: #fff; border-color: #c9962e; box-shadow: 0 5px 0 #2e6b24; text-shadow: 2px 2px 0 #2e6b24; }
+.d .btn.peq { background: #4a2c18; color: #f5d68a; box-shadow: 0 5px 0 #24130a; text-shadow: none; }
+</style>
+</head>
+<body>
+<h1>Alchemix: qual visual?</h1>
+<p class="nota">Rascunhos rápidos para comparar o clima. A arte final seria redesenhada.</p>
+<div class="linha">
+
+  <div class="col">
+    <h2>A · Medieval misterioso</h2>
+    <div class="cel a">
+      <div class="fundo"></div>
+      <div class="tela">
+        <div class="topo"><span class="chip">🔑 3 dicas</span><span class="chip">⚙</span></div>
+        <div class="logo">ALCHEMIX</div>
+        <div class="sub">reações em cadeia</div>
+        <div class="elementos">
+          <div class="el" style="--c:#ff6a2a">🔥</div><div class="el" style="--c:#3aa0ff">💧</div><div class="el" style="--c:#8fe3ff">🌪️</div><div class="el" style="--c:#c48a4a">🪨</div><div class="el" style="--c:#4cd964">🌱</div>
+        </div>
+        <div class="botoes"><div class="btn">▶ JOGAR · Fase 1</div><div class="btn peq">📖 Receitas 0/55</div></div>
+      </div>
+    </div>
+    <p>Fiel ao PDF: noite, velas, roxo e dourado. Mais "sério".</p>
+  </div>
+
+  <div class="col">
+    <h2>B · Atual (alegre)</h2>
+    <div class="cel"><img class="print" src="atual.png" alt="tela atual"></div>
+    <p>O jogo de hoje: céu, ilhas, mascote. Leve, cara de jogo de celular.</p>
+  </div>
+
+  <div class="col">
+    <h2>C · Mistura (recomendo)</h2>
+    <div class="cel c">
+      <div class="fundo"></div>
+      <div class="tela">
+        <div class="topo"><span class="chip">🔑 3 dicas</span><span class="chip">⚙</span></div>
+        <img class="mascote" src="mascote-frasco.png" alt="">
+        <div class="logo">ALCHEMIX</div>
+        <div class="sub">reações em cadeia</div>
+        <div class="elementos">
+          <div class="el" style="--c:#ff6a2a">🔥</div><div class="el" style="--c:#3aa0ff">💧</div><div class="el" style="--c:#8fe3ff">🌪️</div><div class="el" style="--c:#c48a4a">🪨</div><div class="el" style="--c:#4cd964">🌱</div>
+        </div>
+        <div class="botoes"><div class="btn">▶ JOGAR · Fase 1</div><div class="btn peq">📖 Receitas 0/55</div></div>
+      </div>
+    </div>
+    <p>Laboratório de dia, cores quentes e claras, mascote e botões do jogo atual.</p>
+  </div>
+
+  <div class="col">
+    <h2>D · B + A (novo)</h2>
+    <div class="cel d">
+      <div class="fundo"></div>
+      <div class="tela">
+        <div class="topo"><span class="chip">🔑 3 dicas</span><span class="chip">⚙</span></div>
+        <img class="mascote" src="mascote-frasco.png" alt="">
+        <div class="logo">ALCHEMIX</div>
+        <div class="sub">reações em cadeia</div>
+        <div class="elementos">
+          <div class="el" style="--c:#ff6a2a">🔥</div><div class="el" style="--c:#3aa0ff">💧</div><div class="el" style="--c:#8fe3ff">🌪️</div><div class="el" style="--c:#c48a4a">🪨</div><div class="el" style="--c:#4cd964">🌱</div>
+        </div>
+        <div class="botoes"><div class="btn">▶ JOGAR · Fase 1</div><div class="btn peq">📖 Receitas 0/55</div></div>
+      </div>
+    </div>
+    <p>O mundo de ilhas do jogo atual ao entardecer, com lua e estrelas, e o dourado e roxo mágico do PDF.</p>
+  </div>
+
+</div>
+</body>
+</html>

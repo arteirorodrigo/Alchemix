@@ -24,8 +24,8 @@ export const t = {
   maisMovimentosAnuncio: '+3 movimentos (anúncio)',
   tentarDeNovo: 'Tentar de novo',
   // início
-  logo: 'ALQUIMIA',
-  logoSub: 'em Cadeia',
+  logo: 'ALCHEMIX',
+  logoSub: 'reações em cadeia',
   oQueMais: 'e o que mais?',
   jogar: (n: number) => `JOGAR · Fase ${n}`,
   receitasBotao: (x: number, y: number) => `Receitas ${x}/${y}`,

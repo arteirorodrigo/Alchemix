@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alchemix - reações em cadeia</title>
+<style>
+  /* TESTE PROVISÓRIO: menu inicial com os modos Normal e Modo Livre (Tempo / Toque). Visual "D". */
+  @font-face { font-family: 'Jersey 10'; src: url('Jersey10.ttf') format('truetype'); font-weight: 400 700; }
+  :root { --ink: #2a1033; --gold: #f6c544; --gold-dark: #c9962e; --night: #2a1033; --wood: #4a2c18; --wood-dark: #2e1a0e;
+    --grass: #5dbb4a; --grass-shade: #2e6b24; --blue: #4a7fe0; --blue-shade: #2a4db5; --paper: #fff4dc; --display: 'Jersey 10', ui-monospace, monospace;
+  }
+  * { font-size-adjust: 0.58; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; margin: 0; }
+  body { font-family: var(--display); color: var(--gold); overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent;
+    background:
+      radial-gradient(circle at 80% 11%, #fff6c8 0 20px, #ffe59a55 28px, #0000 80px),
+      linear-gradient(#3b1f6ee6, #7a3fa0aa 30%, #ff9f6a44 58%, #1a0b2e66),
+      url('img/fundo-vila.webp') center / cover no-repeat, #3b1f6e; }
+  .app { height: 100%; max-width: 420px; margin: 0 auto; padding: 0 16px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
+  .star { position: fixed; width: 3px; height: 3px; background: #fff; animation: tw 1.6s ease-in-out infinite alternate; }
+  @keyframes tw { to { opacity: .2; } }
+  .mascot { width: 130px; margin-top: 9vh; image-rendering: pixelated; filter: drop-shadow(0 0 14px #c77dff); animation: bob 1.8s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(-6px); } }
+  .logo { font-size: 60px; font-weight: 700; letter-spacing: 2px; line-height: 1; margin-top: 10px;
+    text-shadow: 0 5px 0 #7a3b0b, 0 0 18px #b46cff, 4px 4px 0 var(--ink), -4px -4px 0 var(--ink), 4px -4px 0 var(--ink), -4px 4px 0 var(--ink); }
+  .sub { margin-top: 12px; background: var(--night); border: 3px solid #1a0b2e; box-shadow: inset 0 0 0 2px var(--gold-dark), 4px 4px 0 #1a0b2e; padding: 8px 18px; font-size: 19px; font-weight: 700; }
+  .menu { margin-top: auto; margin-bottom: 7vh; width: 100%; display: flex; flex-direction: column; gap: 14px; }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; box-sizing: border-box; font-family: var(--display); font-weight: 700; color: #fff; text-decoration: none;
+    border: 3px solid #1a0b2e; padding: 14px; font-size: 26px; cursor: pointer; text-shadow: 2px 2px 0 var(--ink); }
+  .btn:active { transform: translateY(2px); }
+  .btn small { display: block; font-size: 13px; font-weight: 400; opacity: .9; text-shadow: 1px 1px 0 var(--ink); }
+  .btn .txt { text-align: left; }
+  .green { background: var(--grass); box-shadow: 0 5px 0 var(--grass-shade), inset 0 0 0 2px var(--gold-dark); }
+  .blue { background: var(--blue); box-shadow: 0 5px 0 var(--blue-shade), inset 0 0 0 2px var(--gold-dark); }
+  .wood { background: var(--wood); color: var(--gold); box-shadow: 0 5px 0 var(--wood-dark), inset 0 0 0 2px var(--gold-dark); font-size: 18px; padding: 10px; text-shadow: none; }
+  .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modes .btn { flex-direction: column; gap: 2px; font-size: 22px; padding: 14px 6px; }
+  .modes .btn .ic { font-size: 30px; }
+  .modes .btn small { text-align: center; }
+</style>
+</head>
+<body>
+<div class="app">
+  <img class="mascot" src="img/mascote-frasco.png" alt="">
+  <div class="logo">ALCHEMIX</div>
+  <div class="sub">reações em cadeia</div>
+
+  <div class="menu" id="main">
+    <a class="btn green" href="rumo-a-receita.html"><span>▶</span><span class="txt">Normal<small>capítulos e livro de receitas</small></span></a>
+    <button class="btn blue" id="livre"><span>✨</span><span class="txt">Modo Livre<small>faça pontos com as receitas que já sabe</small></span></button>
+  </div>
+
+  <div class="menu" id="livreMenu" hidden>
+    <div class="modes">
+      <a class="btn blue" href="modo-livre/index.html?m=tempo"><span class="ic">⏱</span>Tempo<small>1 minuto</small></a>
+      <a class="btn blue" href="modo-livre/index.html?m=toques"><span class="ic">👆</span>Toque<small>30 toques</small></a>
+    </div>
+    <button class="btn wood" id="voltar">← Voltar</button>
+  </div>
+</div>
+<script>
+  [[8,13],[20,5],[32,10],[45,3],[58,8],[66,15],[90,22],[14,24],[4,33],[94,7],[38,19],[74,3]].forEach(([x, y], i) => {
+    const s = document.createElement('div'); s.className = 'star'; s.style.left = x + '%'; s.style.top = y + '%'; s.style.animationDelay = (i * .13) + 's'; document.body.append(s);
+  });
+  const show = (livre) => { document.getElementById('main').hidden = livre; document.getElementById('livreMenu').hidden = !livre; };
+  document.getElementById('livre').onclick = () => show(true);
+  document.getElementById('voltar').onclick = () => show(false);
+  if (location.hash === '#livre') show(true);
+</script>
+</body>
+</html>

@@ -60,7 +60,7 @@ export const HOME = {
   settings: { x: 320, y: lerp(8, 20), w: 52, h: 52 } as Rect,
   mascot: { x: W / 2, y: lerp(108, 168), size: lerp(96, 140) },
   logoY: lerp(192, 270),
-  subtitle: { x: 118, y: lerp(226, 312), w: 154, h: 44 } as Rect,
+  subtitle: { x: 85, y: lerp(226, 312), w: 220, h: 44 } as Rect,
   combo: { x: 66, y: lerp(282, 376), w: 258, h: 42 } as Rect,
   strip: { x: 18, y: H - 320, w: 354, h: 96 } as Rect,
   play: { x: 22, y: H - 208, w: 346, h: 72 } as Rect,

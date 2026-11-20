@@ -1,0 +1,68 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Alchemix - comparar layout</title>
+<style>
+@font-face { font-family:'J'; src:url('Jersey10.ttf'); }
+* { box-sizing:border-box; font-family:'J',monospace; font-size-adjust:.58; }
+body { margin:0; padding:20px 16px; background:#1d1a22; color:#eee; }
+h1 { text-align:center; margin:0 0 4px; font-size:32px; } .sub { text-align:center; opacity:.7; margin:0 0 18px; font-size:17px; }
+.linha { display:flex; gap:26px; justify-content:center; }
+.col h2 { text-align:center; margin:0 0 4px; font-size:24px; } .col p { text-align:center; opacity:.75; font-size:15px; max-width:340px; margin:0 auto 10px; min-height:40px; }
+.cel { width:340px; height:736px; border:6px solid #000; border-radius:28px; overflow:hidden; position:relative; display:flex; flex-direction:column; gap:8px; padding:12px;
+  background: radial-gradient(circle at 82% 6%, #fff6c8 0 14px, #ffe59a55 20px, #0000 60px), linear-gradient(#3b1f6ee6, #7a3fa0aa 30%, #ff9f6a44 60%, #1a0b2e66), url('img/fundo-vila.webp') center/cover; }
+.night { background:#2a1033; color:#f6c544; border:3px solid #1a0b2e; box-shadow:inset 0 0 0 2px #c9962e, 0 4px 0 #1a0b2e; }
+.paper { background:#fff4dc; color:#2a1033; border:3px solid #2a1033; box-shadow:inset 0 0 0 2px #c9962e, 0 4px 0 #2a1033; }
+.wood { background:#4a2c18; color:#f6c544; border:3px solid #1a0b2e; box-shadow:inset 0 0 0 2px #c9962e, 0 4px 0 #1a0b2e; }
+.ib { width:44px; height:44px; display:grid; place-items:center; font-size:22px; flex:none; }
+.row { display:flex; align-items:center; gap:8px; white-space:nowrap; }
+.lbl { font-size:13px; color:#e9c8ff; letter-spacing:.05em; } .paper .lbl { color:#7a5a44; }
+.board { background:#4a2c18; border:3px solid #1a0b2e; box-shadow:inset 0 0 0 2px #c9962e, 0 5px 0 #1a0b2e, 0 0 20px #b46cff55; padding:7px; display:grid; grid-template-columns:repeat(5,1fr); gap:4px; }
+.t { aspect-ratio:1; border:2px solid #2a1033; display:grid; place-items:center; box-shadow:inset 0 -4px 0 #0002; } .t img { width:70%; image-rendering:pixelated; }
+.q { width:30px; height:30px; border:2px solid #2a1033; display:grid; place-items:center; } .q img { width:22px; image-rendering:pixelated; }
+.slot { width:30px; height:30px; border:2px dashed #c9962e; display:grid; place-items:center; color:#c9962e; font-size:18px; }
+.btn { flex:1; text-align:center; padding:11px 6px; font-size:21px; }
+.goalimg { font-size:46px; line-height:1; }
+</style></head><body>
+<h1>Alchemix: layout da partida</h1><p class="sub">3 ideias com a fonte Jersey 10 e o visual roxo e dourado. A fase é a mesma nas três.</p>
+<div class="linha">
+
+<div class="col"><h2>1 · Arrumado</h2><p>A mesma ordem de hoje, só organizada: objetivo grande com nome, 2 botões embaixo.</p>
+<div class="cel">
+  <div class="row"><div class="ib night">⌂</div><div class="night" style="flex:1;text-align:center;padding:6px;font-size:24px">FASE 13 <span style="font-size:15px;color:#e9c8ff">· Cap. 2</span></div><div class="ib night">⏸</div></div>
+  <div class="paper row" style="padding:10px;gap:12px">
+    <div class="goalimg">🏺</div>
+    <div style="flex:1"><div class="lbl">OBJETIVO</div><div style="font-size:28px;line-height:1">Vaso</div><div class="row" style="gap:4px;margin-top:4px"><div class="slot">?</div>+<div class="slot">?</div></div></div>
+    <div style="text-align:right"><div class="lbl">TOQUES</div><div style="font-size:40px;line-height:1">5</div><div style="font-size:15px">❤️❤️❤️</div></div>
+  </div>
+  <div class="night row" style="padding:5px 10px"><span class="lbl">PRÓXIMAS</span><div class="q" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="q" style="background:#fde3b0"><img src="img/fogo.png"></div><div class="q" style="background:#dfe1e8"><img src="img/pedra.png"></div><span style="margin-left:auto;font-size:18px">📖 0/16</span></div>
+  <div class="board"><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#fde3b0"><img src="img/fogo.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#fde3b0"><img src="img/fogo.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#fde3b0"><img src="img/fogo.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div></div>
+  <div class="row" style="margin-top:auto"><div class="btn wood">📖 Receitas</div><div class="btn wood">💡 Dica</div></div>
+</div></div>
+
+<div class="col"><h2>2 · Objetivo em destaque</h2><p>O objetivo vira um "cartaz" no centro do topo; toques e vidas em selos dos lados.</p>
+<div class="cel">
+  <div class="row" style="justify-content:space-between"><div class="ib night">⌂</div><div style="color:#f6c544;font-size:24px;text-shadow:2px 2px 0 #1a0b2e">Fase 13</div><div class="ib night">⏸</div></div>
+  <div class="row" style="align-items:stretch">
+    <div class="night" style="width:72px;text-align:center;padding:8px 2px"><div class="lbl">TOQUES</div><div style="font-size:40px;line-height:1">5</div></div>
+    <div class="paper" style="flex:1;text-align:center;padding:6px"><div class="lbl">FAÇA</div><div class="goalimg">🏺</div><div style="font-size:24px;line-height:1">Vaso</div></div>
+    <div class="night" style="width:72px;text-align:center;padding:8px 2px"><div class="lbl">VIDAS</div><div style="font-size:12px;line-height:2.4;white-space:nowrap">❤️❤️❤️</div></div>
+  </div>
+  <div class="row" style="justify-content:center;gap:6px;color:#f6c544;font-size:16px">próximas: <div class="q" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="q" style="background:#fde3b0"><img src="img/fogo.png"></div><div class="q" style="background:#dfe1e8"><img src="img/pedra.png"></div></div>
+  <div class="board"><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#fde3b0"><img src="img/fogo.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#fde3b0"><img src="img/fogo.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#fde3b0"><img src="img/fogo.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div></div>
+  <div class="row" style="margin-top:auto;justify-content:center;gap:18px">
+    <div class="ib wood" style="width:64px;height:64px;font-size:28px;border-radius:50%">📖</div><div class="ib wood" style="width:64px;height:64px;font-size:28px;border-radius:50%">💡</div>
+  </div>
+</div></div>
+
+<div class="col"><h2>3 · Tabuleiro máximo</h2><p>Tudo numa faixa fina no topo; o tabuleiro ganha o espaço todo. Próximas ficam embaixo dele.</p>
+<div class="cel">
+  <div class="night row" style="padding:6px 8px;gap:6px">
+    <span style="font-size:20px">⌂</span>
+    <div class="paper row" style="padding:2px 8px;gap:4px;box-shadow:none"><span style="font-size:24px">🏺</span><span style="font-size:20px">Vaso</span></div>
+    <span style="margin-left:auto;font-size:22px;white-space:nowrap">👆5</span><span style="font-size:10px;white-space:nowrap">❤️❤️❤️</span><span style="font-size:20px">⏸</span>
+  </div>
+  <div style="color:#f6c544;text-align:center;font-size:18px;text-shadow:2px 2px 0 #1a0b2e">Fase 13 · Cap. 2</div>
+  <div class="board" style="margin-top:6px"><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#fde3b0"><img src="img/fogo.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#fde3b0"><img src="img/fogo.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#fde3b0"><img src="img/fogo.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div><div class="t" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="t" style="background:#cde8f8"><img src="img/agua.png"></div></div>
+  <div class="row" style="justify-content:center;gap:6px;color:#f6c544;font-size:16px;margin-top:4px">próximas: <div class="q" style="background:#dfe1e8"><img src="img/pedra.png"></div><div class="q" style="background:#fde3b0"><img src="img/fogo.png"></div><div class="q" style="background:#dfe1e8"><img src="img/pedra.png"></div></div>
+  <div class="row" style="margin-top:auto"><div class="btn wood">📖 Receitas · 0/16</div><div class="btn wood" style="flex:.45">💡</div></div>
+</div></div>
+
+</div></body></html>

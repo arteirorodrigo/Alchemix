@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alchemix - comparar fontes</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Jersey+10&family=DotGothic16&family=VT323&family=Tiny5&family=Silkscreen&family=Nunito:wght@700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; padding: 24px 16px; background: #1d1a22; color: #eee; font-family: 'Nunito', sans-serif; }
+  h1 { text-align: center; margin: 0 0 20px; }
+  .linha { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  .col { width: 330px; }
+  .col h2 { font-size: 18px; margin: 0 0 4px; text-align: center; }
+  .col .nota { font-size: 13px; opacity: .7; text-align: center; margin: 0 0 10px; min-height: 34px; }
+  .tela { font-family: var(--f), monospace; background: linear-gradient(#3b1f6e, #7a3fa0 60%, #ff9f6a99); padding: 14px; border: 5px solid #000; border-radius: 22px; color: #2a1033; }
+  .tela * { font-family: inherit; }
+  .logo { text-align: center; font-size: calc(40px * var(--k)); color: #f6c544; text-shadow: 0 4px 0 #7a3b0b, 3px 3px 0 #2a1033, -3px -3px 0 #2a1033, 3px -3px 0 #2a1033, -3px 3px 0 #2a1033; margin-bottom: 10px; }
+  .card { background: #fff4dc; border: 3px solid #2a1033; box-shadow: 0 4px 0 #2a1033; padding: 10px; margin-bottom: 10px; }
+  .row { display: flex; align-items: center; justify-content: space-between; }
+  .lbl { font-size: calc(12px * var(--k)); color: #7a5a44; }
+  .big { font-size: calc(32px * var(--k)); line-height: 1; }
+  .fase { background: #5dbb4a; color: #fff; padding: 6px 12px; border: 3px solid #2a1033; font-size: calc(20px * var(--k)); text-shadow: 2px 2px 0 #2a1033; display: inline-block; }
+  .btn { background: #5dbb4a; color: #fff; border: 3px solid #2a1033; box-shadow: 0 4px 0 #2e6b24; padding: 10px; text-align: center; font-size: calc(18px * var(--k)); text-shadow: 2px 2px 0 #2a1033; margin-top: 10px; }
+  .btn.wood { background: #4a2c18; color: #f6c544; text-shadow: none; box-shadow: 0 4px 0 #2e1a0e; }
+  p { margin: 6px 0 0; font-size: calc(15px * var(--k)); line-height: 1.35; }
+  .num { font-size: calc(18px * var(--k)); margin-top: 6px; }
+</style>
+</head>
+<body>
+<h1>Alchemix: fontes pixel retas</h1>
+<div class="linha">
+  <div class="col"><h2>A · Press Start 2P</h2><p class="nota">Clássica 8-bit: quadrada e larga, cara de fliperama. Precisa de tamanho menor.</p>
+    <div class="tela" style="--f:'Press Start 2P';--k:0.62">
+      <div class="logo">ALCHEMIX</div>
+      <div class="card"><div class="row"><span class="fase">Fase 13</span><div style="text-align:right"><div class="lbl">TOQUES</div><div class="big">5</div></div></div>
+        <p>Toque numa peça e depois numa vizinha. Se for uma receita, nasce um elemento novo! Ação, coração.</p><div class="num">0123456789 · 3/16</div></div>
+      <div class="btn">▶ Próxima fase</div><div class="btn wood">📖 Receitas (3/16)</div>
+    </div></div>
+  <div class="col"><h2>B · Jersey 10</h2><p class="nota">Reta, alta e grossa. Muito legível, cara de placar de jogo.</p>
+    <div class="tela" style="--f:'Jersey 10';--k:1.25">
+      <div class="logo">ALCHEMIX</div>
+      <div class="card"><div class="row"><span class="fase">Fase 13</span><div style="text-align:right"><div class="lbl">TOQUES</div><div class="big">5</div></div></div>
+        <p>Toque numa peça e depois numa vizinha. Se for uma receita, nasce um elemento novo! Ação, coração.</p><div class="num">0123456789 · 3/16</div></div>
+      <div class="btn">▶ Próxima fase</div><div class="btn wood">📖 Receitas (3/16)</div>
+    </div></div>
+  <div class="col"><h2>C · DotGothic16</h2><p class="nota">Reta e fina, lembra jogos de RPG antigos.</p>
+    <div class="tela" style="--f:'DotGothic16';--k:1.0">
+      <div class="logo">ALCHEMIX</div>
+      <div class="card"><div class="row"><span class="fase">Fase 13</span><div style="text-align:right"><div class="lbl">TOQUES</div><div class="big">5</div></div></div>
+        <p>Toque numa peça e depois numa vizinha. Se for uma receita, nasce um elemento novo! Ação, coração.</p><div class="num">0123456789 · 3/16</div></div>
+      <div class="btn">▶ Próxima fase</div><div class="btn wood">📖 Receitas (3/16)</div>
+    </div></div>
+  <div class="col"><h2>D · VT323</h2><p class="nota">Reta, de terminal/computador antigo. Bem legível.</p>
+    <div class="tela" style="--f:'VT323';--k:1.25">
+      <div class="logo">ALCHEMIX</div>
+      <div class="card"><div class="row"><span class="fase">Fase 13</span><div style="text-align:right"><div class="lbl">TOQUES</div><div class="big">5</div></div></div>
+        <p>Toque numa peça e depois numa vizinha. Se for uma receita, nasce um elemento novo! Ação, coração.</p><div class="num">0123456789 · 3/16</div></div>
+      <div class="btn">▶ Próxima fase</div><div class="btn wood">📖 Receitas (3/16)</div>
+    </div></div>
+  <div class="col"><h2>E · Tiny5</h2><p class="nota">Reta e compacta, letras simples.</p>
+    <div class="tela" style="--f:'Tiny5';--k:1.0">
+      <div class="logo">ALCHEMIX</div>
+      <div class="card"><div class="row"><span class="fase">Fase 13</span><div style="text-align:right"><div class="lbl">TOQUES</div><div class="big">5</div></div></div>
+        <p>Toque numa peça e depois numa vizinha. Se for uma receita, nasce um elemento novo! Ação, coração.</p><div class="num">0123456789 · 3/16</div></div>
+      <div class="btn">▶ Próxima fase</div><div class="btn wood">📖 Receitas (3/16)</div>
+    </div></div>
+  <div class="col"><h2>F · Silkscreen</h2><p class="nota">Reta, só maiúsculas, bem larga.</p>
+    <div class="tela" style="--f:'Silkscreen';--k:0.8">
+      <div class="logo">ALCHEMIX</div>
+      <div class="card"><div class="row"><span class="fase">Fase 13</span><div style="text-align:right"><div class="lbl">TOQUES</div><div class="big">5</div></div></div>
+        <p>Toque numa peça e depois numa vizinha. Se for uma receita, nasce um elemento novo! Ação, coração.</p><div class="num">0123456789 · 3/16</div></div>
+      <div class="btn">▶ Próxima fase</div><div class="btn wood">📖 Receitas (3/16)</div>
+    </div></div>
+</div>
+</body>
+</html>
