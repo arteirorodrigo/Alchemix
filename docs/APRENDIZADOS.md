@@ -62,7 +62,9 @@ Mantenha curto: refine, junte e apague o que deixar de valer.
 - **Visual aprovado ("D"):** o mundo de ilhas do jogo ao entardecer (lua,
   estrelas) com roxo e dourado do conceito; caixas roxo-escuras ou madeira
   com filete dourado. **Fonte: Jersey 10** (`prototipos/Jersey10.ttf`).
-- **Testes jogáveis (abrir `prototipos/index.html` no Chrome):**
+- **Testes jogáveis** — online para amigos: https://arteirorodrigo.github.io/Alchemix/prototipos/
+  (GitHub Pages, ramo `claude/claude-superpower-skills-nagpbr`; atualiza a cada push).
+  No computador: abrir `prototipos/index.html` no Chrome.
   - Menu: **Normal** e **Modo Livre** (→ Tempo 1 min ou Toque 30 toques).
   - Normal = `rumo-a-receita.html`: capítulos destravam bases (Água+Fogo →
     Terra → Vento → Vida), metas com quantidade, toques = mínimo + 2, layout
