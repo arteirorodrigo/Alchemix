@@ -127,16 +127,19 @@
 (() => {
   const EL = {
     agua: ['Água', '💧', 'agua', '#cde8f8'], terra: ['Terra', '🟫', 'terra', '#dfe1e8'], fogo: ['Fogo', '🔥', 'fogo', '#fde3b0'],
-    vida: ['Vida', '🌱', 'planta', '#d6f0c4'], barro: ['Barro', '🟤', 'barro', '#ecd9c0'], tijolo: ['Tijolo', '🧱', 'tijolo', '#f2cdbd'],
+    vida: ['Vida', '🌱', 'vida', '#d6f0c4'], barro: ['Barro', '🟤', 'barro', '#ecd9c0'], tijolo: ['Tijolo', '🧱', 'tijolo', '#f2cdbd'],
     vapor: ['Vapor', '☁️', 'vapor', '#f1f6fb'], flor: ['Flor', '🌸', 'flor', '#f8dbe6'], casinha: ['Casinha', '🏠', 'casinha', '#fbeeb8'],
-    arcoiris: ['Arco-íris', '🌈', 'arcoiris', '#d6f2f2'], lava: ['Lava', '🌋', null, '#f7c3a6'], obsidiana: ['Obsidiana', '🖤', null, '#d6d0dc'],
-    cinza: ['Cinza', '⚫', null, '#dedad6'], sabao: ['Sabão', '🧼', null, '#e2f1fb'], nuvem: ['Nuvem', '🌥️', null, '#eef2f7'],
-    chuva: ['Chuva', '🌧️', null, '#d5e4f3'], musgo: ['Musgo', '🍀', null, '#d4ecc7'], pantano: ['Pântano', '🐸', null, '#cfe3c2'],
-    sol: ['Sol', '☀️', null, '#fdeeb0'], areia: ['Areia', '🏜️', null, '#f4e2bd'], vidro: ['Vidro', '🔷', null, '#d9ecf8'], vaso: ['Vaso', '🏺', null, '#efd6bf'],
-    lago: ['Lago', '🏞️', null, '#cfe6f2'], montanha: ['Montanha', '⛰️', null, '#e2e0dc'], arbusto: ['Arbusto', '🌿', null, '#cfeac0'],
-    arvore: ['Árvore', '🌳', null, '#cde8bf'], minerio: ['Minério', '🪙', null, '#efe2b8'], metal: ['Metal', '⚙️', null, '#dde2e8'],
-    vento: ['Vento', '🌬️', null, '#e6f3f8'], passaro: ['Pássaro', '🐦', null, '#e3eefa'], raio: ['Raio', '⚡', null, '#fff1a8'], onda: ['Onda', '🌊', null, '#cfe4f6'], poeira: ['Poeira', '🌫️', null, '#e8e3da'],
-    tornado: ['Tornado', '🌪️', null, '#dfe4ea'], tempestade: ['Tempestade', '⛈️', null, '#cfd7e3'], praia: ['Praia', '🏖️', null, '#f6e6c0'],
+    arcoiris: ['Arco-íris', '🌈', 'arcoiris', '#d6f2f2'], lava: ['Lava', '🌋', 'lava', '#f7c3a6'], obsidiana: ['Obsidiana', '🖤', 'obsidiana', '#d6d0dc'],
+    cinza: ['Cinza', '⚫', 'cinza', '#dedad6'], sabao: ['Sabão', '🧼', 'sabao', '#e2f1fb'], nuvem: ['Nuvem', '🌥️', 'nuvem', '#eef2f7'],
+    chuva: ['Chuva', '🌧️', 'chuva', '#d5e4f3'], musgo: ['Musgo', '🍀', 'musgo', '#d4ecc7'], pantano: ['Pântano', '🐸', 'pantano', '#cfe3c2'],
+    sol: ['Sol', '☀️', 'sol', '#fdeeb0'], areia: ['Areia', '🏜️', 'areia', '#f4e2bd'], vidro: ['Vidro', '🔷', 'vidro', '#d9ecf8'], vaso: ['Vaso', '🏺', 'vaso', '#efd6bf'],
+    lago: ['Lago', '🏞️', 'lago', '#cfe6f2'], montanha: ['Montanha', '⛰️', 'montanha', '#e2e0dc'], arbusto: ['Arbusto', '🌿', 'arbusto', '#cfeac0'],
+    arvore: ['Árvore', '🌳', 'arvore', '#cde8bf'], minerio: ['Minério', '🪙', 'minerio', '#efe2b8'], metal: ['Metal', '⚙️', 'metal', '#dde2e8'],
+    vento: ['Vento', '🌬️', 'vento', '#e6f3f8'], passaro: ['Pássaro', '🐦', 'passaro', '#e3eefa'], raio: ['Raio', '⚡', 'raio', '#fff1a8'], onda: ['Onda', '🌊', 'onda', '#cfe4f6'], poeira: ['Poeira', '🌫️', 'poeira', '#e8e3da'],
+    tornado: ['Tornado', '🌪️', 'tornado', '#dfe4ea'], tempestade: ['Tempestade', '⛈️', 'tempestade', '#cfd7e3'], praia: ['Praia', '🏖️', 'praia', '#f6e6c0'],
+    abelha: ['Abelha', '🐝', 'abelha', '#fbedb0'], mel: ['Mel', '🍯', 'mel', '#f9e0a8'], ferramenta: ['Ferramenta', '⛏️', 'ferramenta', '#e4dfd8'],
+    fazenda: ['Fazenda', '🚜', 'fazenda', '#dcefc6'], castelo: ['Castelo', '🏰', 'castelo', '#e2e2ea'], peixe: ['Peixe', '🐟', 'peixe', '#d3e8f7'],
+    ilha: ['Ilha', '🏝️', 'ilha', '#d2eef0'], deserto: ['Deserto', '🌵', 'deserto', '#f6e3b8'],
   };
   const BASE = ['agua', 'fogo', 'terra', 'vento', 'vida'];
   const R = (a, b, r) => ({ a, b, r, k: [a, b].sort().join('+') });
@@ -147,6 +150,7 @@
     R('sol','terra','areia'), R('cinza','agua','sabao'), R('musgo','agua','pantano'), R('tijolo','tijolo','casinha'), R('nuvem','agua','chuva'),
     R('arbusto','chuva','arvore'), R('areia','fogo','vidro'), R('minerio','fogo','metal'), R('barro','barro','vaso'),
     R('vento','fogo','raio'), R('vento','agua','onda'), R('vento','terra','poeira'), R('vento','vento','tornado'), R('nuvem','raio','tempestade'), R('areia','onda','praia'), R('vida','vento','passaro'),
+    R('flor','vento','abelha'), R('abelha','flor','mel'), R('minerio','terra','ferramenta'), R('ferramenta','vida','fazenda'), R('ferramenta','tijolo','castelo'), R('onda','vida','peixe'), R('lava','onda','ilha'), R('areia','vento','deserto'),
   ];
   const find = (x, y) => RECIPES.find(r => (r.a === x && r.b === y) || (r.a === y && r.b === x));
   const producer = (e) => RECIPES.find(r => r.r === e);
@@ -158,6 +162,7 @@
     { bases: ['agua', 'fogo', 'terra'], goals: ['barro:2', 'tijolo', 'obsidiana', 'areia', 'minerio', 'lava:3', 'montanha:3', 'vaso', 'vidro', 'metal', 'casinha'] },
     { bases: ['agua', 'fogo', 'terra', 'vento'], goals: ['raio:2', 'onda:2', 'poeira:3', 'tornado:3', 'praia', 'tempestade'] },
     { bases: ['agua', 'fogo', 'terra', 'vento', 'vida'], goals: ['flor:2', 'musgo:2', 'sabao', 'pantano', 'cinza:3', 'passaro:3', 'arcoiris', 'arbusto:3', 'arvore'] },
+    { bases: ['agua', 'fogo', 'terra', 'vento', 'vida'], goals: ['peixe:2', 'abelha:2', 'deserto', 'ilha', 'ferramenta', 'mel', 'fazenda', 'castelo'] },
   ];
   const ALLGOALS = CHAPTERS.flatMap(c => c.goals);
   const parseGoal = (s) => { const [goal, n] = s.split(':'); return { goal, count: Number(n) || 1 }; };
@@ -189,7 +194,7 @@
 
   function ico(e) {
     const d = EL[e]; const s = document.createElement('div'); s.className = 'ico';
-    if (d && d[2]) { const im = document.createElement('img'); im.src = 'img/' + d[2] + '.png'; im.alt = d[0]; s.append(im); } else s.textContent = d ? d[1] : '?';
+    if (d && d[2]) { const im = document.createElement('img'); im.src = 'img/elementos/' + d[2] + '.png'; im.alt = d[0]; s.append(im); } else s.textContent = d ? d[1] : '?';
     return s;
   }
   // peça "útil": folha do objetivo que está em falta no tabuleiro
