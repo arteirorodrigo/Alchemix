@@ -125,65 +125,11 @@
 <div class="box toast" id="toast" hidden></div>
 <div class="modal" id="modal" hidden><div class="box card" id="card"></div></div>
 
+<script src="regras-normal.js"></script>
 <script>
 (() => {
-  const EL = {
-    agua: ['Água', '💧', 'agua', '#cde8f8'], terra: ['Terra', '🟫', 'terra', '#dfe1e8'], fogo: ['Fogo', '🔥', 'fogo', '#fde3b0'],
-    vida: ['Vida', '🌱', 'vida', '#d6f0c4'], barro: ['Barro', '🟤', 'barro', '#ecd9c0'], tijolo: ['Tijolo', '🧱', 'tijolo', '#f2cdbd'],
-    vapor: ['Vapor', '☁️', 'vapor', '#f1f6fb'], flor: ['Flor', '🌸', 'flor', '#f8dbe6'], casinha: ['Casinha', '🏠', 'casinha', '#fbeeb8'],
-    arcoiris: ['Arco-íris', '🌈', 'arcoiris', '#d6f2f2'], lava: ['Lava', '🌋', 'lava', '#f7c3a6'], obsidiana: ['Obsidiana', '🖤', 'obsidiana', '#d6d0dc'],
-    cinza: ['Cinza', '⚫', 'cinza', '#dedad6'], sabao: ['Sabão', '🧼', 'sabao', '#e2f1fb'], nuvem: ['Nuvem', '🌥️', 'nuvem', '#eef2f7'],
-    chuva: ['Chuva', '🌧️', 'chuva', '#d5e4f3'], musgo: ['Musgo', '🍀', 'musgo', '#d4ecc7'], pantano: ['Pântano', '🐸', 'pantano', '#cfe3c2'],
-    sol: ['Sol', '☀️', 'sol', '#fdeeb0'], areia: ['Areia', '🏜️', 'areia', '#f4e2bd'], vidro: ['Vidro', '🔷', 'vidro', '#d9ecf8'], vaso: ['Vaso', '🏺', 'vaso', '#efd6bf'],
-    lago: ['Lago', '🏞️', 'lago', '#cfe6f2'], montanha: ['Montanha', '⛰️', 'montanha', '#e2e0dc'], arbusto: ['Arbusto', '🌿', 'arbusto', '#cfeac0'],
-    arvore: ['Árvore', '🌳', 'arvore', '#cde8bf'], minerio: ['Minério', '🪙', 'minerio', '#efe2b8'], metal: ['Metal', '⚙️', 'metal', '#dde2e8'],
-    vento: ['Vento', '🌬️', 'vento', '#e6f3f8'], passaro: ['Pássaro', '🐦', 'passaro', '#e3eefa'], raio: ['Raio', '⚡', 'raio', '#fff1a8'], onda: ['Onda', '🌊', 'onda', '#cfe4f6'], poeira: ['Poeira', '🌫️', 'poeira', '#e8e3da'],
-    tornado: ['Tornado', '🌪️', 'tornado', '#dfe4ea'], tempestade: ['Tempestade', '⛈️', 'tempestade', '#cfd7e3'], praia: ['Praia', '🏖️', 'praia', '#f6e6c0'],
-    abelha: ['Abelha', '🐝', 'abelha', '#fbedb0'], mel: ['Mel', '🍯', 'mel', '#f9e0a8'], ferramenta: ['Ferramenta', '⛏️', 'ferramenta', '#e4dfd8'],
-    fazenda: ['Fazenda', '🚜', 'fazenda', '#dcefc6'], castelo: ['Castelo', '🏰', 'castelo', '#e2e2ea'], peixe: ['Peixe', '🐟', 'peixe', '#d3e8f7'],
-    ilha: ['Ilha', '🏝️', 'ilha', '#d2eef0'], deserto: ['Deserto', '🌵', 'deserto', '#f6e3b8'],
-  };
-  const BASE = ['agua', 'fogo', 'terra', 'vento', 'vida'];
-  const R = (a, b, r) => ({ a, b, r, k: [a, b].sort().join('+') });
-  const RECIPES = [
-    R('agua','terra','barro'), R('agua','fogo','vapor'), R('vida','agua','flor'), R('fogo','terra','lava'), R('vida','terra','musgo'),
-    R('vida','fogo','cinza'), R('agua','agua','lago'), R('terra','terra','montanha'), R('fogo','fogo','sol'), R('vida','vida','arbusto'),
-    R('barro','fogo','tijolo'), R('flor','vapor','arcoiris'), R('vapor','vapor','nuvem'), R('lava','agua','obsidiana'), R('lava','terra','minerio'),
-    R('sol','terra','areia'), R('cinza','agua','sabao'), R('musgo','agua','pantano'), R('tijolo','tijolo','casinha'), R('nuvem','agua','chuva'),
-    R('arbusto','chuva','arvore'), R('areia','fogo','vidro'), R('minerio','fogo','metal'), R('barro','barro','vaso'),
-    R('vento','fogo','raio'), R('vento','agua','onda'), R('vento','terra','poeira'), R('vento','vento','tornado'), R('nuvem','raio','tempestade'), R('areia','onda','praia'), R('vida','vento','passaro'),
-    R('flor','vento','abelha'), R('abelha','flor','mel'), R('minerio','terra','ferramenta'), R('ferramenta','vida','fazenda'), R('ferramenta','tijolo','castelo'), R('onda','vida','peixe'), R('lava','onda','ilha'), R('areia','vento','deserto'),
-  ];
-  const find = (x, y) => RECIPES.find(r => (r.a === x && r.b === y) || (r.a === y && r.b === x));
-  const producer = (e) => RECIPES.find(r => r.r === e);
-  // objetivos em ordem de dificuldade
-  // capítulos: cada um destrava uma base nova
-  // metas "elemento:quantidade"; toda fase pede ≥ 2 combinações e o capítulo vai do mais fácil ao mais difícil
-  const CHAPTERS = [
-    { bases: ['agua', 'fogo'], goals: ['vapor:2', 'sol:2', 'lago:3', 'nuvem', 'chuva'] },
-    { bases: ['agua', 'fogo', 'terra'], goals: ['barro:2', 'tijolo', 'obsidiana', 'areia', 'minerio', 'lava:3', 'montanha:3', 'vaso', 'vidro', 'metal', 'casinha'] },
-    { bases: ['agua', 'fogo', 'terra', 'vento'], goals: ['raio:2', 'onda:2', 'poeira:3', 'tornado:3', 'praia', 'tempestade'] },
-    { bases: ['agua', 'fogo', 'terra', 'vento', 'vida'], goals: ['flor:2', 'musgo:2', 'sabao', 'pantano', 'cinza:3', 'passaro:3', 'arcoiris', 'arbusto:3', 'arvore'] },
-    { bases: ['agua', 'fogo', 'terra', 'vento', 'vida'], goals: ['peixe:2', 'abelha:2', 'deserto', 'ilha', 'ferramenta', 'mel', 'fazenda', 'castelo'] },
-  ];
-  const ALLGOALS = CHAPTERS.flatMap(c => c.goals);
-  const parseGoal = (s) => { const [goal, n] = s.split(':'); return { goal, count: Number(n) || 1 }; };
-  function levelInfo(n) {
-    let first = 1;
-    for (let c = 0; c < CHAPTERS.length; c++) {
-      const ch = CHAPTERS[c];
-      if (n < first + ch.goals.length) return { chapter: c + 1, first, bases: ch.bases, ...parseGoal(ch.goals[n - first]) };
-      first += ch.goals.length;
-    }
-    return { chapter: CHAPTERS.length, first: -1, bases: BASE, ...parseGoal(ALLGOALS[(n - first) % ALLGOALS.length]) };
-  }
+  const { EL, RECIPES, CHAPTERS, ROWS, COLS, find, producer, leaves, levelInfo, adj, novaFase, jogar, dica } = AlchemixRegras;
 
-  const rngOf = (seed) => { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
-  const pick = (rng, xs) => xs[Math.floor(rng() * xs.length)];
-
-  // folhas (elementos base) e passos necessários para fazer `e`
-  function leaves(e, out = []) { const p = producer(e); if (!p || BASE.includes(e)) out.push(e); else { leaves(p.a, out); leaves(p.b, out); } return out; }
-  const steps = (e) => leaves(e).length - 1;
   // só entram no livro as receitas feitas com bases já liberadas
   const visibleRecipes = () => RECIPES.filter(r => known.has(r.k) || leaves(r.r).every(l => G.bases.includes(l)));
 
@@ -191,32 +137,19 @@
   const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
   let level = Number(store.get('receita.level')) || 1;
   let known = new Set(JSON.parse(store.get('receita.book') || '[]'));
-  let G, cells, queue, rng, taps, lives = 3, sel = null, busy = false, hint = null, seenEls, done = new Set();
-  const ROWS = 6, COLS = 5;
+  // G = estado da partida (regras-normal.js): cells, queue, taps, lives, done, made...
+  let G, sel = null, busy = false, hint = null;
 
   function ico(e) {
     const d = EL[e]; const s = document.createElement('div'); s.className = 'ico';
     if (d && d[2]) { const im = document.createElement('img'); im.src = 'img/elementos/' + d[2] + '.png'; im.alt = d[0]; s.append(im); } else s.textContent = d ? d[1] : '?';
     return s;
   }
-  // peça "útil": folha do objetivo que está em falta no tabuleiro
-  function helpful() {
-    const need = leaves(G.goal); const have = {}; for (const c of cells) if (c) have[c] = (have[c] || 0) + 1;
-    const cnt = {}; for (const l of need) cnt[l] = (cnt[l] || 0) + 1;
-    const short = Object.keys(cnt).filter(l => (have[l] || 0) < cnt[l] + 1);
-    return short.length ? pick(rng, short) : pick(rng, need);
-  }
-  function nextPiece() { queue.push(rng() < 0.3 ? pick(rng, leaves(G.goal)) : pick(rng, G.bases)); return queue.shift(); }
-
   function start(n) {
     level = n; store.set('receita.level', String(n));
-    const info = levelInfo(n); const goal = info.goal;
-    rng = rngOf(n * 104729 + 7);
-    G = { goal, count: info.count, made: 0, need: steps(goal) * info.count, bases: info.bases };
-    cells = Array.from({ length: ROWS * COLS }, () => rng() < 0.3 ? pick(rng, leaves(goal)) : pick(rng, G.bases));
-    queue = [0, 0, 0].map(() => rng() < 0.3 ? pick(rng, leaves(goal)) : pick(rng, G.bases));
-    taps = G.need + 2;
-    sel = null; hint = null; busy = false; lives = 3; seenEls = new Set(cells); done = new Set();
+    const info = levelInfo(n);
+    G = novaFase(n);
+    sel = null; hint = null; busy = false;
     $('title').innerHTML = `FASE ${n} <small>· Cap. ${info.chapter}</small>`;
     render();
     if (n === 1 && !store.get('receita.seen')) { store.set('receita.seen', '1'); help(); }
@@ -249,60 +182,56 @@
     $('goalIco').textContent = ''; $('goalIco').append(ico(G.goal)); $('goalIco').title = EL[G.goal][0];
     $('goalCnt').textContent = G.count > 1 ? `${G.made}/${G.count}` : '';
     renderTree();
-    $('taps').textContent = taps; $('lives').textContent = '❤️'.repeat(lives) + '🤍'.repeat(3 - lives);
+    $('taps').textContent = G.taps; $('lives').textContent = '❤️'.repeat(Math.max(0, G.lives)) + '🤍'.repeat(3 - Math.max(0, G.lives));
     const vis = visibleRecipes();
     $('found').textContent = `📖 ${vis.filter(r => known.has(r.k)).length}/${vis.length}`;
-    const q = $('queue'); q.textContent = ''; for (const e of queue) { const d = document.createElement('div'); d.className = 'q'; d.style.background = EL[e][3]; d.append(ico(e)); q.append(d); }
+    const q = $('queue'); q.textContent = ''; for (const e of G.queue) { const d = document.createElement('div'); d.className = 'q'; d.style.background = EL[e][3]; d.append(ico(e)); q.append(d); }
     const b = $('board'); b.textContent = ''; b.style.gridTemplateColumns = `repeat(${COLS}, auto)`; b.style.setProperty('--cs', cs() + 'px');
-    cells.forEach((e, i) => {
+    G.cells.forEach((e, i) => {
       const t = document.createElement('button'); t.className = 'tile'; t.style.setProperty('--t', EL[e][3]); t.setAttribute('aria-label', EL[e][0]);
-      if (done.has(i)) t.classList.add('done');
+      if (G.done.includes(i)) t.classList.add('done');
       if (i === sel) t.classList.add('sel'); if (hint && hint.includes(i)) t.classList.add('hint');
       if (fx.pop === i) t.classList.add('pop'); if (fx.boom && fx.boom.includes(i)) t.classList.add('boom'); if (fx.drop === i) t.classList.add('drop'); if (fx.shake && fx.shake.includes(i)) t.classList.add('shake');
       t.append(ico(e)); t.onclick = () => tap(i); b.append(t);
     });
   }
-  const adj = (a, b) => { const ra = Math.floor(a / COLS), ca = a % COLS, rb = Math.floor(b / COLS), cb = b % COLS; return Math.abs(ra - rb) + Math.abs(ca - cb) === 1; };
   function toast(msg, ms = 2000) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, ms); }
 
   function tap(i) {
     if (busy) return;
     // peça do objetivo já concluída: fica no tabuleiro, mas não se mexe mais
-    if (done.has(i)) { toast(`✓ Essa ${EL[cells[i]][0]} já conta para o objetivo`, 1400); return; }
+    if (G.done.includes(i)) { toast(`✓ Essa ${EL[G.cells[i]][0]} já conta para o objetivo`, 1400); return; }
     hint = null;
     if (sel === null || sel === i || !adj(sel, i)) { sel = sel === i ? null : i; render(); return; }
     const a = sel, b = i; sel = null;
-    const r = find(cells[a], cells[b]);
-    if (r) {
-      taps--;
+    const antes = [G.cells[a], G.cells[b]];
+    const res = jogar(G, a, b);
+    if (res.tipo === 'receita') {
+      const r = res.receita;
       const isNew = !known.has(r.k);
       known.add(r.k); store.set('receita.book', JSON.stringify([...known]));
-      cells[b] = r.r; cells[a] = nextPiece(); seenEls.add(r.r);
       render({ pop: b, drop: a });
       if (isNew) toast(`✨ Nova receita! ${EL[r.a][1]} + ${EL[r.b][1]} = ${EL[r.r][1]} ${EL[r.r][0]}`, 2600);
-      if (r.r === G.goal) {
-        G.made++;
-        if (G.made >= G.count) { render({ pop: b }); return setTimeout(win, 450); }
-        // ainda falta: a peça pronta fica no tabuleiro, travada, e conta no objetivo
-        done.add(b);
-        setTimeout(() => { render(); toast(`${EL[G.goal][1]} ${G.made}/${G.count} — falta${G.count - G.made > 1 ? 'm' : ''} ${G.count - G.made}!`, 1500); }, 350);
-      }
+      if (res.venceu) return setTimeout(win, 450);
+      if (r.r === G.goal) setTimeout(() => { render(); toast(`${EL[G.goal][1]} ${G.made}/${G.count} — falta${G.count - G.made > 1 ? 'm' : ''} ${G.count - G.made}!`, 1500); }, 350);
+      if (res.perdeu) setTimeout(() => lose(res.perdeu), 400);
     } else {
-      lives--; taps--; busy = true;
+      // mostra as peças que não reagiram tremendo e só depois as peças úteis que vieram no lugar
+      const depois = [G.cells[a], G.cells[b]];
+      G.cells[a] = antes[0]; G.cells[b] = antes[1];
+      busy = true;
       render({ shake: [a, b] });
-      return setTimeout(() => {
+      setTimeout(() => {
         busy = false;
-        cells[a] = helpful(); cells[b] = helpful();
+        G.cells[a] = depois[0]; G.cells[b] = depois[1];
         render({ boom: [a, b] });
-        if (lives <= 0) return setTimeout(() => lose('vidas'), 500);
-        if (taps <= 0) return setTimeout(() => lose('toques'), 400);
+        if (res.perdeu) return setTimeout(() => lose(res.perdeu), res.perdeu === 'vidas' ? 500 : 400);
         toast(`💥 Não reagiu! −1 ❤️ — vieram peças úteis no lugar.`, 1800);
       }, 520);
     }
-    if (taps <= 0) setTimeout(() => lose('toques'), 400);
   }
   function win() {
-    const extra = taps; const stars = extra >= 2 ? '⭐⭐⭐' : extra >= 1 ? '⭐⭐' : '⭐';
+    const extra = G.taps; const stars = extra >= 2 ? '⭐⭐⭐' : extra >= 1 ? '⭐⭐' : '⭐';
     modal(`<img class="mascot" src="img/mascote-frasco.png" alt=""><h2>Você fez ${G.count > 1 ? G.count + '× ' : ''}${EL[G.goal][0]}!</h2><div class="ico" style="width:70px;height:70px;margin:0 auto;font-size:52px" id="wico"></div><p style="font-size:28px">${stars}</p><p>Sobraram ${extra} toques</p><button class="btn green" data-a="next">Próxima fase</button>`);
     $('wico').append(ico(G.goal));
   }
@@ -314,9 +243,9 @@
   }
   function modal(html) {
     $('card').innerHTML = html; $('modal').hidden = false;
-    $('card').querySelectorAll('[data-a]').forEach(btn => btn.onclick = () => { $('modal').hidden = true; ({ restart: () => start(level), next: () => start(level + 1), close: () => {}, skip: () => start(level + 1), help: () => help(), more: addMore, life: () => { lives = 1; render(); toast('+1 ❤️'); } })[btn.dataset.a](); });
+    $('card').querySelectorAll('[data-a]').forEach(btn => btn.onclick = () => { $('modal').hidden = true; ({ restart: () => start(level), next: () => start(level + 1), close: () => {}, skip: () => start(level + 1), help: () => help(), more: addMore, life: () => { G.lives = 1; render(); toast('+1 ❤️'); } })[btn.dataset.a](); });
   }
-  function addMore() { taps += 5; render(); toast('+5 toques'); }
+  function addMore() { G.taps += 5; render(); toast('+5 toques'); }
   function help() {
     modal(`<h2>Como jogar</h2><p>Chegue ao <b>objetivo</b> lá em cima juntando peças.</p><p>Toque numa peça e depois numa <b>vizinha</b>. Se for uma receita, nasce um elemento novo — e você descobre a receita!</p><p>Não reagiu? 💥 Explode, <b>tira uma vida ❤️ e 1 toque</b>, e as duas viram peças úteis. São 3 vidas por fase.</p><p>Os <b>?</b> do objetivo se revelam conforme você descobre. Use poucos toques para ganhar mais estrelas.</p><button class="btn green" data-a="close">Bora!</button>`);
   }
@@ -329,19 +258,9 @@
     modal(`<h2>Receitas (${got}/${vis.length})</h2><div class="book">${rows}</div>${locked ? '<p>🔒 Mais receitas chegam com a próxima base.</p>' : ''}<button class="btn green" data-a="close">Fechar</button>`);
     $('card').querySelectorAll('[data-e]').forEach(s => { s.replaceWith(ico(s.dataset.e)); });
   }
-  // dica: procura um par vizinho que faça uma peça do caminho do objetivo
-  function findHint() {
-    const path = new Set(); (function walk(e) { path.add(e); const p = producer(e); if (p && !BASE.includes(e)) { walk(p.a); walk(p.b); } })(G.goal);
-    let best = null, bestTier = -1;
-    for (let a = 0; a < cells.length; a++) for (let b = 0; b < cells.length; b++) {
-      if (!adj(a, b) || done.has(a) || done.has(b)) continue; const r = find(cells[a], cells[b]); if (!r || !path.has(r.r)) continue;
-      const tier = steps(r.r); if (tier > bestTier) { bestTier = tier; best = [a, b]; }
-    }
-    return best;
-  }
   $('pause').onclick = () => modal(`<h2>Pausa</h2><button class="btn green" data-a="close">▶ Continuar</button><button class="btn wood" data-a="restart">↺ Recomeçar fase</button><button class="btn wood" data-a="skip">⏭ Pular fase</button><button class="btn wood" data-a="help">? Como jogar</button>`);
   $('bookb').onclick = book;
-  $('hintb').onclick = () => { const h = findHint(); if (!h) { toast('Nenhum par útil agora — tente explodir peças que não servem'); return; } hint = h; sel = null; render(); toast('Junte as peças marcadas'); };
+  $('hintb').onclick = () => { const h = dica(G); if (!h) { toast('Nenhum par útil agora — tente explodir peças que não servem'); return; } hint = h; sel = null; render(); toast('Junte as peças marcadas'); };
   window.addEventListener('resize', () => render());
   start(level);
 })();
