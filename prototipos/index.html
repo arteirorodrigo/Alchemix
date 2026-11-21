@@ -60,6 +60,7 @@
     <button class="btn wood" id="voltar">← Voltar</button>
   </div>
 </div>
+<script src="precarga.js"></script>
 <script>
   [[8,13],[20,5],[32,10],[45,3],[58,8],[66,15],[90,22],[14,24],[4,33],[94,7],[38,19],[74,3]].forEach(([x, y], i) => {
     const s = document.createElement('div'); s.className = 'star'; s.style.left = x + '%'; s.style.top = y + '%'; s.style.animationDelay = (i * .13) + 's'; document.body.append(s);
