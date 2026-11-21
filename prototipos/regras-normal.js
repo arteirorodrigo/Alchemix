@@ -81,14 +81,6 @@
   const novaFase = (n) => gerarFase(n, AJUSTE[n] || 0);
   const copiar = (e) => ({ ...e, cells: e.cells.slice(), queue: e.queue.slice(), done: e.done.slice() });
   function proximaPeca(e) { e.queue.push(sortear(e)); return e.queue.shift(); }
-  // peça "útil": folha do objetivo que está em falta no tabuleiro
-  function util(e) {
-    const need = leaves(e.goal); const have = {}; for (const c of e.cells) if (c) have[c] = (have[c] || 0) + 1;
-    const cnt = {}; for (const l of need) cnt[l] = (cnt[l] || 0) + 1;
-    const short = Object.keys(cnt).filter(l => (have[l] || 0) < cnt[l] + 1);
-    return short.length ? pick(e, short) : pick(e, need);
-  }
-
   // uma jogada: juntar a casa `a` (primeiro toque) com a vizinha `b`. Muta o estado.
   function jogar(e, a, b) {
     if (a === b || !adj(a, b) || e.done.includes(a) || e.done.includes(b)) return { tipo: 'invalido', venceu: false, perdeu: false };
@@ -104,9 +96,7 @@
       }
     } else {
       e.lives--; e.taps--;
-      // só peça básica vira peça útil; elemento já feito fica no lugar (não se perde progresso)
-      if (BASE.includes(e.cells[a])) e.cells[a] = util(e);
-      if (BASE.includes(e.cells[b])) e.cells[b] = util(e);
+      // errar custa 1 vida e 1 toque; as peças ficam no lugar
     }
     const perdeu = venceu ? false : e.lives <= 0 ? 'vidas' : e.taps <= 0 ? 'toques' : false;
     return { tipo: r ? 'receita' : 'erro', receita: r, venceu, perdeu };

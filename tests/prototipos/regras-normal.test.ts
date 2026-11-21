@@ -77,21 +77,13 @@ describe('regras do modo Normal', () => {
     expect(e.taps).toBe(R.novaFase(20).taps - 1);
   });
 
-  it('erro não troca peça já evoluída', () => {
+  it('erro mantém as duas peças no lugar', () => {
     const e = R.novaFase(20);
     e.cells[0] = 'vapor'; e.cells[1] = 'terra';
+    const antes = e.s;
     const res = R.jogar(e, 0, 1);
     expect(res.tipo).toBe('erro');
-    expect(e.cells[0]).toBe('vapor');
-    expect(R.BASE).toContain(e.cells[1]);
-  });
-
-  it('erro entre duas evoluídas não troca nenhuma', () => {
-    const e = R.novaFase(20);
-    e.cells[0] = 'vapor'; e.cells[1] = 'areia';
-    const antes = e.s;
-    R.jogar(e, 0, 1);
-    expect([e.cells[0], e.cells[1]]).toEqual(['vapor', 'areia']);
+    expect([e.cells[0], e.cells[1]]).toEqual(['vapor', 'terra']);
     expect(e.s).toBe(antes);
   });
 

@@ -43,6 +43,8 @@ Mantenha curto: refine, junte e apague o que deixar de valer.
 - **Regras previsíveis** são essenciais em jogo de lógica: se o jogador não
   prevê o resultado, ele chuta em vez de deduzir.
 - **Errar deve custar algo (estrelas, vidas), não a partida inteira.**
+  No Alchemix, errar custa 1 vida e 1 toque e **as peças ficam no lugar**:
+  o dono achou "muito ruim" o erro trocar peças (perde o que já tinha feito).
 - **Fases geradas por computador** tendem a parecer arbitrárias; o gerador
   precisa medir qualidade (vários caminhos, chute raramente vence).
 - **Fase que se resolve com 1 combinação não é fase.** Receitas de um passo
