@@ -40,7 +40,8 @@
   .queue { display: flex; align-items: center; gap: 6px; padding: 4px 8px; font-size: 13px; color: var(--muted); }
   .queue .q { width: 30px; height: 30px; border: 2px solid var(--ink); display: flex; align-items: center; justify-content: center; }
   .boardwrap { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; }
-  .board { background: var(--wood); border: 3px solid var(--ink); box-shadow: 0 5px 0 var(--ink), inset 0 6px 0 var(--grass); padding: 12px 6px 6px; display: grid; gap: 5px; }
+  .tile img { pointer-events: none; -webkit-user-drag: none; user-drag: none; }
+  .board { touch-action: none; background: var(--wood); border: 3px solid var(--ink); box-shadow: 0 5px 0 var(--ink), inset 0 6px 0 var(--grass); padding: 12px 6px 6px; display: grid; gap: 5px; }
   .tile { width: var(--cs); height: var(--cs); display: flex; align-items: center; justify-content: center; border: 2px solid var(--ink); background: var(--t, #eee); box-shadow: inset 0 -5px 0 rgba(0,0,0,.18); cursor: pointer; padding: 0; position: relative; transition: transform .12s; }
   .tile.sel { outline: 4px solid #fff; outline-offset: -2px; transform: scale(1.12); z-index: 2; box-shadow: 0 0 0 3px var(--gold, #f6c544), 0 0 18px 6px #fff8; }
   .tile.viz { outline: 3px dashed #fffc; outline-offset: -5px; }
@@ -243,10 +244,30 @@
       if (G.done.includes(i)) t.classList.add('done');
       if (i === sel) t.classList.add('sel'); else if (sel !== null && adj(sel, i) && !G.done.includes(i)) t.classList.add('viz'); if (hint && hint.includes(i)) t.classList.add('hint');
       if (fx.pop === i) t.classList.add('pop'); if (fx.boom && fx.boom.includes(i)) t.classList.add('boom'); if (fx.drop === i) t.classList.add('drop'); if (fx.shake && fx.shake.includes(i)) t.classList.add('shake');
-      t.append(ico(e)); t.onclick = () => tap(i); b.append(t);
+      t.dataset.i = i; t.append(ico(e)); t.onclick = () => { if (Date.now() - arrastou < 400) return; tap(i); }; b.append(t);
     });
   }
   function toast(msg, ms = 2000) { const t = $('toast'); t.textContent = ''; msg.split(/(\[\w+\])/).forEach(p => { const m = p.match(/^\[(\w+)\]$/); t.append(m && EL[m[1]] ? ico(m[1]) : p); }); t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, ms); }
+
+  // arrastar uma peça até a vizinha = tocar nela e depois na vizinha (o novo nasce onde você soltou)
+  let arrasto = null, arrastou = 0;
+  $('board').addEventListener('pointerdown', ev => {
+    const t = ev.target.closest('.tile'); if (!t || busy) return;
+    arrasto = { i: Number(t.dataset.i), x: ev.clientX, y: ev.clientY };
+  });
+  $('board').addEventListener('dragstart', ev => ev.preventDefault());
+  addEventListener('pointermove', ev => {
+    if (!arrasto) return;
+    const dx = ev.clientX - arrasto.x, dy = ev.clientY - arrasto.y, lim = cs() * 0.4;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < lim) return;
+    const i = arrasto.i; arrasto = null; arrastou = Date.now();
+    const j = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? (i % COLS < COLS - 1 ? i + 1 : -1) : (i % COLS ? i - 1 : -1)) : (dy > 0 ? i + COLS : i - COLS);
+    if (j < 0 || j >= G.cells.length || busy) return;
+    if (G.done.includes(i)) { tap(i); return; }
+    sel = i; tap(j);
+  });
+  addEventListener('pointerup', () => { arrasto = null; });
+  addEventListener('pointercancel', () => { arrasto = null; });
 
   function tap(i) {
     if (busy) return;
@@ -316,7 +337,7 @@
   }
   function addMore() { G.taps += 5; render(); toast('+5 toques'); }
   function help() {
-    modal(`<h2>Como jogar</h2><p>Chegue ao <b>objetivo</b> lá em cima juntando peças.</p><p>Toque numa peça e depois numa <b>vizinha</b> (elas ficam marcadas). Se for uma receita, o elemento novo <b>nasce na 2ª peça</b> que você tocou, e a 1ª recebe a próxima peça da faixa <b>PRÓXIMAS ➜</b>.</p><p>Não reagiu? 💥 <b>Tira uma vida ❤️ e 1 toque</b>. As peças <b>ficam no lugar</b>. São 3 vidas por fase.</p><p>Os <b>?</b> do objetivo se revelam conforme você descobre. Use poucos toques para ganhar mais estrelas.</p><button class="btn green" data-a="close">Bora!</button>`);
+    modal(`<h2>Como jogar</h2><p>Chegue ao <b>objetivo</b> lá em cima juntando peças.</p><p>Toque numa peça e depois numa <b>vizinha</b> (elas ficam marcadas) — ou <b>arraste</b> a peça até a vizinha. Se for uma receita, o elemento novo <b>nasce na 2ª peça</b> que você tocou, e a 1ª recebe a próxima peça da faixa <b>PRÓXIMAS ➜</b>.</p><p>Não reagiu? 💥 <b>Tira uma vida ❤️ e 1 toque</b>. As peças <b>ficam no lugar</b>. São 3 vidas por fase.</p><p>Os <b>?</b> do objetivo se revelam conforme você descobre. Use poucos toques para ganhar mais estrelas.</p><button class="btn green" data-a="close">Bora!</button>`);
   }
   function book() {
     const vis = visibleRecipes(); const got = vis.filter(r => known.has(r.k)).length;
