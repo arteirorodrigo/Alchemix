@@ -87,6 +87,30 @@ describe('regras do modo Normal', () => {
     expect(e.s).toBe(antes);
   });
 
+  it('martelo troca a peça por uma básica útil, sem gastar toque', () => {
+    const e = R.novaFase(21); // Praia: folhas sol(fogo,fogo)+terra, onda(vento,agua)
+    e.cells[0] = 'lava';
+    const toques = e.taps;
+    expect(R.martelar(e, 0)).toBe(true);
+    expect(R.leaves(e.goal)).toContain(e.cells[0]);
+    expect(e.taps).toBe(toques);
+  });
+
+  it('martelo nunca devolve a mesma peça', () => {
+    for (let n = 1; n <= 10; n++) {
+      const e = R.novaFase(n);
+      for (let i = 0; i < 30; i++) { const antes = e.cells[i]; R.martelar(e, i); expect(e.cells[i]).not.toBe(antes); }
+    }
+  });
+
+  it('martelo não quebra peça travada', () => {
+    const e = R.novaFase(1);
+    R.jogar(e, ...parQueFaz(e, 'vapor'));
+    const t = e.done[0], antes = e.cells[t];
+    expect(R.martelar(e, t)).toBe(false);
+    expect(e.cells[t]).toBe(antes);
+  });
+
   it('fase além do fim', () => {
     const e = R.novaFase(60);
     expect(R.EL[e.goal]).toBeDefined();

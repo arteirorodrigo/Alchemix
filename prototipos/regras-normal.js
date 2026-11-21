@@ -81,6 +81,20 @@
   const novaFase = (n) => gerarFase(n, AJUSTE[n] || 0);
   const copiar = (e) => ({ ...e, cells: e.cells.slice(), queue: e.queue.slice(), done: e.done.slice() });
   function proximaPeca(e) { e.queue.push(sortear(e)); return e.queue.shift(); }
+  // martelo (ajuda): troca a peça da casa i pela base do objetivo que mais falta no tabuleiro. Não gasta toque.
+  function martelar(e, i) {
+    if (i < 0 || i >= e.cells.length || e.done.includes(i)) return false;
+    const need = leaves(e.goal), have = {}, cnt = {};
+    e.cells.forEach((c, k) => { if (k !== i) have[c] = (have[c] || 0) + 1; });
+    for (const l of need) cnt[l] = (cnt[l] || 0) + 1;
+    const falta = Object.keys(cnt).filter(l => (have[l] || 0) < cnt[l] + 1);
+    let opcoes = falta.length ? falta : [...new Set(need)];
+    if (opcoes.length > 1) opcoes = opcoes.filter(x => x !== e.cells[i]);
+    else if (opcoes[0] === e.cells[i]) { const outras = e.bases.filter(x => x !== e.cells[i]); if (outras.length) opcoes = outras; }
+    e.cells[i] = pick(e, opcoes);
+    return true;
+  }
+
   // uma jogada: juntar a casa `a` (primeiro toque) com a vizinha `b`. Muta o estado.
   function jogar(e, a, b) {
     if (a === b || !adj(a, b) || e.done.includes(a) || e.done.includes(b)) return { tipo: 'invalido', venceu: false, perdeu: false };
@@ -142,7 +156,7 @@
     return null;
   }
 
-  const api = { EL, BASE, RECIPES, CHAPTERS, ROWS, COLS, AJUSTE, find, producer, leaves, steps, caminho, levelInfo, adj, rand, gerarFase, novaFase, copiar, jogar, paresValidos, jogadasUteis, dica };
+  const api = { EL, BASE, RECIPES, CHAPTERS, ROWS, COLS, AJUSTE, find, producer, leaves, steps, caminho, levelInfo, adj, rand, martelar, gerarFase, novaFase, copiar, jogar, paresValidos, jogadasUteis, dica };
   g.AlchemixRegras = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

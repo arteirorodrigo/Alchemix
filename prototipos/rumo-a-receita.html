@@ -89,10 +89,9 @@
   #lives { font-size: 15px; white-space: nowrap; }
   .queue.night { padding: 5px 10px; color: var(--gold); }
   .queue .lbl { font-size: 13px; color: var(--lilac); letter-spacing: .05em; }
-  #found { font-size: 18px; }
   .board { background: var(--woodD); border-color: var(--night-dark); box-shadow: inset 0 0 0 2px var(--gold-dark), 0 5px 0 var(--night-dark), 0 0 20px #b46cff55; padding: 8px; }
-  .foot { display: flex; justify-content: center; gap: 22px; }
-  .foot .btn.ib { width: 64px; height: 64px; font-size: 30px; }
+  .foot { display: flex; justify-content: center; gap: 16px; }
+  .foot .btn.ib { width: 60px; height: 60px; font-size: 28px; }
   .card .btn { font-size: 20px; }
   .modal { background: rgba(26, 11, 46, .72); }
   .box.card { background: #fff4dc; border-color: var(--night-dark); box-shadow: inset 0 0 0 3px var(--gold-dark), 0 5px 0 var(--night-dark), 0 0 30px #b46cff66; }
@@ -103,7 +102,26 @@
   .book .row { background: #fffaf0; border-color: var(--night-dark); font-size: 18px; }
   .box.toast { background: var(--night); color: var(--gold); border-color: var(--night-dark); box-shadow: inset 0 0 0 2px var(--gold-dark), 0 4px 0 var(--night-dark); font-size: 19px; }
   .toast .ico { display: inline-flex; width: 1.5em; height: 1.5em; vertical-align: middle; }
-  .btn.mini { display: none; width: 40px; height: 40px; font-size: 18px; }
+  .moedas { display: flex; align-items: center; padding: 0 8px; min-height: 48px; font-size: 22px; white-space: nowrap; box-sizing: border-box; }
+  .aj { position: relative; }
+  .mais3 { font: 26px/1 var(--display); color: var(--gold); }
+  .ajudas-mini .mais3 { font-size: 17px; }
+  .qt { position: absolute; right: -7px; bottom: -7px; min-width: 22px; height: 22px; padding: 0 4px; box-sizing: border-box; background: var(--grass); color: #fff; border: 2px solid var(--night-dark); border-radius: 11px; font: 15px/18px var(--display); text-shadow: none; }
+  .qt.preco { background: var(--orange); }
+  .qt.livro { background: var(--night); color: var(--gold); font-size: 13px; }
+  .qt:empty { display: none; }
+  .board.marteloOn { outline: 4px dashed var(--berry); outline-offset: 3px; }
+  .board.marteloOn .tile:not(.done) { cursor: crosshair; }
+  .frasco { display: flex; gap: 3px; justify-content: center; margin-top: 3px; }
+  .frasco span { width: 18px; height: 18px; border: 2px dashed var(--muted); display: grid; place-items: center; box-sizing: border-box; background: #fff8; }
+  .frasco span.ok { border: 2px solid var(--grass-shade); background: #e6f6d8; }
+  .frasco span.novo { animation: pop .4s ease-out; }
+  .frasco .ico { width: 100%; height: 100%; }
+  .ajudas-mini { display: none; margin-left: auto; gap: 6px; }
+  .ganho { background: #fff8e6; border: 2px solid var(--night-dark); padding: 6px 10px; text-align: left; font-size: 17px; }
+  .ganho div { display: flex; justify-content: space-between; }
+  .ganho .tot { font-size: 26px; border-top: 2px dashed var(--gold-dark); margin-top: 4px; padding-top: 2px; color: var(--night); }
+  .btn.orange.ad { background: var(--orange); box-shadow: inset 0 0 0 2px var(--gold-dark), 0 4px 0 var(--orange-shade); }
   /* celular baixo: encolhe o cabeçalho antes de encolher as casas */
   @media (max-height: 700px) {
     .app { gap: 4px; padding-block: 4px; }
@@ -120,10 +138,18 @@
     .queue.night { padding: 3px 8px; }
     .queue .q { width: 26px; height: 26px; }
     .foot { display: none; }
-    .btn.mini { display: grid; }
-    #found { display: none; }
+    .ajudas-mini { display: flex; }
+    .ajudas-mini { gap: 5px; }
+    .ajudas-mini .btn.ib { width: 34px; height: 34px; font-size: 16px; }
+    .ajudas-mini .qt { right: -6px; bottom: -6px; min-width: 17px; height: 17px; font-size: 11px; line-height: 13px; padding: 0 2px; }
+    .ajudas-mini .qt.livro { display: none; }
+    .moedas { min-height: 40px; font-size: 18px; padding: 0 6px; }
     .queue .lbl { font-size: 11px; white-space: nowrap; }
-    .queue .btn.mini:first-of-type { margin-left: auto; }
+    .queue .lbl .txt { display: none; }
+    .queue .lbl { font-size: 16px; }
+    #queue { gap: 4px !important; }
+    .top .title { white-space: nowrap; }
+    .top .title small { display: none; }
     .toast { top: calc(50px + env(safe-area-inset-top, 0px)); font-size: 16px !important; }
   }
   /* ---- vitória comemorada ---- */
@@ -146,10 +172,11 @@
   <div class="top">
     <a class="btn ib night" href="index.html" aria-label="Menu">⌂</a>
     <div class="title night" id="title">FASE 1</div>
+    <div class="moedas night" id="moedas" aria-label="Moedas">🪙 0</div>
     <button class="btn ib night" id="pause" aria-label="Pausa">⏸</button>
   </div>
   <div class="box goal paper2">
-    <div style="text-align:center;flex:none"><div class="ico big" id="goalIco"></div><div id="goalCnt" style="font-size:18px"></div></div>
+    <div style="text-align:center;flex:none"><div class="ico big" id="goalIco"></div><div class="frasco" id="frasco" aria-label="progresso do objetivo"></div></div>
     <div style="min-width:0;flex:1">
       <div class="lbl">OBJETIVO</div>
       <div class="gname" id="gname"></div>
@@ -157,11 +184,13 @@
     </div>
     <div class="taps"><div class="lbl">TOQUES</div><div class="val" id="taps">0</div><div id="lives"></div></div>
   </div>
-  <div class="queue night" title="Peças que vão entrar no lugar da 1ª peça que você tocar"><span class="lbl">PRÓXIMAS ➜</span><div id="queue" style="display:flex;gap:6px"></div><span style="margin-left:auto" id="found"></span><button class="btn ib wood mini" id="bookm" aria-label="Receitas">📖</button><button class="btn ib wood mini" id="hintm" aria-label="Dica">💡</button></div>
+  <div class="queue night" title="Peças que vão entrar no lugar da 1ª peça que você tocar"><span class="lbl"><span class="txt">PRÓXIMAS </span>➜</span><div id="queue" style="display:flex;gap:6px"></div><div class="ajudas-mini" id="ajudasMini"></div></div>
   <div class="boardwrap"><div class="board" id="board"></div></div>
-  <div class="foot">
-    <button class="btn ib wood" id="bookb" aria-label="Receitas">📖</button>
-    <button class="btn ib wood" id="hintb" aria-label="Dica">💡</button>
+  <div class="foot" id="ajudas">
+    <button class="btn ib wood aj" id="bookb" aria-label="Receitas">📖<span class="qt livro" id="found"></span></button>
+    <button class="btn ib wood aj" id="hintb" aria-label="Dica">💡<span class="qt" id="q-dica"></span></button>
+    <button class="btn ib wood aj" id="martb" aria-label="Martelo: troca uma peça">🔨<span class="qt" id="q-martelo"></span></button>
+    <button class="btn ib wood aj" id="maisb" aria-label="Mais 3 toques"><b class="mais3">+3</b><span class="qt" id="q-toques"></span></button>
   </div>
 </div>
 <div class="box toast" id="toast" hidden></div>
@@ -172,7 +201,7 @@
 <script src="precarga.js"></script>
 <script>
 (() => {
-  const { EL, RECIPES, CHAPTERS, ROWS, COLS, find, producer, leaves, levelInfo, adj, novaFase, jogar, dica } = AlchemixRegras;
+  const { EL, RECIPES, CHAPTERS, ROWS, COLS, find, producer, leaves, levelInfo, adj, novaFase, jogar, dica, martelar } = AlchemixRegras;
 
   // só entram no livro as receitas feitas com bases já liberadas
   const visibleRecipes = () => RECIPES.filter(r => known.has(r.k) || leaves(r.r).every(l => G.bases.includes(l)));
@@ -184,6 +213,19 @@
   // G = estado da partida (regras-normal.js): cells, queue, taps, lives, done, made...
   let G, sel = null, busy = false, hint = null, novas = [];
   const som = (n, x) => AlchemixSom.tocar(n, x);
+  // moedas e ajudas (guardadas no aparelho)
+  const PRECO = { dica: 25, martelo: 40, toques: 50 };
+  let moedas = Number(store.get('alchemix.moedas')) || 0;
+  let aj = (() => { try { return JSON.parse(store.get('alchemix.ajudas')) || null; } catch { return null; } })() || { dica: 3, martelo: 2, toques: 1 };
+  let martelo = false, ultimoGanho = 0;
+  const salvar = () => { store.set('alchemix.moedas', String(moedas)); store.set('alchemix.ajudas', JSON.stringify(aj)); };
+  // usa uma ajuda: gasta do estoque ou compra com moedas. Devolve false se não deu.
+  function pagar(nome) {
+    if (aj[nome] > 0) { aj[nome]--; salvar(); return true; }
+    if (moedas >= PRECO[nome]) { moedas -= PRECO[nome]; salvar(); return true; }
+    toast(`Faltam ${PRECO[nome] - moedas} 🪙 — vença fases para ganhar moedas`, 2200); return false;
+  }
+  const podePagar = (nome) => aj[nome] > 0 || moedas >= PRECO[nome];
 
   function ico(e) {
     const d = EL[e]; const s = document.createElement('div'); s.className = 'ico';
@@ -232,11 +274,15 @@
   }
   function render(fx = {}) {
     $('goalIco').textContent = ''; $('goalIco').append(ico(G.goal)); $('goalIco').title = EL[G.goal][0];
-    $('goalCnt').textContent = G.count > 1 ? `${G.made}/${G.count}` : '';
+    $('moedas').textContent = `🪙 ${moedas}`;
+    for (const n of ['dica', 'martelo', 'toques']) { const q = $('q-' + n); q.textContent = aj[n] > 0 ? aj[n] : '🪙' + PRECO[n]; q.classList.toggle('preco', !(aj[n] > 0)); }
+    const fr = $('frasco'); fr.textContent = '';
+    if (G.count > 1) for (let k = 0; k < G.count; k++) { const sl = document.createElement('span'); if (k < G.made) { sl.className = 'ok' + (fx.encheu === k ? ' novo' : ''); sl.append(ico(G.goal)); } fr.append(sl); }
+    $('board').classList.toggle('marteloOn', martelo);
     renderTree();
     $('taps').textContent = G.taps; $('lives').textContent = '❤️'.repeat(Math.max(0, G.lives)) + '🤍'.repeat(3 - Math.max(0, G.lives));
     const vis = visibleRecipes();
-    $('found').textContent = `📖 ${vis.filter(r => known.has(r.k)).length}/${vis.length}`;
+    $('found').textContent = `${vis.filter(r => known.has(r.k)).length}/${vis.length}`;
     const q = $('queue'); q.textContent = ''; for (const e of G.queue) { const d = document.createElement('div'); d.className = 'q'; d.style.background = EL[e][3]; d.append(ico(e)); q.append(d); }
     const b = $('board'); b.textContent = ''; b.style.gridTemplateColumns = `repeat(${COLS}, auto)`; b.style.setProperty('--cs', cs() + 'px');
     G.cells.forEach((e, i) => {
@@ -252,7 +298,7 @@
   // arrastar uma peça até a vizinha = tocar nela e depois na vizinha (o novo nasce onde você soltou)
   let arrasto = null, arrastou = 0;
   $('board').addEventListener('pointerdown', ev => {
-    const t = ev.target.closest('.tile'); if (!t || busy) return;
+    const t = ev.target.closest('.tile'); if (!t || busy || martelo) return;
     arrasto = { i: Number(t.dataset.i), x: ev.clientX, y: ev.clientY };
   });
   $('board').addEventListener('dragstart', ev => ev.preventDefault());
@@ -271,6 +317,11 @@
 
   function tap(i) {
     if (busy) return;
+    if (martelo) {
+      if (G.done.includes(i)) { toast('Essa já conta para o objetivo — escolha outra', 1400); return; }
+      if (!pagar('martelo')) { martelo = false; render(); return; }
+      martelo = false; martelar(G, i); som('erro'); render({ boom: [i] }); toast(`🔨 Quebrou! Veio [${G.cells[i]}] no lugar`, 1600); return;
+    }
     // peça do objetivo já concluída: fica no tabuleiro, mas não se mexe mais
     if (G.done.includes(i)) { toast(`✓ Essa ${EL[G.cells[i]][0]} já conta para o objetivo`, 1400); return; }
     hint = null;
@@ -286,7 +337,7 @@
       render({ pop: b, drop: a });
       if (isNew) toast(`✨ Nova receita! [${r.a}] + [${r.b}] = [${r.r}] ${EL[r.r][0]}`, 2600);
       if (res.venceu) return setTimeout(win, 450);
-      if (r.r === G.goal) setTimeout(() => { som('meta'); render(); toast(`[${G.goal}] ${G.made}/${G.count} — falta${G.count - G.made > 1 ? 'm' : ''} ${G.count - G.made}!`, 1500); }, 350);
+      if (r.r === G.goal) setTimeout(() => { som('meta'); render({ encheu: G.made - 1 }); toast(`[${G.goal}] ${G.made}/${G.count} — falta${G.count - G.made > 1 ? 'm' : ''} ${G.count - G.made}!`, 1500); }, 350);
       if (res.perdeu) setTimeout(() => lose(res.perdeu), 400);
     } else {
       // não reagiu: as peças tremem e ficam no lugar
@@ -303,6 +354,12 @@
   }
   function win() {
     const extra = G.taps; const n = extra >= 2 ? 3 : extra >= 1 ? 2 : 1;
+    // moedas: base pela fase, sem erro e toques que sobraram
+    const ganho = { linhas: [['Fase ' + level, 10 + 3 * G.need]] };
+    if (G.lives >= 3) ganho.linhas.push(['❤️ Sem erro', 10]);
+    if (extra > 0) ganho.linhas.push([`👆 ${extra} toque${extra > 1 ? 's' : ''} sobrando`, 5 * extra]);
+    ganho.total = ganho.linhas.reduce((a, l) => a + l[1], 0);
+    ultimoGanho = ganho.total; moedas += ganho.total; salvar();
     const feitas = novas.map(r => `<div class="row"><span class="ico" data-e="${r.a}"></span>+<span class="ico" data-e="${r.b}"></span>=<span class="ico" data-e="${r.r}"></span> ${EL[r.r][0]}</div>`).join('');
     modal(`<img class="mascot pula" src="img/mascote-frasco.webp" alt="Mascote do Alchemix: um frasco de poção sorridente">
       <h2>Fase completa!</h2>
@@ -311,10 +368,12 @@
       <div class="estrelas" aria-label="${n} de 3 estrelas"><span>⭐</span><span>⭐</span><span>⭐</span></div>
       <p>${extra ? `Sobraram ${extra} toque${extra > 1 ? 's' : ''}` : 'No último toque!'}${n < 3 ? ' — sobre 2 toques para 3 estrelas' : ''}</p>
       ${feitas ? `<p>Receitas novas nesta fase:</p><div class="novas">${feitas}</div>` : ''}
+      <div class="ganho">${ganho.linhas.map(([t, v]) => `<div><span>${t}</span><span>+${v}</span></div>`).join('')}<div class="tot"><span>Total</span><span>+${ganho.total} 🪙</span></div></div>
+      <button class="btn orange ad" data-a="dobrar">▶ Dobrar (anúncio)</button>
       <button class="btn green" data-a="next">Próxima fase ➜</button>`);
     $('wico').append(ico(G.goal));
     $('card').querySelectorAll('[data-e]').forEach(x => x.replaceWith(ico(x.dataset.e)));
-    som('vitoria');
+    som('vitoria'); render();
     const est = $('card').querySelectorAll('.estrelas span');
     for (let k = 0; k < n; k++) setTimeout(() => { if (est[k]) { est[k].classList.add('on'); som('estrela', k); } }, 550 + k * 380);
     // confete nas cores do jogo
@@ -333,11 +392,17 @@
   function modal(html) {
     $('modal').querySelectorAll('.confete').forEach(x => x.remove());
     $('card').innerHTML = html; $('modal').hidden = false;
-    $('card').querySelectorAll('[data-a]').forEach(btn => btn.onclick = () => { $('modal').hidden = true; $('modal').querySelectorAll('.confete').forEach(x => x.remove()); ({ restart: () => start(level), next: () => start(level + 1), close: () => {}, skip: () => start(level + 1), help: () => help(), more: addMore, som: () => { AlchemixSom.alternar(); pausa(); }, life: () => { G.lives = 1; render(); toast('+1 ❤️'); } })[btn.dataset.a](); });
+    $('card').querySelectorAll('[data-a]').forEach(btn => btn.onclick = () => { $('modal').hidden = true; $('modal').querySelectorAll('.confete').forEach(x => x.remove()); ({ restart: () => start(level), next: () => start(level + 1), close: () => {}, skip: () => start(level + 1), help: () => help(), more: () => anuncio(addMore), dobrar, som: () => { AlchemixSom.alternar(); pausa(); }, life: () => anuncio(() => { G.lives = 1; render(); toast('+1 ❤️'); }) })[btn.dataset.a](); });
   }
   function addMore() { G.taps += 5; render(); toast('+5 toques'); }
+  // anúncio com recompensa (simulado; aqui entra o AdMob)
+  function anuncio(depois) {
+    modal(`<h2>📺 Anúncio</h2><p>Simulado — aqui entra o anúncio em vídeo.</p><p style="font-size:44px" id="cont">3</p>`);
+    let k = 3; const t = setInterval(() => { k--; const c = $('cont'); if (c) c.textContent = k; if (k <= 0) { clearInterval(t); $('modal').hidden = true; depois(); } }, 1000);
+  }
+  function dobrar() { anuncio(() => { moedas += ultimoGanho; salvar(); render(); som('vitoria'); modal(`<h2>Moedas dobradas!</h2><p style="font-size:34px">+${ultimoGanho} 🪙</p><p>Agora você tem ${moedas} 🪙</p><button class="btn green" data-a="next">Próxima fase ➜</button>`); }); }
   function help() {
-    modal(`<h2>Como jogar</h2><p>Chegue ao <b>objetivo</b> lá em cima juntando peças.</p><p>Toque numa peça e depois numa <b>vizinha</b> (elas ficam marcadas) — ou <b>arraste</b> a peça até a vizinha. Se for uma receita, o elemento novo <b>nasce na 2ª peça</b> que você tocou, e a 1ª recebe a próxima peça da faixa <b>PRÓXIMAS ➜</b>.</p><p>Não reagiu? 💥 <b>Tira uma vida ❤️ e 1 toque</b>. As peças <b>ficam no lugar</b>. São 3 vidas por fase.</p><p>Os <b>?</b> do objetivo se revelam conforme você descobre. Use poucos toques para ganhar mais estrelas.</p><button class="btn green" data-a="close">Bora!</button>`);
+    modal(`<h2>Como jogar</h2><p>Chegue ao <b>objetivo</b> lá em cima juntando peças.</p><p>Toque numa peça e depois numa <b>vizinha</b> (elas ficam marcadas) — ou <b>arraste</b> a peça até a vizinha. Se for uma receita, o elemento novo <b>nasce na 2ª peça</b> que você tocou, e a 1ª recebe a próxima peça da faixa <b>PRÓXIMAS ➜</b>.</p><p>Não reagiu? 💥 <b>Tira uma vida ❤️ e 1 toque</b>. As peças <b>ficam no lugar</b>. São 3 vidas por fase.</p><p>Os <b>?</b> do objetivo se revelam conforme você descobre. Use poucos toques para ganhar mais estrelas.</p><p>Ajudas: 💡 dica, 🔨 troca uma peça e <b>+3</b> dá 3 toques. Quando o estoque acaba, compre com 🪙 — você ganha moedas vencendo fases (mais ainda sem errar e com toques sobrando).</p><button class="btn green" data-a="close">Bora!</button>`);
   }
   function book() {
     const vis = visibleRecipes(); const got = vis.filter(r => known.has(r.k)).length;
@@ -350,8 +415,14 @@
   }
   const pausa = () => modal(`<h2>Pausa</h2><button class="btn green" data-a="close">▶ Continuar</button><button class="btn wood" data-a="som">${AlchemixSom.ligado() ? '🔊 Som: ligado' : '🔇 Som: desligado'}</button><button class="btn wood" data-a="restart">↺ Recomeçar fase</button><button class="btn wood" data-a="skip">⏭ Pular fase</button><button class="btn wood" data-a="help">? Como jogar</button>`);
   $('pause').onclick = pausa;
-  $('bookb').onclick = $('bookm').onclick = book;
-  $('hintb').onclick = $('hintm').onclick = () => { const h = dica(G); if (!h) { toast('Daqui não dá mais para chegar ao objetivo — recomece a fase no ⏸', 2600); return; } hint = h; sel = null; render(); toast('Junte as peças marcadas'); };
+  $('bookb').onclick = book;
+  $('martb').onclick = () => { if (martelo) { martelo = false; render(); toast('Martelo guardado', 1000); return; } if (!podePagar('martelo')) { pagar('martelo'); return; } martelo = true; sel = null; hint = null; render(); toast('🔨 Toque na peça que quer quebrar (de novo no 🔨 para cancelar)', 2400); };
+  $('maisb').onclick = () => { if (pagar('toques')) { G.taps += 3; som('meta'); render(); toast('+3 toques', 1400); } };
+  // celular baixo: as ajudas sobem para a faixa PRÓXIMAS
+  const baixo = matchMedia('(max-height: 700px)');
+  const posicionar = () => { const d = baixo.matches ? $('ajudasMini') : $('ajudas'); ['bookb', 'hintb', 'martb', 'maisb'].forEach(id => d.append($(id))); };
+  posicionar(); baixo.addEventListener ? baixo.addEventListener('change', posicionar) : baixo.addListener(posicionar);
+  $('hintb').onclick = () => { const h = dica(G); if (!h) { toast('Daqui não dá mais para chegar ao objetivo — recomece a fase no ⏸', 2600); return; } if (!pagar('dica')) return; hint = h; sel = null; render(); toast('Junte as peças marcadas'); };
   window.addEventListener('resize', () => render());
   start(level);
 })();
