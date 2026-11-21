@@ -44,6 +44,8 @@
   .tile { width: var(--cs); height: var(--cs); display: flex; align-items: center; justify-content: center; border: 2px solid var(--ink); background: var(--t, #eee); box-shadow: inset 0 -5px 0 rgba(0,0,0,.18); cursor: pointer; padding: 0; position: relative; transition: transform .12s; }
   .tile.sel { outline: 4px solid #fff; outline-offset: -2px; transform: scale(1.07); z-index: 2; }
   .tile.hint { outline: 4px dashed var(--orange); outline-offset: -2px; }
+  .tile.done { outline: 4px solid #f5c542; outline-offset: -2px; cursor: default; filter: saturate(.85); }
+  .tile.done::after { content: '✓'; position: absolute; top: 2px; right: 4px; font-size: 18px; color: #fff; background: #3aa35b; border-radius: 50%; width: 20px; height: 20px; line-height: 20px; text-align: center; }
   .tile.pop { animation: pop .35s ease-out; }
   .tile.boom { animation: boom .35s ease-out; }
   .tile.drop { animation: drop .3s ease-out; }
@@ -189,7 +191,7 @@
   const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
   let level = Number(store.get('receita.level')) || 1;
   let known = new Set(JSON.parse(store.get('receita.book') || '[]'));
-  let G, cells, queue, rng, taps, lives = 3, sel = null, busy = false, hint = null, seenEls;
+  let G, cells, queue, rng, taps, lives = 3, sel = null, busy = false, hint = null, seenEls, done = new Set();
   const ROWS = 6, COLS = 5;
 
   function ico(e) {
@@ -214,7 +216,7 @@
     cells = Array.from({ length: ROWS * COLS }, () => rng() < 0.3 ? pick(rng, leaves(goal)) : pick(rng, G.bases));
     queue = [0, 0, 0].map(() => rng() < 0.3 ? pick(rng, leaves(goal)) : pick(rng, G.bases));
     taps = G.need + 2;
-    sel = null; hint = null; busy = false; lives = 3; seenEls = new Set(cells);
+    sel = null; hint = null; busy = false; lives = 3; seenEls = new Set(cells); done = new Set();
     $('title').innerHTML = `FASE ${n} <small>· Cap. ${info.chapter}</small>`;
     render();
     if (n === 1 && !store.get('receita.seen')) { store.set('receita.seen', '1'); help(); }
@@ -254,6 +256,7 @@
     const b = $('board'); b.textContent = ''; b.style.gridTemplateColumns = `repeat(${COLS}, auto)`; b.style.setProperty('--cs', cs() + 'px');
     cells.forEach((e, i) => {
       const t = document.createElement('button'); t.className = 'tile'; t.style.setProperty('--t', EL[e][3]); t.setAttribute('aria-label', EL[e][0]);
+      if (done.has(i)) t.classList.add('done');
       if (i === sel) t.classList.add('sel'); if (hint && hint.includes(i)) t.classList.add('hint');
       if (fx.pop === i) t.classList.add('pop'); if (fx.boom && fx.boom.includes(i)) t.classList.add('boom'); if (fx.drop === i) t.classList.add('drop'); if (fx.shake && fx.shake.includes(i)) t.classList.add('shake');
       t.append(ico(e)); t.onclick = () => tap(i); b.append(t);
@@ -264,6 +267,8 @@
 
   function tap(i) {
     if (busy) return;
+    // peça do objetivo já concluída: fica no tabuleiro, mas não se mexe mais
+    if (done.has(i)) { toast(`✓ Essa ${EL[cells[i]][0]} já conta para o objetivo`, 1400); return; }
     hint = null;
     if (sel === null || sel === i || !adj(sel, i)) { sel = sel === i ? null : i; render(); return; }
     const a = sel, b = i; sel = null;
@@ -278,8 +283,9 @@
       if (r.r === G.goal) {
         G.made++;
         if (G.made >= G.count) { render({ pop: b }); return setTimeout(win, 450); }
-        // ainda falta: a peça pronta sai do tabuleiro e conta no objetivo
-        setTimeout(() => { cells[b] = nextPiece(); render({ drop: b }); toast(`${EL[G.goal][1]} ${G.made}/${G.count} — falta${G.count - G.made > 1 ? 'm' : ''} ${G.count - G.made}!`, 1500); }, 350);
+        // ainda falta: a peça pronta fica no tabuleiro, travada, e conta no objetivo
+        done.add(b);
+        setTimeout(() => { render(); toast(`${EL[G.goal][1]} ${G.made}/${G.count} — falta${G.count - G.made > 1 ? 'm' : ''} ${G.count - G.made}!`, 1500); }, 350);
       }
     } else {
       lives--; taps--; busy = true;
@@ -328,7 +334,7 @@
     const path = new Set(); (function walk(e) { path.add(e); const p = producer(e); if (p && !BASE.includes(e)) { walk(p.a); walk(p.b); } })(G.goal);
     let best = null, bestTier = -1;
     for (let a = 0; a < cells.length; a++) for (let b = 0; b < cells.length; b++) {
-      if (!adj(a, b)) continue; const r = find(cells[a], cells[b]); if (!r || !path.has(r.r)) continue;
+      if (!adj(a, b) || done.has(a) || done.has(b)) continue; const r = find(cells[a], cells[b]); if (!r || !path.has(r.r)) continue;
       const tier = steps(r.r); if (tier > bestTier) { bestTier = tier; best = [a, b]; }
     }
     return best;
