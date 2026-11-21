@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error módulo .mjs sem tipos
-import { alertasCapitulo, alertasFase, chanceVitoria, contarSolucoes, medirFase } from '../../scripts/medir/metricas.mjs';
+import { alertasCapitulo, alertasFase, chanceVitoria, contarSolucoes, medirFase, seguirDica } from '../../scripts/medir/metricas.mjs';
+import { createRequire } from 'node:module';
+const R = createRequire(import.meta.url)('../../prototipos/regras-normal.js');
 
 describe('medidor de fases', () => {
   it('fase 1 tem solução', () => {
@@ -31,6 +33,13 @@ describe('medidor de fases', () => {
     alertasCapitulo(ms);
     expect(ms[1].alertas).toContain('FICOU MAIS FÁCIL');
     expect(ms[0].alertas).not.toContain('FICOU MAIS FÁCIL');
+  });
+
+  it('sem dica, seguir a dica não vence por sorte', () => {
+    const e = R.novaFase(1);
+    e.cells = e.cells.map(() => 'lago'); // nenhum par reage: não há dica
+    expect(R.dica(e)).toBeNull();
+    expect(seguirDica(e)).toBe(false);
   });
 
   it('fase além do fim', () => {

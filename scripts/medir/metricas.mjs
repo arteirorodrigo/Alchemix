@@ -76,6 +76,18 @@ export function chanceVitoria(n, politica, partidas = 2000, semente = 1) {
   return vitorias / partidas;
 }
 
+// Segue sempre a 💡 a partir do estado `e` (muta). Sem dica disponível = não vence
+// (nada de jogada ao acaso, para a sorte não esconder o alerta).
+export function seguirDica(e) {
+  for (;;) {
+    const d = dica(e);
+    if (!d) return false;
+    const res = jogar(e, d[0], d[1]);
+    if (res.venceu) return true;
+    if (res.perdeu) return false;
+  }
+}
+
 export function alertasFase(m) {
   const al = [];
   if (m.solucoes === 0 && m.completo) al.push('SEM SOLUÇÃO SEM ERRAR');
@@ -103,7 +115,7 @@ export function medirFase(n, { partidas = 2000, limiteNos = 200000 } = {}) {
     solucoes, completo,
     chute: chanceVitoria(n, 'chute', partidas),
     sabeCaminho: chanceVitoria(n, 'sabeCaminho', partidas),
-    dicaVence: chanceVitoria(n, 'dica', 1) === 1,
+    dicaVence: seguirDica(novaFase(n)),
   };
   m.alertas = alertasFase(m);
   return m;
