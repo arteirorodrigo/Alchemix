@@ -3,7 +3,7 @@
 Documento vivo. Revisado no início de cada sessão e atualizado ao fechar.
 Mantenha curto: refine, junte e apague o que deixar de valer.
 
-Última atualização: 2026-11-20 (sessão 2)
+Última atualização: 2026-11-21 (sessão 3, revisão inicial)
 
 ## Como trabalhamos melhor
 
@@ -63,23 +63,30 @@ Mantenha curto: refine, junte e apague o que deixar de valer.
   estrelas) com roxo e dourado do conceito; caixas roxo-escuras ou madeira
   com filete dourado. **Fonte: Jersey 10** (`prototipos/Jersey10.ttf`).
 - **Testes jogáveis** — online para amigos: https://arteirorodrigo.github.io/Alchemix/prototipos/
-  (GitHub Pages, ramo `claude/claude-superpower-skills-nagpbr`; atualiza a cada push).
+  (GitHub Pages, ramo `claude/claude-superpower-skills-nagpbr`; atualiza a cada push
+  **nesse ramo** — se a sessão trabalhar em outro ramo, levar as mudanças para lá
+  para o link dos amigos atualizar).
   No computador: abrir `prototipos/index.html` no Chrome.
   - Menu: **Normal** e **Modo Livre** (→ Tempo 1 min ou Toque 30 toques).
   - Normal = `rumo-a-receita.html`: capítulos destravam bases (Água+Fogo →
-    Terra → Vento → Vida), metas com quantidade, toques = mínimo + 2, layout
-    "1" (objetivo grande, ⏸ com recomeçar/pular/ajuda, 📖 e 💡 embaixo).
+    Terra → Vento → Vida → capítulo 5 **Mundo**), metas com quantidade,
+    toques = mínimo + 2, layout "1" (objetivo grande, ⏸ com
+    recomeçar/pular/ajuda, 📖 e 💡 embaixo). Partida ocupa a tela inteira no
+    celular.
   - Modo Livre = `modo-livre/`: juntar vizinhos; final ★ some e pontua pelo
     tamanho da cadeia; peças caem e entram bases aleatórias; sem livro, sem
     embaralhar; travou = fim. Não conta para o livro.
+- **Coleção:** 44 elementos, todos com arte própria em
+  `prototipos/img/elementos/` (inclusive Terra).
 - **Jogo completo (`src/`, Phaser):** ainda tem a mecânica antiga (trocar
-  peças). Só a tela inicial recebeu o visual D e o nome novo.
+  peças) e a fonte Pixelify (rejeitada). Só a tela inicial recebeu o visual D
+  e o nome novo.
 - Imagens de referência em `docs/referencias/`: folha de elementos, livro de
   receitas (fundo transparente), layouts, telas no estilo novo.
 - **Próximos passos (lista do dono):**
-  1. Ajustar toda a coleção (arte de todos os elementos; Terra ainda usa a
-     pedra cinza; 26 de 36 ainda são emoji).
+  1. ~~Ajustar toda a coleção~~ — feito (44 artes novas).
   2. Melhorar as fases (Praia e Árvore parecem apertadas demais).
   3. Fazer o logo e criar o ícone.
   4. Criar imagens para o Instagram.
-  5. Levar tudo para o jogo completo.
+  5. Levar tudo para o jogo completo (mecânica nova, visual D, Jersey 10 no
+     lugar da Pixelify, as 44 artes).
