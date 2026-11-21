@@ -78,6 +78,12 @@ Mantenha curto: refine, junte e apague o que deixar de valer.
     embaralhar; travou = fim. Não conta para o livro.
 - **Coleção:** 44 elementos, todos com arte própria em
   `prototipos/img/elementos/` (inclusive Terra).
+- **Auditor:** peça "audita o jogo" (ou uma fase/capítulo). Agente em
+  `.claude/agents/game_auditor.md`; medidor `node scripts/medir-fases.mjs`
+  (~30 s, mesmas regras do jogo via `prototipos/regras-normal.js`);
+  relatórios em `docs/auditorias/`.
+- **Peça concluída fica travada:** em metas 2×/3×, a peça pronta fica no
+  tabuleiro com ✓ e não se mexe mais.
 - **Jogo completo (`src/`, Phaser):** ainda tem a mecânica antiga (trocar
   peças) e a fonte Pixelify (rejeitada). Só a tela inicial recebeu o visual D
   e o nome novo.
