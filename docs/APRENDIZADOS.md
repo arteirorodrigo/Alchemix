@@ -82,6 +82,11 @@ Mantenha curto: refine, junte e apague o que deixar de valer.
   `.claude/agents/game_auditor.md`; medidor `node scripts/medir-fases.mjs`
   (~30 s, mesmas regras do jogo via `prototipos/regras-normal.js`);
   relatórios em `docs/auditorias/`.
+- **Fases ajustadas (sessão 3):** cada fase usa a variação de sorteio que
+  `scripts/escolher-sementes.mjs` escolhe (tem solução, a 💡 vence, rampa no
+  capítulo). Ao mudar metas/regras, rodar de novo e colar o `AJUSTE` em
+  `prototipos/regras-normal.js`. Ainda apertadas: Tempestade, Árvore, Castelo
+  (receitas longas; ideia em aberto: regra de mover peça).
 - **Peça concluída fica travada:** em metas 2×/3×, a peça pronta fica no
   tabuleiro com ✓ e não se mexe mais.
 - **Jogo completo (`src/`, Phaser):** ainda tem a mecânica antiga (trocar

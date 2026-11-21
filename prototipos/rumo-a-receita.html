@@ -42,7 +42,10 @@
   .boardwrap { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; }
   .board { background: var(--wood); border: 3px solid var(--ink); box-shadow: 0 5px 0 var(--ink), inset 0 6px 0 var(--grass); padding: 12px 6px 6px; display: grid; gap: 5px; }
   .tile { width: var(--cs); height: var(--cs); display: flex; align-items: center; justify-content: center; border: 2px solid var(--ink); background: var(--t, #eee); box-shadow: inset 0 -5px 0 rgba(0,0,0,.18); cursor: pointer; padding: 0; position: relative; transition: transform .12s; }
-  .tile.sel { outline: 4px solid #fff; outline-offset: -2px; transform: scale(1.07); z-index: 2; }
+  .tile.sel { outline: 4px solid #fff; outline-offset: -2px; transform: scale(1.12); z-index: 2; box-shadow: 0 0 0 3px var(--gold, #f6c544), 0 0 18px 6px #fff8; }
+  .tile.viz { outline: 3px dashed #fffc; outline-offset: -5px; }
+  .slot.pista { border-style: dashed; background: #fff8; }
+  .slot.pista .ico { opacity: .4; }
   .tile.hint { outline: 4px dashed var(--orange); outline-offset: -2px; }
   .tile.done { outline: 4px solid #f5c542; outline-offset: -2px; cursor: default; filter: saturate(.85); }
   .tile.done::after { content: '✓'; position: absolute; top: 2px; right: 4px; font-size: 18px; color: #fff; background: #3aa35b; border-radius: 50%; width: 20px; height: 20px; line-height: 20px; text-align: center; }
@@ -57,7 +60,7 @@
   @keyframes boom { 0% { transform: scale(1.3) rotate(-8deg); filter: brightness(2); } 100% { transform: none; } }
   @keyframes drop { 0% { transform: translateY(-30px); opacity: 0; } 100% { transform: none; opacity: 1; } }
   .foot { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-  .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); padding: 10px 14px; font-size: 16px; z-index: 20; max-width: 88%; text-align: center; }
+  .toast { position: fixed; left: 50%; top: calc(64px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); padding: 10px 14px; font-size: 16px; z-index: 20; max-width: 88%; text-align: center; }
   .modal { position: fixed; inset: 0; background: rgba(34, 20, 30, .6); display: flex; align-items: center; justify-content: center; z-index: 30; padding: 16px; }
   .card { padding: 16px; text-align: center; display: flex; flex-direction: column; gap: 10px; width: min(360px, 100%); max-height: 85vh; overflow: auto; }
   .card h2 { margin: 0; font-size: 24px; }
@@ -98,6 +101,30 @@
   .card .btn.paper { background: var(--woodD); color: var(--gold); border-color: var(--night-dark); box-shadow: inset 0 0 0 2px var(--gold-dark), 0 4px 0 var(--night-dark); }
   .book .row { background: #fffaf0; border-color: var(--night-dark); font-size: 18px; }
   .box.toast { background: var(--night); color: var(--gold); border-color: var(--night-dark); box-shadow: inset 0 0 0 2px var(--gold-dark), 0 4px 0 var(--night-dark); font-size: 19px; }
+  .toast .ico { display: inline-flex; width: 1.5em; height: 1.5em; vertical-align: middle; }
+  .btn.mini { display: none; width: 40px; height: 40px; font-size: 18px; }
+  /* celular baixo: encolhe o cabeçalho antes de encolher as casas */
+  @media (max-height: 700px) {
+    .app { gap: 4px; padding-block: 4px; }
+    .btn.ib { width: 40px; height: 40px; font-size: 18px; }
+    .top .title { font-size: 20px; padding: 2px 8px; }
+    .goal { padding: 4px 10px; gap: 10px; }
+    .goal .lbl, .taps .lbl { font-size: 11px; }
+    .goal .big { width: 40px; height: 40px; }
+    .goal .big .ico { font-size: 30px; }
+    .gname { font-size: 20px; margin: 0 0 2px; }
+    .slot { width: 24px; height: 24px; font-size: 14px; }
+    .taps .val { font-size: 26px; }
+    #lives { font-size: 12px; }
+    .queue.night { padding: 3px 8px; }
+    .queue .q { width: 26px; height: 26px; }
+    .foot { display: none; }
+    .btn.mini { display: grid; }
+    #found { display: none; }
+    .queue .lbl { font-size: 11px; white-space: nowrap; }
+    .queue .btn.mini:first-of-type { margin-left: auto; }
+    .toast { top: calc(50px + env(safe-area-inset-top, 0px)); font-size: 16px !important; }
+  }
 </style>
 
 <div class="app">
@@ -115,7 +142,7 @@
     </div>
     <div class="taps"><div class="lbl">TOQUES</div><div class="val" id="taps">0</div><div id="lives"></div></div>
   </div>
-  <div class="queue night"><span class="lbl">PRÓXIMAS</span><div id="queue" style="display:flex;gap:6px"></div><span style="margin-left:auto" id="found"></span></div>
+  <div class="queue night" title="Peças que vão entrar no lugar da 1ª peça que você tocar"><span class="lbl">PRÓXIMAS ➜</span><div id="queue" style="display:flex;gap:6px"></div><span style="margin-left:auto" id="found"></span><button class="btn ib wood mini" id="bookm" aria-label="Receitas">📖</button><button class="btn ib wood mini" id="hintm" aria-label="Dica">💡</button></div>
   <div class="boardwrap"><div class="board" id="board"></div></div>
   <div class="foot">
     <button class="btn ib wood" id="bookb" aria-label="Receitas">📖</button>
@@ -170,7 +197,12 @@
     // os ingredientes de uma receita só aparecem depois que você descobre essa receita
     const t = $('tree'); t.textContent = '';
     const p = producer(G.goal); const kp = known.has(p.k);
-    t.append(slotFor(p.a, kp), '+', slotFor(p.b, kp));
+    // pista: se você já conhece os dois ingredientes (por outras receitas), eles aparecem apagados
+    const conhece = (e) => G.bases.includes(e) || RECIPES.some(r => r.r === e && known.has(r.k));
+    if (!kp && conhece(p.a) && conhece(p.b)) {
+      const pista = (e) => { const s = slotFor(e, true); s.className = 'slot pista'; s.title = 'pista: você já conhece este ingrediente'; return s; };
+      t.append(pista(p.a), '+', pista(p.b));
+    } else t.append(slotFor(p.a, kp), '+', slotFor(p.b, kp));
   }
   // tamanho da peça pelo espaço que sobra de verdade para o tabuleiro (moldura: 2×(8 de margem + 3 de borda))
   function cs() {
@@ -190,12 +222,12 @@
     G.cells.forEach((e, i) => {
       const t = document.createElement('button'); t.className = 'tile'; t.style.setProperty('--t', EL[e][3]); t.setAttribute('aria-label', EL[e][0]);
       if (G.done.includes(i)) t.classList.add('done');
-      if (i === sel) t.classList.add('sel'); if (hint && hint.includes(i)) t.classList.add('hint');
+      if (i === sel) t.classList.add('sel'); else if (sel !== null && adj(sel, i) && !G.done.includes(i)) t.classList.add('viz'); if (hint && hint.includes(i)) t.classList.add('hint');
       if (fx.pop === i) t.classList.add('pop'); if (fx.boom && fx.boom.includes(i)) t.classList.add('boom'); if (fx.drop === i) t.classList.add('drop'); if (fx.shake && fx.shake.includes(i)) t.classList.add('shake');
       t.append(ico(e)); t.onclick = () => tap(i); b.append(t);
     });
   }
-  function toast(msg, ms = 2000) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, ms); }
+  function toast(msg, ms = 2000) { const t = $('toast'); t.textContent = ''; msg.split(/(\[\w+\])/).forEach(p => { const m = p.match(/^\[(\w+)\]$/); t.append(m && EL[m[1]] ? ico(m[1]) : p); }); t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, ms); }
 
   function tap(i) {
     if (busy) return;
@@ -211,9 +243,9 @@
       const isNew = !known.has(r.k);
       known.add(r.k); store.set('receita.book', JSON.stringify([...known]));
       render({ pop: b, drop: a });
-      if (isNew) toast(`✨ Nova receita! ${EL[r.a][1]} + ${EL[r.b][1]} = ${EL[r.r][1]} ${EL[r.r][0]}`, 2600);
+      if (isNew) toast(`✨ Nova receita! [${r.a}] + [${r.b}] = [${r.r}] ${EL[r.r][0]}`, 2600);
       if (res.venceu) return setTimeout(win, 450);
-      if (r.r === G.goal) setTimeout(() => { render(); toast(`${EL[G.goal][1]} ${G.made}/${G.count} — falta${G.count - G.made > 1 ? 'm' : ''} ${G.count - G.made}!`, 1500); }, 350);
+      if (r.r === G.goal) setTimeout(() => { render(); toast(`[${G.goal}] ${G.made}/${G.count} — falta${G.count - G.made > 1 ? 'm' : ''} ${G.count - G.made}!`, 1500); }, 350);
       if (res.perdeu) setTimeout(() => lose(res.perdeu), 400);
     } else {
       // mostra as peças que não reagiram tremendo e só depois as peças úteis que vieram no lugar
@@ -226,13 +258,13 @@
         G.cells[a] = depois[0]; G.cells[b] = depois[1];
         render({ boom: [a, b] });
         if (res.perdeu) return setTimeout(() => lose(res.perdeu), res.perdeu === 'vidas' ? 500 : 400);
-        toast(`💥 Não reagiu! −1 ❤️ — vieram peças úteis no lugar.`, 1800);
+        toast(`💥 Não reagiu! −1 ❤️ e −1 toque — vieram peças úteis no lugar.`, 2000);
       }, 520);
     }
   }
   function win() {
     const extra = G.taps; const stars = extra >= 2 ? '⭐⭐⭐' : extra >= 1 ? '⭐⭐' : '⭐';
-    modal(`<img class="mascot" src="img/mascote-frasco.png" alt=""><h2>Você fez ${G.count > 1 ? G.count + '× ' : ''}${EL[G.goal][0]}!</h2><div class="ico" style="width:70px;height:70px;margin:0 auto;font-size:52px" id="wico"></div><p style="font-size:28px">${stars}</p><p>Sobraram ${extra} toques</p><button class="btn green" data-a="next">Próxima fase</button>`);
+    modal(`<img class="mascot" src="img/mascote-frasco.png" alt="Mascote do Alchemix: um frasco de poção sorridente"><h2>Você fez ${G.count > 1 ? G.count + '× ' : ''}${EL[G.goal][0]}!</h2><div class="ico" style="width:70px;height:70px;margin:0 auto;font-size:52px" id="wico"></div><p style="font-size:28px">${stars}</p><p>Sobraram ${extra} toques</p><button class="btn green" data-a="next">Próxima fase</button>`);
     $('wico').append(ico(G.goal));
   }
   function lose(why) {
@@ -247,7 +279,7 @@
   }
   function addMore() { G.taps += 5; render(); toast('+5 toques'); }
   function help() {
-    modal(`<h2>Como jogar</h2><p>Chegue ao <b>objetivo</b> lá em cima juntando peças.</p><p>Toque numa peça e depois numa <b>vizinha</b>. Se for uma receita, nasce um elemento novo — e você descobre a receita!</p><p>Não reagiu? 💥 Explode, <b>tira uma vida ❤️ e 1 toque</b>, e as duas viram peças úteis. São 3 vidas por fase.</p><p>Os <b>?</b> do objetivo se revelam conforme você descobre. Use poucos toques para ganhar mais estrelas.</p><button class="btn green" data-a="close">Bora!</button>`);
+    modal(`<h2>Como jogar</h2><p>Chegue ao <b>objetivo</b> lá em cima juntando peças.</p><p>Toque numa peça e depois numa <b>vizinha</b> (elas ficam marcadas). Se for uma receita, o elemento novo <b>nasce na 2ª peça</b> que você tocou, e a 1ª recebe a próxima peça da faixa <b>PRÓXIMAS ➜</b>.</p><p>Não reagiu? 💥 Explode, <b>tira uma vida ❤️ e 1 toque</b>, e as duas viram peças úteis. São 3 vidas por fase.</p><p>Os <b>?</b> do objetivo se revelam conforme você descobre. Use poucos toques para ganhar mais estrelas.</p><button class="btn green" data-a="close">Bora!</button>`);
   }
   function book() {
     const vis = visibleRecipes(); const got = vis.filter(r => known.has(r.k)).length;
@@ -259,8 +291,8 @@
     $('card').querySelectorAll('[data-e]').forEach(s => { s.replaceWith(ico(s.dataset.e)); });
   }
   $('pause').onclick = () => modal(`<h2>Pausa</h2><button class="btn green" data-a="close">▶ Continuar</button><button class="btn wood" data-a="restart">↺ Recomeçar fase</button><button class="btn wood" data-a="skip">⏭ Pular fase</button><button class="btn wood" data-a="help">? Como jogar</button>`);
-  $('bookb').onclick = book;
-  $('hintb').onclick = () => { const h = dica(G); if (!h) { toast('Nenhum par útil agora — tente explodir peças que não servem'); return; } hint = h; sel = null; render(); toast('Junte as peças marcadas'); };
+  $('bookb').onclick = $('bookm').onclick = book;
+  $('hintb').onclick = $('hintm').onclick = () => { const h = dica(G); if (!h) { toast('Daqui não fecha sem errar — recomece a fase no ⏸', 2600); return; } hint = h; sel = null; render(); toast('Junte as peças marcadas'); };
   window.addEventListener('resize', () => render());
   start(level);
 })();

@@ -226,13 +226,13 @@
     playing = false; clearInterval(timer);
     const best = Number(store.get(bestKey()) || 0); const rec = score > best; if (rec) store.set(bestKey(), String(score));
     render();
-    modal(`<img class="mascot" src="img/mascote-frasco.png" alt=""><h2>${rec ? 'Novo recorde!' : stuck ? 'Travou!' : 'Fim!'}</h2>${stuck ? '<p>Nenhum vizinho reage mais.</p>' : ''}<p style="font-size:40px;color:var(--ink)">${score} pontos</p><p>${made} combinações · recorde ${Math.max(best, score)}</p>
+    modal(`<img class="mascot" src="img/mascote-frasco.png" alt="Mascote do Alchemix: um frasco de poção sorridente"><h2>${rec ? 'Novo recorde!' : stuck ? 'Travou!' : 'Fim!'}</h2>${stuck ? '<p>Nenhum vizinho reage mais.</p>' : ''}<p style="font-size:40px;color:var(--ink)">${score} pontos</p><p>${made} combinações · recorde ${Math.max(best, score)}</p>
       <button class="btn green" data-m="${mode}">Jogar de novo</button><button class="btn wood" data-a="menu">Menu</button>`);
   }
 
   function menu() {
     playing = false; clearInterval(timer);
-    modal(`<img class="mascot" src="img/mascote-frasco.png" alt=""><h2>Modo Livre</h2>
+    modal(`<img class="mascot" src="img/mascote-frasco.png" alt="Mascote do Alchemix: um frasco de poção sorridente"><h2>Modo Livre</h2>
       <p>Junte vizinhos. Quando chegar num <b>final ★</b> (que não combina com mais nada), ele some e vale pontos: quanto mais longa a receita, mais pontos.</p>
       <p>Lago = 1 · Montanha = 1 · Vidro = 3 · Casinha = 5</p>
       <button class="btn green" data-m="tempo">⏱ 1 minuto</button><button class="btn green" data-m="toques">👆 ${TAPS} toques</button>
