@@ -125,6 +125,20 @@
     .queue .btn.mini:first-of-type { margin-left: auto; }
     .toast { top: calc(50px + env(safe-area-inset-top, 0px)); font-size: 16px !important; }
   }
+  /* ---- vitória comemorada ---- */
+  .card .mascot.pula { animation: pula .7s ease-in-out infinite alternate; }
+  @keyframes pula { from { transform: translateY(0) rotate(-4deg); } to { transform: translateY(-10px) rotate(4deg); } }
+  .estrelas { display: flex; justify-content: center; gap: 6px; }
+  .estrelas span { font-size: 44px; line-height: 1; filter: grayscale(1) brightness(.6); opacity: .35; }
+  .estrelas span.on { filter: none; opacity: 1; animation: brilha .45s ease-out; }
+  @keyframes brilha { 0% { transform: scale(.2) rotate(-40deg); } 60% { transform: scale(1.4) rotate(10deg); } 100% { transform: none; } }
+  .novas { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .novas .row { display: flex; align-items: center; gap: 4px; font-size: 18px; }
+  .novas .ico { width: 30px; height: 30px; font-size: 22px; }
+  .confete { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 31; }
+  .confete i { position: absolute; top: -20px; width: 9px; height: 14px; animation: cai linear forwards; }
+  @keyframes cai { to { transform: translateY(110vh) rotate(720deg); } }
+  @media (prefers-reduced-motion: reduce) { .card .mascot.pula, .estrelas span.on, .confete { animation: none; display: none; } .estrelas span.on { display: inline; } }
 </style>
 
 <div class="app">
@@ -153,6 +167,7 @@
 <div class="modal" id="modal" hidden><div class="box card" id="card"></div></div>
 
 <script src="regras-normal.js"></script>
+<script src="som.js"></script>
 <script>
 (() => {
   const { EL, RECIPES, CHAPTERS, ROWS, COLS, find, producer, leaves, levelInfo, adj, novaFase, jogar, dica } = AlchemixRegras;
@@ -165,7 +180,8 @@
   let level = Number(store.get('receita.level')) || 1;
   let known = new Set(JSON.parse(store.get('receita.book') || '[]'));
   // G = estado da partida (regras-normal.js): cells, queue, taps, lives, done, made...
-  let G, sel = null, busy = false, hint = null;
+  let G, sel = null, busy = false, hint = null, novas = [];
+  const som = (n, x) => AlchemixSom.tocar(n, x);
 
   function ico(e) {
     const d = EL[e]; const s = document.createElement('div'); s.className = 'ico';
@@ -176,7 +192,7 @@
     level = n; store.set('receita.level', String(n));
     const info = levelInfo(n);
     G = novaFase(n);
-    sel = null; hint = null; busy = false;
+    sel = null; hint = null; busy = false; novas = [];
     $('title').innerHTML = `FASE ${n} <small>· Cap. ${info.chapter}</small>`;
     render();
     if (n === 1 && !store.get('receita.seen')) { store.set('receita.seen', '1'); help(); }
@@ -234,7 +250,7 @@
     // peça do objetivo já concluída: fica no tabuleiro, mas não se mexe mais
     if (G.done.includes(i)) { toast(`✓ Essa ${EL[G.cells[i]][0]} já conta para o objetivo`, 1400); return; }
     hint = null;
-    if (sel === null || sel === i || !adj(sel, i)) { sel = sel === i ? null : i; render(); return; }
+    if (sel === null || sel === i || !adj(sel, i)) { sel = sel === i ? null : i; if (sel !== null) som('toque'); render(); return; }
     const a = sel, b = i; sel = null;
     const antes = [G.cells[a], G.cells[b]];
     const res = jogar(G, a, b);
@@ -242,16 +258,19 @@
       const r = res.receita;
       const isNew = !known.has(r.k);
       known.add(r.k); store.set('receita.book', JSON.stringify([...known]));
+      if (isNew) novas.push(r);
+      som(isNew ? 'novo' : 'acerto');
       render({ pop: b, drop: a });
       if (isNew) toast(`✨ Nova receita! [${r.a}] + [${r.b}] = [${r.r}] ${EL[r.r][0]}`, 2600);
       if (res.venceu) return setTimeout(win, 450);
-      if (r.r === G.goal) setTimeout(() => { render(); toast(`[${G.goal}] ${G.made}/${G.count} — falta${G.count - G.made > 1 ? 'm' : ''} ${G.count - G.made}!`, 1500); }, 350);
+      if (r.r === G.goal) setTimeout(() => { som('meta'); render(); toast(`[${G.goal}] ${G.made}/${G.count} — falta${G.count - G.made > 1 ? 'm' : ''} ${G.count - G.made}!`, 1500); }, 350);
       if (res.perdeu) setTimeout(() => lose(res.perdeu), 400);
     } else {
       // mostra as peças que não reagiram tremendo e só depois as peças úteis que vieram no lugar
       const depois = [G.cells[a], G.cells[b]];
       G.cells[a] = antes[0]; G.cells[b] = antes[1];
       busy = true;
+      som('erro');
       render({ shake: [a, b] });
       setTimeout(() => {
         busy = false;
@@ -263,19 +282,38 @@
     }
   }
   function win() {
-    const extra = G.taps; const stars = extra >= 2 ? '⭐⭐⭐' : extra >= 1 ? '⭐⭐' : '⭐';
-    modal(`<img class="mascot" src="img/mascote-frasco.png" alt="Mascote do Alchemix: um frasco de poção sorridente"><h2>Você fez ${G.count > 1 ? G.count + '× ' : ''}${EL[G.goal][0]}!</h2><div class="ico" style="width:70px;height:70px;margin:0 auto;font-size:52px" id="wico"></div><p style="font-size:28px">${stars}</p><p>Sobraram ${extra} toques</p><button class="btn green" data-a="next">Próxima fase</button>`);
+    const extra = G.taps; const n = extra >= 2 ? 3 : extra >= 1 ? 2 : 1;
+    const feitas = novas.map(r => `<div class="row"><span class="ico" data-e="${r.a}"></span>+<span class="ico" data-e="${r.b}"></span>=<span class="ico" data-e="${r.r}"></span> ${EL[r.r][0]}</div>`).join('');
+    modal(`<img class="mascot pula" src="img/mascote-frasco.png" alt="Mascote do Alchemix: um frasco de poção sorridente">
+      <h2>Fase completa!</h2>
+      <p>Você fez ${G.count > 1 ? G.count + '× ' : ''}<b>${EL[G.goal][0]}</b></p>
+      <div class="ico" style="width:70px;height:70px;margin:0 auto;font-size:52px" id="wico"></div>
+      <div class="estrelas" aria-label="${n} de 3 estrelas"><span>⭐</span><span>⭐</span><span>⭐</span></div>
+      <p>${extra ? `Sobraram ${extra} toque${extra > 1 ? 's' : ''}` : 'No último toque!'}${n < 3 ? ' — sobre 2 toques para 3 estrelas' : ''}</p>
+      ${feitas ? `<p>Receitas novas nesta fase:</p><div class="novas">${feitas}</div>` : ''}
+      <button class="btn green" data-a="next">Próxima fase ➜</button>`);
     $('wico').append(ico(G.goal));
+    $('card').querySelectorAll('[data-e]').forEach(x => x.replaceWith(ico(x.dataset.e)));
+    som('vitoria');
+    const est = $('card').querySelectorAll('.estrelas span');
+    for (let k = 0; k < n; k++) setTimeout(() => { if (est[k]) { est[k].classList.add('on'); som('estrela', k); } }, 550 + k * 380);
+    // confete nas cores do jogo
+    const c = document.createElement('div'); c.className = 'confete'; c.setAttribute('aria-hidden', 'true');
+    const cores = ['#f6c544', '#e9c8ff', '#6cc24a', '#e2566b', '#4aa3e0', '#fff4dc'];
+    for (let k = 0; k < 40; k++) { const p = document.createElement('i'); p.style.left = Math.random() * 100 + '%'; p.style.background = cores[k % cores.length]; p.style.animationDuration = 1.6 + Math.random() * 1.6 + 's'; p.style.animationDelay = Math.random() * .6 + 's'; c.append(p); }
+    $('modal').append(c);
   }
   function lose(why) {
     if (G.made >= G.count) return;
     const msg = why === 'vidas' ? 'Acabaram as vidas' : 'Acabaram os toques';
     const extra = why === 'vidas' ? '<button class="btn green" data-a="life">+1 ❤️ (anúncio)</button>' : '<button class="btn green" data-a="more">+5 toques (anúncio)</button>';
+    som('derrota');
     modal(`<h2>${msg}</h2><p>Faltou pouco para ${EL[G.goal][0]}. As receitas que você descobriu ficam no livro.</p>${extra}<button class="btn paper" data-a="restart">Recomeçar</button>`);
   }
   function modal(html) {
+    $('modal').querySelectorAll('.confete').forEach(x => x.remove());
     $('card').innerHTML = html; $('modal').hidden = false;
-    $('card').querySelectorAll('[data-a]').forEach(btn => btn.onclick = () => { $('modal').hidden = true; ({ restart: () => start(level), next: () => start(level + 1), close: () => {}, skip: () => start(level + 1), help: () => help(), more: addMore, life: () => { G.lives = 1; render(); toast('+1 ❤️'); } })[btn.dataset.a](); });
+    $('card').querySelectorAll('[data-a]').forEach(btn => btn.onclick = () => { $('modal').hidden = true; $('modal').querySelectorAll('.confete').forEach(x => x.remove()); ({ restart: () => start(level), next: () => start(level + 1), close: () => {}, skip: () => start(level + 1), help: () => help(), more: addMore, som: () => { AlchemixSom.alternar(); pausa(); }, life: () => { G.lives = 1; render(); toast('+1 ❤️'); } })[btn.dataset.a](); });
   }
   function addMore() { G.taps += 5; render(); toast('+5 toques'); }
   function help() {
@@ -290,7 +328,8 @@
     modal(`<h2>Receitas (${got}/${vis.length})</h2><div class="book">${rows}</div>${locked ? '<p>🔒 Mais receitas chegam com a próxima base.</p>' : ''}<button class="btn green" data-a="close">Fechar</button>`);
     $('card').querySelectorAll('[data-e]').forEach(s => { s.replaceWith(ico(s.dataset.e)); });
   }
-  $('pause').onclick = () => modal(`<h2>Pausa</h2><button class="btn green" data-a="close">▶ Continuar</button><button class="btn wood" data-a="restart">↺ Recomeçar fase</button><button class="btn wood" data-a="skip">⏭ Pular fase</button><button class="btn wood" data-a="help">? Como jogar</button>`);
+  const pausa = () => modal(`<h2>Pausa</h2><button class="btn green" data-a="close">▶ Continuar</button><button class="btn wood" data-a="som">${AlchemixSom.ligado() ? '🔊 Som: ligado' : '🔇 Som: desligado'}</button><button class="btn wood" data-a="restart">↺ Recomeçar fase</button><button class="btn wood" data-a="skip">⏭ Pular fase</button><button class="btn wood" data-a="help">? Como jogar</button>`);
+  $('pause').onclick = pausa;
   $('bookb').onclick = $('bookm').onclick = book;
   $('hintb').onclick = $('hintm').onclick = () => { const h = dica(G); if (!h) { toast('Daqui não fecha sem errar — recomece a fase no ⏸', 2600); return; } hint = h; sel = null; render(); toast('Junte as peças marcadas'); };
   window.addEventListener('resize', () => render());
