@@ -7,6 +7,7 @@ const args = process.argv.slice(2);
 const opt = (nome, padrao) => { const i = args.indexOf(nome); return i >= 0 ? args[i + 1] : padrao; };
 const [de, ate] = (opt('--fases', `1-${totalDeFases()}`)).split('-').map(Number);
 const partidas = Number(opt('--partidas', 2000));
+if (!(de >= 1) || (ate && !(ate >= de))) { console.error('Uso: --fases A-B com 1 ≤ A ≤ B (ex.: --fases 17-31)'); process.exit(1); }
 const json = args.includes('--json');
 
 const medidas = [];

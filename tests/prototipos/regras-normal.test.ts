@@ -23,10 +23,11 @@ function parQueFaz(e: any, alvo: string): [number, number] {
 
 describe('regras do modo Normal', () => {
   it('paridade fase 1 e 20', () => {
-    expect(R.novaFase(1).cells).toEqual(INICIAL_1.cells);
-    expect(R.novaFase(1).queue).toEqual(INICIAL_1.queue);
-    expect(R.novaFase(20).cells).toEqual(INICIAL_20.cells);
-    expect(R.novaFase(20).queue).toEqual(INICIAL_20.queue);
+    // sorteio original (variação 0); fases 1 e 20 não mudaram de meta na reordenação
+    expect(R.gerarFase(1, 0).cells).toEqual(INICIAL_1.cells);
+    expect(R.gerarFase(1, 0).queue).toEqual(INICIAL_1.queue);
+    expect(R.gerarFase(20, 0).cells).toEqual(INICIAL_20.cells);
+    expect(R.gerarFase(20, 0).queue).toEqual(INICIAL_20.queue);
   });
 
   it('toques = mínimo + 2', () => {

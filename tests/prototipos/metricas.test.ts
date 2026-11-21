@@ -42,13 +42,22 @@ describe('medidor de fases', () => {
     expect(seguirDica(e)).toBe(false);
   });
 
+  it('a dica só aponta jogada que ainda vence (Praia, sorteio original)', () => {
+    expect(seguirDica(R.gerarFase(21, 0))).toBe(true);
+  });
+
+  it('sem saída limpa a dica avisa em vez de mandar errar (Sabão, sorteio original)', () => {
+    expect(contarSolucoes(25, { k: 0 }).solucoes).toBe(0);
+    expect(R.dica(R.gerarFase(25, 0))).toBeNull();
+  });
+
   it('fase além do fim', () => {
     expect(() => medirFase(50, { partidas: 100 })).not.toThrow();
   });
 
-  it('tempo da fase mais longa (Árvore, 31)', () => {
+  it('tempo da fase mais longa (Árvore, 32)', () => {
     const t = Date.now();
-    const m = medirFase(31);
+    const m = medirFase(32);
     expect(m.meta).toBe('arvore');
     expect(Date.now() - t).toBeLessThan(20000);
   }, 30000);

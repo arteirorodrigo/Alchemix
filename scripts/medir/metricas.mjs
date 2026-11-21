@@ -2,28 +2,18 @@
 import { createRequire } from 'node:module';
 
 const R = createRequire(import.meta.url)('../../prototipos/regras-normal.js');
-const { novaFase, jogar, paresValidos, dica, caminho, find, levelInfo } = R;
+const { novaFase, gerarFase, copiar, jogar, paresValidos, jogadasUteis, dica, caminho, levelInfo } = R;
 
 // Limites dos alertas (decisão do Claude; o relatório do auditor os cita).
 export const LIMITES = { chuteVence: 0.30, apertada: 0.20, ficouMaisFacil: 0.25 };
 
-// cópia rápida da partida (bases não muda durante o jogo)
-const copiar = (e) => ({ ...e, cells: e.cells.slice(), queue: e.queue.slice(), done: e.done.slice() });
-
-// jogadas que reagem e fazem algo do caminho do objetivo, nas duas ordens (a peça nova nasce em `b`)
-function jogadasUteis(e, path) {
-  const out = [];
-  for (const [a, b] of paresValidos(e)) {
-    const r = find(e.cells[a], e.cells[b]);
-    if (r && path.has(r.r)) out.push([a, b], [b, a]);
-  }
-  return out;
-}
-
 // Conta as sequências de jogadas úteis que vencem sem errar. Estados repetidos são lembrados
 // (mesmo tabuleiro, fila, sorteio, toques e metas → mesmo número de soluções).
-export function contarSolucoes(n, { limiteNos = 200000 } = {}) {
-  const inicio = novaFase(n);
+// `k` (opcional) testa outra variação do sorteio da fase, sem mexer no jogo.
+const fase = (n, k) => k == null ? novaFase(n) : gerarFase(n, k);
+
+export function contarSolucoes(n, { limiteNos = 200000, k } = {}) {
+  const inicio = fase(n, k);
   const path = caminho(inicio.goal);
   const memo = new Map();
   let nos = 0, completo = true;
@@ -60,12 +50,12 @@ function escolherJogada(e, politica, rnd, path) {
 
 // Fração de partidas vencidas por um jogador que segue a `politica`:
 // 'chute' = par vizinho qualquer; 'sabeCaminho' = par útil ao acaso; 'dica' = sempre a dica.
-export function chanceVitoria(n, politica, partidas = 2000, semente = 1) {
+export function chanceVitoria(n, politica, partidas = 2000, semente = 1, k) {
   const rnd = geradorDe(semente);
   const path = caminho(levelInfo(n).goal);
   let vitorias = 0;
   for (let i = 0; i < partidas; i++) {
-    const e = novaFase(n);
+    const e = fase(n, k);
     for (;;) {
       const [a, b] = escolherJogada(e, politica, rnd, path);
       const res = jogar(e, a, b);
@@ -106,16 +96,16 @@ export function alertasCapitulo(medidas) {
   }
 }
 
-export function medirFase(n, { partidas = 2000, limiteNos = 200000 } = {}) {
+export function medirFase(n, { partidas = 2000, limiteNos = 200000, k } = {}) {
   const info = levelInfo(n);
-  const e = novaFase(n);
-  const { solucoes, completo } = contarSolucoes(n, { limiteNos });
+  const e = fase(n, k);
+  const { solucoes, completo } = contarSolucoes(n, { limiteNos, k });
   const m = {
     n, capitulo: info.chapter, meta: info.goal, quantidade: info.count, toques: e.taps, minimo: e.need,
     solucoes, completo,
-    chute: chanceVitoria(n, 'chute', partidas),
-    sabeCaminho: chanceVitoria(n, 'sabeCaminho', partidas),
-    dicaVence: seguirDica(novaFase(n)),
+    chute: chanceVitoria(n, 'chute', partidas, 1, k),
+    sabeCaminho: chanceVitoria(n, 'sabeCaminho', partidas, 1, k),
+    dicaVence: seguirDica(fase(n, k)),
   };
   m.alertas = alertasFase(m);
   return m;

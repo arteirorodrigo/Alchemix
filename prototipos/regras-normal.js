@@ -38,8 +38,8 @@
     { bases: ['agua', 'fogo'], goals: ['vapor:2', 'sol:2', 'lago:3', 'nuvem', 'chuva'] },
     { bases: ['agua', 'fogo', 'terra'], goals: ['barro:2', 'tijolo', 'obsidiana', 'areia', 'minerio', 'lava:3', 'montanha:3', 'vaso', 'vidro', 'metal', 'casinha'] },
     { bases: ['agua', 'fogo', 'terra', 'vento'], goals: ['raio:2', 'onda:2', 'poeira:3', 'tornado:3', 'praia', 'tempestade'] },
-    { bases: ['agua', 'fogo', 'terra', 'vento', 'vida'], goals: ['flor:2', 'musgo:2', 'sabao', 'pantano', 'cinza:3', 'passaro:3', 'arcoiris', 'arbusto:3', 'arvore'] },
-    { bases: ['agua', 'fogo', 'terra', 'vento', 'vida'], goals: ['peixe:2', 'abelha:2', 'deserto', 'ilha', 'ferramenta', 'mel', 'fazenda', 'castelo'] },
+    { bases: ['agua', 'fogo', 'terra', 'vento', 'vida'], goals: ['flor:2', 'musgo:2', 'sabao', 'pantano', 'cinza:3', 'passaro:3', 'arbusto:3', 'arcoiris', 'mel', 'arvore'] },
+    { bases: ['agua', 'fogo', 'terra', 'vento', 'vida'], goals: ['deserto', 'ilha', 'ferramenta', 'peixe:2', 'abelha:2', 'fazenda', 'castelo'] },
   ];
   const ALLGOALS = CHAPTERS.flatMap(c => c.goals);
   const parseGoal = (s) => { const [goal, n] = s.split(':'); return { goal, count: Number(n) || 1 }; };
@@ -66,14 +66,20 @@
   const pick = (e, xs) => xs[Math.floor(rand(e) * xs.length)];
   const sortear = (e) => rand(e) < 0.3 ? pick(e, leaves(e.goal)) : pick(e, e.bases);
 
-  function novaFase(n) {
+  // Ajuste de sorteio por fase (escolhido por scripts/escolher-sementes.mjs): a fase n usa a
+  // variação k do sorteio para que dê para vencer sabendo as receitas e a dica funcione.
+  const AJUSTE = {1:4,2:17,4:56,5:19,7:7,8:14,9:32,10:8,12:29,13:13,14:26,15:33,16:36,19:46,20:38,21:3,22:10,25:3,27:34,28:25,29:48,30:14,31:44,32:13,33:9,34:33,35:22,36:7,37:50,38:49,39:50};
+  // Atenção: campo novo e mutável no estado precisa entrar também em copiar() (logo abaixo).
+  function gerarFase(n, k = 0) {
     const info = levelInfo(n);
-    const e = { n, goal: info.goal, count: info.count, made: 0, need: steps(info.goal) * info.count, bases: info.bases, cells: [], queue: [], s: (n * 104729 + 7) >>> 0, taps: 0, lives: 3, done: [] };
+    const e = { n, goal: info.goal, count: info.count, made: 0, need: steps(info.goal) * info.count, bases: info.bases, cells: [], queue: [], s: (n * 104729 + 7 + k * 7919) >>> 0, taps: 0, lives: 3, done: [] };
     e.cells = Array.from({ length: ROWS * COLS }, () => sortear(e));
     e.queue = [0, 0, 0].map(() => sortear(e));
     e.taps = e.need + 2;
     return e;
   }
+  const novaFase = (n) => gerarFase(n, AJUSTE[n] || 0);
+  const copiar = (e) => ({ ...e, cells: e.cells.slice(), queue: e.queue.slice(), done: e.done.slice() });
   function proximaPeca(e) { e.queue.push(sortear(e)); return e.queue.shift(); }
   // peça "útil": folha do objetivo que está em falta no tabuleiro
   function util(e) {
@@ -108,18 +114,43 @@
     for (let a = 0; a < e.cells.length; a++) for (const b of [a + 1, a + COLS]) if (b < e.cells.length && adj(a, b) && !e.done.includes(a) && !e.done.includes(b)) out.push([a, b]);
     return out;
   }
-  // dica: o par vizinho que faz a peça mais avançada do caminho do objetivo
-  function dica(e) {
+  // jogadas que reagem e fazem algo do caminho do objetivo, nas duas ordens (o novo nasce em `b`)
+  function jogadasUteis(e, path = caminho(e.goal)) {
+    const out = [];
+    for (const [a, b] of paresValidos(e)) { const r = find(e.cells[a], e.cells[b]); if (r && path.has(r.r)) out.push([a, b], [b, a]); }
+    return out;
+  }
+  // dica antiga: o par que faz a peça mais avançada do caminho (usada só se a busca não decidir)
+  function dicaGulosa(e) {
     const path = caminho(e.goal);
     let best = null, bestTier = -1;
-    for (let a = 0; a < e.cells.length; a++) for (let b = 0; b < e.cells.length; b++) {
-      if (!adj(a, b) || e.done.includes(a) || e.done.includes(b)) continue; const r = find(e.cells[a], e.cells[b]); if (!r || !path.has(r.r)) continue;
-      const tier = steps(r.r); if (tier > bestTier) { bestTier = tier; best = [a, b]; }
-    }
+    for (const [a, b] of jogadasUteis(e, path)) { const t = steps(find(e.cells[a], e.cells[b]).r); if (t > bestTier) { bestTier = t; best = [a, b]; } }
     return best;
   }
+  // dica: uma jogada que ainda leva à vitória sem errar (busca), da peça mais avançada para a mais simples.
+  // Devolve null quando daqui não dá mais para vencer sem errar.
+  function dica(e, limiteNos = 30000) {
+    const path = caminho(e.goal);
+    let nos = 0, estourou = false;
+    const ordenar = (x, js) => js.map(j => [steps(find(x.cells[j[0]], x.cells[j[1]]).r), j]).sort((p, q) => q[0] - p[0]).map(p => p[1]);
+    function vence(x) {
+      if (++nos > limiteNos) { estourou = true; return false; }
+      for (const [a, b] of ordenar(x, jogadasUteis(x, path))) {
+        const f = copiar(x); const res = jogar(f, a, b);
+        if (res.venceu || (!res.perdeu && vence(f))) return true;
+        if (estourou) return false;
+      }
+      return false;
+    }
+    for (const j of ordenar(e, jogadasUteis(e, path))) {
+      const f = copiar(e); const res = jogar(f, j[0], j[1]);
+      if (res.venceu || (!res.perdeu && vence(f))) return j;
+      if (estourou) return dicaGulosa(e);
+    }
+    return null;
+  }
 
-  const api = { EL, BASE, RECIPES, CHAPTERS, ROWS, COLS, find, producer, leaves, steps, caminho, levelInfo, adj, rand, novaFase, jogar, paresValidos, dica };
+  const api = { EL, BASE, RECIPES, CHAPTERS, ROWS, COLS, AJUSTE, find, producer, leaves, steps, caminho, levelInfo, adj, rand, gerarFase, novaFase, copiar, jogar, paresValidos, jogadasUteis, dica };
   g.AlchemixRegras = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
