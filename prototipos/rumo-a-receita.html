@@ -117,6 +117,20 @@
   .frasco span.ok { border: 2px solid var(--grass-shade); background: #e6f6d8; }
   .frasco span.novo { animation: pop .4s ease-out; }
   .frasco .ico { width: 100%; height: 100%; }
+  /* ---- tela Fases ---- */
+  .fases { position: fixed; inset: 0; z-index: 25; overflow-y: auto; padding: 10px max(12px, env(safe-area-inset-left, 0px)) 24px; box-sizing: border-box;
+    background: linear-gradient(#3b1f6ef2, #2a1033f2); }
+  .fases .in { max-width: 440px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+  .fases .cap { padding: 8px 10px; }
+  .fases .cap h3 { margin: 0 0 8px; font-weight: 400; font-size: 21px; display: flex; align-items: center; gap: 8px; color: var(--gold); }
+  .fases .cap h3 .ico { width: 28px; height: 28px; }
+  .fases .g { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .fases .f { min-height: 48px; background: #fff4dc; color: var(--night); border: 2px solid var(--night-dark); font: 22px/1 var(--display); padding: 4px 0 2px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+  .fases .f small { font-size: 15px; letter-spacing: 0; color: #e0a100; min-height: 15px; line-height: 1; }
+  .fases .f.at { background: var(--grass); color: #fff; box-shadow: 0 0 12px #fff8; }
+  .fases .f.at small { color: #fff; }
+  .fases .f.lk { background: var(--woodD); color: var(--gold-dark); cursor: default; font-size: 18px; }
+  .fases .resumo { text-align: center; color: var(--lilac); font-size: 17px; }
   .ajudas-mini { display: none; margin-left: auto; gap: 6px; }
   .ganho { background: #fff8e6; border: 2px solid var(--night-dark); padding: 6px 10px; text-align: left; font-size: 17px; }
   .ganho div { display: flex; justify-content: space-between; }
@@ -193,6 +207,7 @@
     <button class="btn ib wood aj" id="maisb" aria-label="Mais 3 toques"><b class="mais3">+3</b><span class="qt" id="q-toques"></span></button>
   </div>
 </div>
+<div class="fases" id="fases" hidden></div>
 <div class="box toast" id="toast" hidden></div>
 <div class="modal" id="modal" hidden><div class="box card" id="card"></div></div>
 
@@ -218,6 +233,9 @@
   let moedas = Number(store.get('alchemix.moedas')) || 0;
   let aj = (() => { try { return JSON.parse(store.get('alchemix.ajudas')) || null; } catch { return null; } })() || { dica: 3, martelo: 2, toques: 1 };
   let martelo = false, ultimoGanho = 0;
+  // progresso: melhores estrelas por fase e a fase mais longe alcançada
+  let estrelas = (() => { try { return JSON.parse(store.get('receita.estrelas')) || {}; } catch { return {}; } })();
+  let maxFase = Math.max(Number(store.get('receita.max')) || 1, Number(store.get('receita.level')) || 1);
   const salvar = () => { store.set('alchemix.moedas', String(moedas)); store.set('alchemix.ajudas', JSON.stringify(aj)); };
   // usa uma ajuda: gasta do estoque ou compra com moedas. Devolve false se não deu.
   function pagar(nome) {
@@ -234,6 +252,7 @@
   }
   function start(n) {
     level = n; store.set('receita.level', String(n));
+    if (n > maxFase) { maxFase = n; store.set('receita.max', String(maxFase)); }
     const info = levelInfo(n);
     G = novaFase(n);
     // carrega antes as artes que esta fase usa (bases e o caminho do objetivo)
@@ -360,6 +379,8 @@
     if (extra > 0) ganho.linhas.push([`👆 ${extra} toque${extra > 1 ? 's' : ''} sobrando`, 5 * extra]);
     ganho.total = ganho.linhas.reduce((a, l) => a + l[1], 0);
     ultimoGanho = ganho.total; moedas += ganho.total; salvar();
+    estrelas[level] = Math.max(estrelas[level] || 0, n); store.set('receita.estrelas', JSON.stringify(estrelas));
+    if (level + 1 > maxFase) { maxFase = level + 1; store.set('receita.max', String(maxFase)); }
     const feitas = novas.map(r => `<div class="row"><span class="ico" data-e="${r.a}"></span>+<span class="ico" data-e="${r.b}"></span>=<span class="ico" data-e="${r.r}"></span> ${EL[r.r][0]}</div>`).join('');
     modal(`<img class="mascot pula" src="img/mascote-frasco.webp" alt="Mascote do Alchemix: um frasco de poção sorridente">
       <h2>Fase completa!</h2>
@@ -392,9 +413,41 @@
   function modal(html) {
     $('modal').querySelectorAll('.confete').forEach(x => x.remove());
     $('card').innerHTML = html; $('modal').hidden = false;
-    $('card').querySelectorAll('[data-a]').forEach(btn => btn.onclick = () => { $('modal').hidden = true; $('modal').querySelectorAll('.confete').forEach(x => x.remove()); ({ restart: () => start(level), next: () => start(level + 1), close: () => {}, skip: () => start(level + 1), help: () => help(), more: () => anuncio(addMore), dobrar, som: () => { AlchemixSom.alternar(); pausa(); }, life: () => anuncio(() => { G.lives = 1; render(); toast('+1 ❤️'); }) })[btn.dataset.a](); });
+    $('card').querySelectorAll('[data-a]').forEach(btn => btn.onclick = () => { $('modal').hidden = true; $('modal').querySelectorAll('.confete').forEach(x => x.remove()); ({ restart: () => start(level), next: () => start(level + 1), close: () => {}, skip: () => start(level + 1), help: () => help(), more: () => anuncio(addMore), dobrar, fases, som: () => { AlchemixSom.alternar(); pausa(); }, life: () => anuncio(() => { G.lives = 1; render(); toast('+1 ❤️'); }) })[btn.dataset.a](); });
   }
   function addMore() { G.taps += 5; render(); toast('+5 toques'); }
+  // tela Fases: capítulos com a grade de fases, estrelas e cadeado
+  const NOMES_CAP = ['Água + Fogo', 'Terra', 'Vento', 'Vida', 'Mundo'];
+  function fases() {
+    const el = $('fases'); el.textContent = '';
+    const inn = document.createElement('div'); inn.className = 'in';
+    inn.innerHTML = `<div class="top"><button class="btn ib night" id="fasesVolta" aria-label="Voltar">✕</button><div class="title night">FASES</div><div class="moedas night">🪙 ${moedas}</div></div>`;
+    const total = Object.values(estrelas).reduce((a, b) => a + b, 0);
+    let n = 1;
+    CHAPTERS.forEach((ch, c) => {
+      const box = document.createElement('div'); box.className = 'box night cap';
+      const trancado = n > maxFase;
+      const h = document.createElement('h3'); h.append(ico(c === 4 ? 'ilha' : ch.bases[ch.bases.length - 1]), `Cap. ${c + 1} · ${NOMES_CAP[c] || ''}${trancado ? ' 🔒' : ''}`);
+      const g = document.createElement('div'); g.className = 'g';
+      ch.goals.forEach(() => {
+        const f = document.createElement('button'); const k = n; f.className = 'f';
+        if (k > maxFase) { f.classList.add('lk'); f.textContent = '🔒'; f.setAttribute('aria-label', `Fase ${k}, trancada`); }
+        else {
+          const st = estrelas[k] || 0;
+          f.innerHTML = `${k}<small>${k === level ? 'agora' : st ? '★'.repeat(st) + '☆'.repeat(3 - st) : ''}</small>`;
+          if (k === level) f.classList.add('at');
+          f.setAttribute('aria-label', `Fase ${k}${st ? `, ${st} estrelas` : ''}`);
+          f.onclick = () => { el.hidden = true; history.replaceState(null, '', location.pathname); som('toque'); start(k); };
+        }
+        g.append(f); n++;
+      });
+      box.append(h, g); inn.append(box);
+    });
+    const r = document.createElement('div'); r.className = 'resumo'; r.textContent = `⭐ ${total} de ${(n - 1) * 3} estrelas`; inn.append(r);
+    el.append(inn); el.hidden = false; $('modal').hidden = true;
+    $('fasesVolta').onclick = () => { el.hidden = true; history.replaceState(null, '', location.pathname); };
+    const at = el.querySelector('.f.at'); if (at) at.scrollIntoView({ block: 'center' });
+  }
   // anúncio com recompensa (simulado; aqui entra o AdMob)
   function anuncio(depois) {
     modal(`<h2>📺 Anúncio</h2><p>Simulado — aqui entra o anúncio em vídeo.</p><p style="font-size:44px" id="cont">3</p>`);
@@ -413,7 +466,7 @@
     modal(`<h2>Receitas (${got}/${vis.length})</h2><div class="book">${rows}</div>${locked ? '<p>🔒 Mais receitas chegam com a próxima base.</p>' : ''}<button class="btn green" data-a="close">Fechar</button>`);
     $('card').querySelectorAll('[data-e]').forEach(s => { s.replaceWith(ico(s.dataset.e)); });
   }
-  const pausa = () => modal(`<h2>Pausa</h2><button class="btn green" data-a="close">▶ Continuar</button><button class="btn wood" data-a="som">${AlchemixSom.ligado() ? '🔊 Som: ligado' : '🔇 Som: desligado'}</button><button class="btn wood" data-a="restart">↺ Recomeçar fase</button><button class="btn wood" data-a="skip">⏭ Pular fase</button><button class="btn wood" data-a="help">? Como jogar</button>`);
+  const pausa = () => modal(`<h2>Pausa</h2><button class="btn green" data-a="close">▶ Continuar</button><button class="btn wood" data-a="som">${AlchemixSom.ligado() ? '🔊 Som: ligado' : '🔇 Som: desligado'}</button><button class="btn wood" data-a="fases">🗺 Fases</button><button class="btn wood" data-a="restart">↺ Recomeçar fase</button><button class="btn wood" data-a="skip">⏭ Pular fase</button><button class="btn wood" data-a="help">? Como jogar</button>`);
   $('pause').onclick = pausa;
   $('bookb').onclick = book;
   $('martb').onclick = () => { if (martelo) { martelo = false; render(); toast('Martelo guardado', 1000); return; } if (!podePagar('martelo')) { pagar('martelo'); return; } martelo = true; sel = null; hint = null; render(); toast('🔨 Toque na peça que quer quebrar (de novo no 🔨 para cancelar)', 2400); };
@@ -425,5 +478,6 @@
   $('hintb').onclick = () => { const h = dica(G); if (!h) { toast('Daqui não dá mais para chegar ao objetivo — recomece a fase no ⏸', 2600); return; } if (!pagar('dica')) return; hint = h; sel = null; render(); toast('Junte as peças marcadas'); };
   window.addEventListener('resize', () => render());
   start(level);
+  if (location.hash === '#fases') fases();
 })();
 </script>
