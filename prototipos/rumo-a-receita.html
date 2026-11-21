@@ -2,7 +2,7 @@
 <title>Alchemix</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
-  @font-face { font-family: 'Jersey 10'; src: url('Jersey10.ttf') format('truetype'); font-weight: 400 700; font-display: swap; }
+  @font-face { font-family: 'Jersey 10'; src: url('Jersey10.woff2') format('woff2'), url('Jersey10.ttf') format('truetype'); font-weight: 400 700; font-display: swap; }
   /* Teste: objetivo final + tabuleiro sempre cheio + descobrir receitas com toques limitados. Visual do protótipo. */
   :root {
     --sky: #7fc4ea; --ink: #2f1f2b; --paper: #f6ecd2; --paper-shade: #d9c49a;
@@ -185,13 +185,15 @@
 
   function ico(e) {
     const d = EL[e]; const s = document.createElement('div'); s.className = 'ico';
-    if (d && d[2]) { const im = document.createElement('img'); im.src = 'img/elementos/' + d[2] + '.png'; im.alt = d[0]; s.append(im); } else s.textContent = d ? d[1] : '?';
+    if (d && d[2]) { const im = document.createElement('img'); im.src = 'img/elementos/' + d[2] + '.webp'; im.alt = d[0]; im.onerror = () => { s.textContent = d[1]; }; s.append(im); } else s.textContent = d ? d[1] : '?';
     return s;
   }
   function start(n) {
     level = n; store.set('receita.level', String(n));
     const info = levelInfo(n);
     G = novaFase(n);
+    // carrega antes as artes que esta fase usa (bases e o caminho do objetivo)
+    new Set([...G.bases, ...AlchemixRegras.caminho(G.goal)]).forEach(e => { if (EL[e] && EL[e][2]) new Image().src = 'img/elementos/' + EL[e][2] + '.webp'; });
     sel = null; hint = null; busy = false; novas = [];
     $('title').innerHTML = `FASE ${n} <small>· Cap. ${info.chapter}</small>`;
     render();
@@ -280,7 +282,7 @@
   function win() {
     const extra = G.taps; const n = extra >= 2 ? 3 : extra >= 1 ? 2 : 1;
     const feitas = novas.map(r => `<div class="row"><span class="ico" data-e="${r.a}"></span>+<span class="ico" data-e="${r.b}"></span>=<span class="ico" data-e="${r.r}"></span> ${EL[r.r][0]}</div>`).join('');
-    modal(`<img class="mascot pula" src="img/mascote-frasco.png" alt="Mascote do Alchemix: um frasco de poção sorridente">
+    modal(`<img class="mascot pula" src="img/mascote-frasco.webp" alt="Mascote do Alchemix: um frasco de poção sorridente">
       <h2>Fase completa!</h2>
       <p>Você fez ${G.count > 1 ? G.count + '× ' : ''}<b>${EL[G.goal][0]}</b></p>
       <div class="ico" style="width:70px;height:70px;margin:0 auto;font-size:52px" id="wico"></div>

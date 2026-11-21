@@ -6,7 +6,7 @@
 <title>Alchemix - Modo Livre</title>
 <style>
   /* TESTE PROVISÓRIO do Modo Livre: junte vizinhos, finais somem e pontuam, peças caem e entram bases no topo. */
-  @font-face { font-family: 'Jersey 10'; src: url('../Jersey10.ttf') format('truetype'); font-weight: 400 700; }
+  @font-face { font-family: 'Jersey 10'; src: url('../Jersey10.woff2') format('woff2'), url('../Jersey10.ttf') format('truetype'); font-weight: 400 700; font-display: swap; }
   :root {
     --ink: #2a1033; --paper: #f6ecd2; --paper-shade: #d9c49a; --gold: #f6c544; --gold-dark: #c9962e;
     --night: #2a1033; --wood: #4a2c18; --wood-dark: #2e1a0e; --grass: #5dbb4a; --grass-shade: #2e6b24;
@@ -124,7 +124,7 @@
 
   function ico(e) {
     const s = document.createElement('div'); s.className = 'ico'; const d = EL[e];
-    if (d[2]) { const im = document.createElement('img'); im.src = '../img/elementos/' + d[2] + '.png'; im.alt = d[0]; s.append(im); } else s.textContent = d[1];
+    if (d[2]) { const im = document.createElement('img'); im.src = '../img/elementos/' + d[2] + '.webp'; im.onerror = () => { im.replaceWith(d[1]); }; im.alt = d[0]; s.append(im); } else s.textContent = d[1];
     return s;
   }
   // tamanho da peça pelo espaço que sobra de verdade para o tabuleiro (moldura: 2×(8 de margem + 3 de borda))
@@ -226,13 +226,13 @@
     playing = false; clearInterval(timer);
     const best = Number(store.get(bestKey()) || 0); const rec = score > best; if (rec) store.set(bestKey(), String(score));
     render();
-    modal(`<img class="mascot" src="img/mascote-frasco.png" alt="Mascote do Alchemix: um frasco de poção sorridente"><h2>${rec ? 'Novo recorde!' : stuck ? 'Travou!' : 'Fim!'}</h2>${stuck ? '<p>Nenhum vizinho reage mais.</p>' : ''}<p style="font-size:40px;color:var(--ink)">${score} pontos</p><p>${made} combinações · recorde ${Math.max(best, score)}</p>
+    modal(`<img class="mascot" src="img/mascote-frasco.webp" alt="Mascote do Alchemix: um frasco de poção sorridente"><h2>${rec ? 'Novo recorde!' : stuck ? 'Travou!' : 'Fim!'}</h2>${stuck ? '<p>Nenhum vizinho reage mais.</p>' : ''}<p style="font-size:40px;color:var(--ink)">${score} pontos</p><p>${made} combinações · recorde ${Math.max(best, score)}</p>
       <button class="btn green" data-m="${mode}">Jogar de novo</button><button class="btn wood" data-a="menu">Menu</button>`);
   }
 
   function menu() {
     playing = false; clearInterval(timer);
-    modal(`<img class="mascot" src="img/mascote-frasco.png" alt="Mascote do Alchemix: um frasco de poção sorridente"><h2>Modo Livre</h2>
+    modal(`<img class="mascot" src="img/mascote-frasco.webp" alt="Mascote do Alchemix: um frasco de poção sorridente"><h2>Modo Livre</h2>
       <p>Junte vizinhos. Quando chegar num <b>final ★</b> (que não combina com mais nada), ele some e vale pontos: quanto mais longa a receita, mais pontos.</p>
       <p>Lago = 1 · Montanha = 1 · Vidro = 3 · Casinha = 5</p>
       <button class="btn green" data-m="tempo">⏱ 1 minuto</button><button class="btn green" data-m="toques">👆 ${TAPS} toques</button>
