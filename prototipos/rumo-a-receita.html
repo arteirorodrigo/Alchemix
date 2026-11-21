@@ -327,7 +327,7 @@
   const pausa = () => modal(`<h2>Pausa</h2><button class="btn green" data-a="close">▶ Continuar</button><button class="btn wood" data-a="som">${AlchemixSom.ligado() ? '🔊 Som: ligado' : '🔇 Som: desligado'}</button><button class="btn wood" data-a="restart">↺ Recomeçar fase</button><button class="btn wood" data-a="skip">⏭ Pular fase</button><button class="btn wood" data-a="help">? Como jogar</button>`);
   $('pause').onclick = pausa;
   $('bookb').onclick = $('bookm').onclick = book;
-  $('hintb').onclick = $('hintm').onclick = () => { const h = dica(G); if (!h) { toast('Daqui não fecha sem errar — recomece a fase no ⏸', 2600); return; } hint = h; sel = null; render(); toast('Junte as peças marcadas'); };
+  $('hintb').onclick = $('hintm').onclick = () => { const h = dica(G); if (!h) { toast('Daqui não dá mais para chegar ao objetivo — recomece a fase no ⏸', 2600); return; } hint = h; sel = null; render(); toast('Junte as peças marcadas'); };
   window.addEventListener('resize', () => render());
   start(level);
 })();
