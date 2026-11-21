@@ -104,7 +104,9 @@
       }
     } else {
       e.lives--; e.taps--;
-      e.cells[a] = util(e); e.cells[b] = util(e);
+      // só peça básica vira peça útil; elemento já feito fica no lugar (não se perde progresso)
+      if (BASE.includes(e.cells[a])) e.cells[a] = util(e);
+      if (BASE.includes(e.cells[b])) e.cells[b] = util(e);
     }
     const perdeu = venceu ? false : e.lives <= 0 ? 'vidas' : e.taps <= 0 ? 'toques' : false;
     return { tipo: r ? 'receita' : 'erro', receita: r, venceu, perdeu };

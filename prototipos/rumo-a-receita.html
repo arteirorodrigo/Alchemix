@@ -277,7 +277,7 @@
         G.cells[a] = depois[0]; G.cells[b] = depois[1];
         render({ boom: [a, b] });
         if (res.perdeu) return setTimeout(() => lose(res.perdeu), res.perdeu === 'vidas' ? 500 : 400);
-        toast(`💥 Não reagiu! −1 ❤️ e −1 toque — vieram peças úteis no lugar.`, 2000);
+        toast(`💥 Não reagiu! −1 ❤️ e −1 toque${(() => { const nb = antes.filter(x => AlchemixRegras.BASE.includes(x)).length; return nb === 2 ? ' — vieram peças úteis no lugar' : nb === 1 ? ' — a peça básica virou útil; a sua ficou' : ' — suas peças ficaram no lugar'; })()}.`, 2000);
       }, 520);
     }
   }
@@ -317,7 +317,7 @@
   }
   function addMore() { G.taps += 5; render(); toast('+5 toques'); }
   function help() {
-    modal(`<h2>Como jogar</h2><p>Chegue ao <b>objetivo</b> lá em cima juntando peças.</p><p>Toque numa peça e depois numa <b>vizinha</b> (elas ficam marcadas). Se for uma receita, o elemento novo <b>nasce na 2ª peça</b> que você tocou, e a 1ª recebe a próxima peça da faixa <b>PRÓXIMAS ➜</b>.</p><p>Não reagiu? 💥 Explode, <b>tira uma vida ❤️ e 1 toque</b>, e as duas viram peças úteis. São 3 vidas por fase.</p><p>Os <b>?</b> do objetivo se revelam conforme você descobre. Use poucos toques para ganhar mais estrelas.</p><button class="btn green" data-a="close">Bora!</button>`);
+    modal(`<h2>Como jogar</h2><p>Chegue ao <b>objetivo</b> lá em cima juntando peças.</p><p>Toque numa peça e depois numa <b>vizinha</b> (elas ficam marcadas). Se for uma receita, o elemento novo <b>nasce na 2ª peça</b> que você tocou, e a 1ª recebe a próxima peça da faixa <b>PRÓXIMAS ➜</b>.</p><p>Não reagiu? 💥 <b>Tira uma vida ❤️ e 1 toque</b>. Peça básica que errou vira uma peça útil; elemento que você já fez <b>fica no lugar</b>. São 3 vidas por fase.</p><p>Os <b>?</b> do objetivo se revelam conforme você descobre. Use poucos toques para ganhar mais estrelas.</p><button class="btn green" data-a="close">Bora!</button>`);
   }
   function book() {
     const vis = visibleRecipes(); const got = vis.filter(r => known.has(r.k)).length;
